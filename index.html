@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Foundation | Welcome</title>
+    <title>Search</title>
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" href="css/ionicons.min.css" />
     <link rel="stylesheet" href="css/style.css" />
@@ -30,12 +30,12 @@
     <div class="row" data-bind="if: searchedGames().length>0 || searching">
       <div id="results" class="large-12 columns" >
         <div class="text-center" data-bind="if: searching"><i class="icon ion-loading-c icon-large"></i></div>
-          <table data-bind="if: searchedGames().length>0" class="">
+          <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">
             <thead>
               <tr>
                 <th width="200"></th>
-                <th>Title</th>
-                <th>Rank</th>
+                <th data-bind="click: sortByName">Title</th>
+                <th data-bind="click: sortByRank">Rank</th>
               </tr>
             </thead>
             <tbody data-bind="foreach: searchedGames">

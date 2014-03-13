@@ -7,6 +7,45 @@ ViewModel = function() {
     self = this; 
     self.searchedGames = ko.observableArray();
     self.searching = ko.observable(null);
+    var nameDirection = -1;
+    var rankDirection = 1;
+
+    self.sortByName = function(i,j){
+    	$("#results-table thead tr th").removeClass("headerSortUp")
+    	$("#results-table thead tr th").removeClass("headerSortDown")
+        nameDirection = -nameDirection;
+        if (nameDirection == 1) {        	
+    		$(j.toElement).addClass("headerSortDown") 
+        }
+        else {       	
+    		$(j.toElement).addClass("headerSortUp")
+        }
+        self.searchedGames.sort(function(a, b){
+            if (self.getName(a.name) > self.getName(b.name)) return 1 * nameDirection;
+            if (self.getName(a.name) < self.getName(b.name)) return -1 * nameDirection;
+            return 0;
+        });
+    };
+
+    self.sortByRank = function(i,j){
+    	$("#results-table thead tr th").removeClass("headerSortUp")
+    	$("#results-table thead tr th").removeClass("headerSortDown")
+        rankDirection = -rankDirection;
+        if (rankDirection == 1) {        	
+    		$(j.toElement).addClass("headerSortDown")  
+        }
+        else {      	
+    		$(j.toElement).addClass("headerSortUp")
+        }
+        self.searchedGames.sort(function(a, b){
+            if (self.getRank(a.statistics) > self.getRank(b.statistics)) return 1 * rankDirection;
+            if (self.getRank(a.statistics) < self.getRank(b.statistics)) return -1 * rankDirection;
+            return 0;
+        });
+    };
+
+
+
     self.getRank = function(stats) {
         console.log(stats)
         return stats.ratings.bayesaverage.value
@@ -28,7 +67,7 @@ ViewModel = function() {
          "q=select%20*%20from%20xml%20where%20url%3D%22" + 
          encodeURIComponent(url) + 
          "%22&format=xml'&callback=?", function(data){
-            self.populateGames(data)
+            self.populateGames(data);
          });
         }; 
     self.populateGames = function(data) {

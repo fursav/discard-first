@@ -1,0 +1,20 @@
+.icon-large{
+	font-size: 2em;
+}
+/* tables */
+
+
+table thead tr {
+	cursor: pointer;
+}
+
+.headerSortUp:after {
+	font-family: "Ionicons";
+	content: "\f10d";
+	float: right;
+}
+.headerSortDown:after {
+	font-family: "Ionicons";
+	content: "\f104";
+	float: right;
+}
