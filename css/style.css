@@ -3,6 +3,9 @@
 }
 /* tables */
 
+table {
+	border: 0px;
+}
 
 table thead tr {
 	cursor: pointer;

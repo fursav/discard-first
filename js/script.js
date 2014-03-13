@@ -6,9 +6,14 @@ ViewModel = function() {
     var self; 
     self = this; 
     self.searchedGames = ko.observableArray();
+    self.selectedGame = ko.observable()
     self.searching = ko.observable(null);
     var nameDirection = -1;
     var rankDirection = 1;
+
+    self.goToGame = function(object) { 
+    	self.selectedGame(object);
+    };
 
     self.sortByName = function(i,j){
     	$("#results-table thead tr th").removeClass("headerSortUp")
@@ -59,6 +64,13 @@ ViewModel = function() {
     self.getShortDescription = function(description) {
         return description.slice(0,100) + "...";
     } 
+
+    self.parseDescription = function(description) {
+    	var regex = new RegExp('&#10;', 'g');
+    	console.log(description.replace(regex,"<br>"));
+    	return description.replace(regex,"<br>")
+    }
+
     self.searchGames = function() { 
         self.searchedGames.removeAll();
         self.searching(true);
@@ -82,7 +94,6 @@ ViewModel = function() {
             }
             else {
                 ids.push(jdata["boardgame"]["objectid"])    
-                console.log(ids)          
             }
             self.getGamesDetails(ids)
         }
@@ -101,6 +112,9 @@ ViewModel = function() {
                         if (gdata["thumbnail"] == null) {
                             gdata["thumbnail"] = "";
                         }
+                        console.log(gdata)
+                        //onsole.log($("<div/>").html(gdata.description).text())
+                        //console.log(gdata.description)
                         self.searchedGames.push(gdata);
                     }
                  });
