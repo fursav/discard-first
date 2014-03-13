@@ -21,3 +21,36 @@ table thead tr {
 	content: "\f104";
 	float: right;
 }
+
+/* definition lists */
+
+dl.inline dt, dl.inline dd {
+    display: inline;
+    margin: 0 5em 0 0;
+}
+
+dl.inline dt {
+    font-weight: bold;
+}
+dl.inline dd:before {
+    content: " ";
+}
+dl.inline dt:before { /* forces a new line */
+    white-space: pre;
+    content: "\A"; /* newline character */
+    font-size: 130%; /* a little extra spacing */
+    vertical-align: top;
+}
+dl.inline dt:first-child:before { /* first line */
+    content: "";
+    font-size: 100%;
+}
+
+.spaced-rows .row {
+	margin-bottom: 1em;
+}
+
+img.radius {
+	-webkit-border-radius: 5px;
+    border-radius: 5px;
+}

@@ -9,7 +9,7 @@ ViewModel = function() {
     self.selectedGame = ko.observable()
     self.searching = ko.observable(null);
     var nameDirection = -1;
-    var rankDirection = 1;
+    var bratingDirection = 1;
 
     self.goToGame = function(object) { 
     	self.selectedGame(object);
@@ -32,29 +32,48 @@ ViewModel = function() {
         });
     };
 
-    self.sortByRank = function(i,j){
+    self.sortByBRating = function(i,j){
     	$("#results-table thead tr th").removeClass("headerSortUp")
     	$("#results-table thead tr th").removeClass("headerSortDown")
-        rankDirection = -rankDirection;
-        if (rankDirection == 1) {        	
+        bratingDirection = -bratingDirection;
+        if (bratingDirection == 1) {        	
     		$(j.toElement).addClass("headerSortDown")  
         }
         else {      	
     		$(j.toElement).addClass("headerSortUp")
         }
         self.searchedGames.sort(function(a, b){
-            if (self.getRank(a.statistics) > self.getRank(b.statistics)) return 1 * rankDirection;
-            if (self.getRank(a.statistics) < self.getRank(b.statistics)) return -1 * rankDirection;
+            if (self.getBRating(a.statistics) > self.getBRating(b.statistics)) return 1 * bratingDirection;
+            if (self.getBRating(a.statistics) < self.getBRating(b.statistics)) return -1 * bratingDirection;
             return 0;
         });
     };
 
 
 
-    self.getRank = function(stats) {
+    self.getBRating = function(stats) {
         console.log(stats)
         return stats.ratings.bayesaverage.value
     }
+
+    self.getCategoriesFromLinks = function(link) {
+    	var categories = []
+    	for (var i = 0; i < link.length; i++) {
+    		if(link[i]["type"] == "boardgamecategory") {
+    			categories.push(link[i]["value"])
+    		}
+    	};
+    	return categories
+    }
+
+    self.getDesignerFromLinks = function(link) {
+    	for (var i = 0; i < link.length; i++) {
+    		if(link[i]["type"] == "boardgamedesigner") {
+    			return link[i]["value"]
+    		}
+    	};
+    }
+
     self.getName = function(name) {
         if(Array.isArray(name)) {
             return name[0].value

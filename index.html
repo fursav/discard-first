@@ -35,7 +35,7 @@
               <tr>
                 <th width="200"></th>
                 <th data-bind="click: sortByName">Title</th>
-                <th data-bind="click: sortByRank">Rank</th>
+                <th data-bind="click: sortByBRating">BGG Rating</th>
               </tr>
             </thead>
             <tbody data-bind="foreach: searchedGames">
@@ -45,7 +45,7 @@
                   <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
                   <blockquote data-bind="html: $root.getShortDescription(description)"></blockquote>
                 </td>
-                <td data-bind="text:$root.getRank(statistics)"></td>
+                <td data-bind="text:$root.getBRating(statistics)"></td>
               </tr>
             </tbody>
           </table>
@@ -58,10 +58,59 @@
             <h1 class="text-center"><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h1>
             <div class="row">
               <div class="column small-4">
-                <img data-bind="attr:{src: image}">
+                <img class="radius" data-bind="attr:{src: image}">
               </div>
+              <div class="column small-8 panel spaced-rows radius">
+                <h4 class="text-center">Quick Stats</h4>
+                <hr noshade="">
+                <div class="row">
+                  <div style="font-weight: bold;" class="column small-6">
+                    Designer
+                  </div>
+                  <div data-bind="text: $root.getDesignerFromLinks(link)" class="column small-6">
+                    
+                  </div>
+                </div>
+                <div class="row">
+                  <div style="font-weight: bold;" class="column small-6">
+                    Num of players
+                  </div>
+                  <div class="column small-6">
+                    <span data-bind="text: minplayers.value"></span> - <span data-bind="text: maxplayers.value"></span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div style="font-weight: bold;" class="column small-6">
+                    Suggested age
+                  </div>
+                  <div class="column small-6">
+                    <span data-bind="text: minage.value"></span> and up
+                  </div>
+                </div>
+                <div class="row">
+                  <div style="font-weight: bold;" class="column small-6">
+                    Playing Time
+                  </div>
+                  <div class="column small-6">
+                    <span data-bind="text: playingtime.value"></span> minutes</span>
+                  </div>
+                </div>
+                <div class="row">
+                  <div style="font-weight: bold;" class="column small-6">
+                    Categories
+                  </div>
+                  <div class="column small-6">
+                    <!-- ko foreach: $root.getCategoriesFromLinks(link) -->  
+                    <span data-bind="text: $data"></span>,
+                    <!-- /ko -->
+                  </div>
+                </div>                  
+              </div>
+            </div>
+            <div class="row">
               <div class="column small-8 panel">
                 <h4 class="text-center">Description</h4>
+                <hr noshade="">
                 <div data-bind="html: $root.parseDescription(description)"></div>
               </div>
             </div>
