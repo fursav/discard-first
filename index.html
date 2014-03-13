@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Foundation | Welcome</title>
     <link rel="stylesheet" href="css/foundation.css" />
+    <link rel="stylesheet" href="css/ionicons.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
     <script src="js/vendor/modernizr.js"></script>
   </head>
   <body>
@@ -15,23 +17,38 @@
       </div>
     </div>
 
-    <div class="row">
-          <div class="large-12 columns">
+    <div class="row collapse">
+          <div class="small-11 columns">
             <input id="search" type="text" placeholder="Search" data-bind="event: { change: searchGames }" />
           </div>
+          <div class="small-1 columns">
+            <button data-bind="click: searchGames" class="postfix text-center"><i class="icon ion-search medium-icon"></i></button>
+          </div>
+
     </div>
 
-    <div class="row" data-bind="if: searchedGames().length>0">
+    <div class="row" data-bind="if: searchedGames().length>0 || searching">
       <div id="results" class="large-12 columns" >
-        <div class="panel" >
-          <ul data-bind="foreach: searchedGames">
-            <li>
-              <div class="callout panel">
-                <img data-bind="attr:{src: thumbnail}"><span data-bind="text:name[0].length > 1 ? name[0]:name "></span>
-              </div>
-            </li>
-          </ul>
-        </div>
+        <div class="text-center" data-bind="if: searching"><i class="icon ion-loading-c icon-large"></i></div>
+          <table data-bind="if: searchedGames().length>0" class="">
+            <thead>
+              <tr>
+                <th width="200"></th>
+                <th>Title</th>
+                <th>Rank</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: searchedGames">
+              <tr>
+                <td class="paddingless"><img data-bind="attr:{src: thumbnail}"></td>
+                <td>
+                  <h4><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h4>
+                  <blockquote data-bind="html: $root.getShortDescription(description)">></blockquote>
+                </td>
+                <td data-bind="text:$root.getRank(statistics)"></td>
+              </tr>
+            </tbody>
+          </table>
       </div>
     </div>
     
