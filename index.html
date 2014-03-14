@@ -10,7 +10,7 @@
     <script src="js/vendor/modernizr.js"></script>
   </head>
   <body>
-    
+
     <div class="row">
       <div class="large-12 columns text-center">
         <h1>Search</h1>
@@ -54,13 +54,13 @@
 
     <!-- Selected game -->
     <div data-bind="with: selectedGame">
-        <div>
+        <div class="spaced-rows">
             <h1 class="text-center"><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h1>
-            <div class="row columns-equal">
-              <div class="column small-4">
-                <img class="radius" data-bind="attr:{src: image}">
+            <div class="row columns-equal" data-equalizer >
+              <div class="column small-3" style="padding:0px;position: relative;"  data-equalizer-watch>
+                <img  class="radius" style="max-width:100%; position:absolute;height:16.563em;" data-bind="attr:{src: image}">
               </div>
-              <div class="column small-8 panel spaced-rows radius">
+              <div class="column small-8 panel spaced-rows radius" data-equalizer-watch>
                 <h4 class="text-center">Quick Stats</h4>
                 <hr noshade="">
                 <div class="row">
@@ -101,7 +101,7 @@
                   </div>
                   <div class="column small-6">
                     <!-- ko foreach: $root.getCategoriesFromLinks(link) -->  
-                    <span data-bind="text: $data"></span>,
+                    <span data-bind="text: $data"></span> 
                     <!-- /ko -->
                   </div>
                 </div>                  
@@ -111,7 +111,7 @@
               <div class="column small-8 panel">
                 <h4 class="text-center">Description</h4>
                 <hr noshade="">
-                <div data-bind="html: $root.parseDescription(description)"></div>
+                <p data-bind="html: $root.parseDescription(description)"></p>
               </div>
             </div>
         </div>
@@ -261,6 +261,7 @@
     
     <script src="js/vendor/jquery.js"></script>
     <script src="js/foundation.min.js"></script>
+    <script src="js/foundation/foundation.equalizer.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/jquery.xml2json.js"></script>
