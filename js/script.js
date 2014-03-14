@@ -5,14 +5,22 @@ $(function() {
 ViewModel = function() { 
     var self; 
     self = this; 
-    self.searchedGames = ko.observableArray();
+    self.searchedGames = ko.observableArray([]);
     self.selectedGame = ko.observable()
     self.searching = ko.observable(null);
     var nameDirection = -1;
     var bratingDirection = 1;
 
+    self.goToSearch = function() {
+        str = encodeURIComponent($("#search").val());
+        location.hash = "search/" + str;
+    }
+
     self.goToGame = function(object) { 
-    	self.selectedGame(object);
+        //console.log(object.id)
+        location.hash = "game/" + object.id
+    	//self.selectedGame(object);
+        //$(".columns-equal").equalize({reset: true});
     };
 
     self.sortByName = function(i,j){
@@ -52,7 +60,7 @@ ViewModel = function() {
 
 
     self.getBRating = function(stats) {
-        console.log(stats)
+        //console.log(stats)
         return stats.ratings.bayesaverage.value
     }
 
@@ -86,18 +94,24 @@ ViewModel = function() {
 
     self.parseDescription = function(description) {
     	var regex = new RegExp('&#10;', 'g');
-    	console.log(description.replace(regex,"<br>"));
+    	//console.log(description.replace(regex,"<br>"));
     	return description.replace(regex,"<br>")
     }
 
-    self.searchGames = function() { 
+    self.searchGames = function(str) { 
         self.searchedGames.removeAll();
+        if (str == ""){
+            return
+        }
         self.searching(true);
-        url = 'http://www.boardgamegeek.com/xmlapi/search?search='+$('#search').val()
+        var regex = new RegExp(' ', 'g');
+        str = str.replace(regex,"+");
+        url = 'http://www.boardgamegeek.com/xmlapi/search?search='+str
         $.getJSON("http://query.yahooapis.com/v1/public/yql?" +
          "q=select%20*%20from%20xml%20where%20url%3D%22" + 
          encodeURIComponent(url) + 
          "%22&format=xml'&callback=?", function(data){
+            console.log(url)
             self.populateGames(data);
          });
         }; 
@@ -117,6 +131,25 @@ ViewModel = function() {
             self.getGamesDetails(ids)
         }
     };
+
+    self.getGameDetails = function (id) {
+        url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ id + "&stats=1"
+        $.getJSON("http://query.yahooapis.com/v1/public/yql?" +
+         "q=select%20*%20from%20xml%20where%20url%3D%22" + 
+         encodeURIComponent(url) + 
+         "%22&format=xml'&callback=?", function(data){
+            if(data.results[0]) {
+                xml = $.parseXML(data.results[0])
+                gdata = $.xml2json(xml)["item"];
+                if (gdata["thumbnail"] == null) {
+                    gdata["thumbnail"] = "";
+                }
+                self.selectedGame(gdata);
+                console.log(gdata)
+            }
+         });   
+    }
+
     self.getGamesDetails = function(gameids) {
         if (gameids.length>20 || gameids.length == 1) {
             for (var i = 0; i < gameids.length; i++) {
@@ -131,7 +164,7 @@ ViewModel = function() {
                         if (gdata["thumbnail"] == null) {
                             gdata["thumbnail"] = "";
                         }
-                        console.log(gdata)
+                        //console.log(gdata)
                         //onsole.log($("<div/>").html(gdata.description).text())
                         //console.log(gdata.description)
                         self.searchedGames.push(gdata);
@@ -160,4 +193,22 @@ ViewModel = function() {
              });
         }        
     }
+
+    // Client-side routes    
+    Sammy(function() {
+        this.get('#search/:string', function() {
+            self.selectedGame(null);
+            self.searchGames(this.params.string);
+        });
+
+        this.get('#game/:gameid', function() {
+            //console.log(this.params.gameid)
+            self.searchedGames.removeAll();
+            self.getGameDetails(this.params.gameid);
+        });
+        this.get('', function() {
+        });
+    
+        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
+    }).run();   
  };
