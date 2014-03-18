@@ -38,7 +38,7 @@
             if (target.length === 0) target = $('#'+hash);
 
             // Account for expedition height if fixed position
-            var scroll_top = target.offset().top;
+            var scroll_top = target.offset().top-10;
             if (expedition.css('position') === 'fixed') {
               scroll_top = scroll_top - expedition.outerHeight();
             }
@@ -46,7 +46,7 @@
             $('html, body').stop().animate({
                 'scrollTop': scroll_top
             }, 700, 'swing', function () {
-                window.location.hash = '#'+hash;
+                //window.location.hash = '#'+hash;
             });
         })
         .on('scroll.fndtn.magellan', self.throttle(this.check_for_arrivals.bind(this), settings.throttle_delay))

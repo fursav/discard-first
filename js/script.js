@@ -1,24 +1,6 @@
 $(function() { 
  $(document).foundation(); 
- ko.applyBindings(new ViewModel); 
-    /*
-    // Client-side routes    
-    Sammy(function() {
-        this.get('#search/:string', function() {
-            self.selectedGame(null);
-            self.searchGames(this.params.string);
-        });
-
-        this.get(/#game\/(.*)(#.+)?/, function() {
-            console.log(this.params)
-            self.searchedGames.removeAll();
-            self.getGameDetails(this.params.splat[0]);
-        });
-        this.get('', function() {
-        });
-    
-        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
-    }).run();*/
+ ko.applyBindings(new ViewModel);
 
  });
 ViewModel = function() { 
@@ -27,25 +9,9 @@ ViewModel = function() {
     self.searchedGames = ko.observableArray([]);
     self.selectedGame = ko.observable()
     self.searching = ko.observable(null);
-    self.baseURL = window.location.href
-    console.log(self.baseURL)
     var nameDirection = -1;
     var bratingDirection = 1;
 
-    self.goToSearch = function() {
-        if (!window.location.origin)
-            window.location.origin = window.location.protocol+"//"+window.location.host;
-        console.log(window.location.origin)
-        str = encodeURIComponent($("#search").val());
-        window.location.href = self.baseURL + "/search/" + str;
-    }
-
-    self.goToGame = function(object) { 
-        //console.log(object.id)
-        location.hash = "game/" + object.id
-    	//self.selectedGame(object);
-        //$(".columns-equal").equalize({reset: true});
-    };
 
     self.sortByName = function(i,j){
     	$("#results-table thead tr th").removeClass("headerSortUp")
@@ -255,16 +221,36 @@ ViewModel = function() {
                 }
              });
         }        
-    }   
+    }
+
+
+    self.goToSearch = function() {
+        str = encodeURIComponent($("#search").val());
+        location.hash =  "search/" + str;
+    }
+
+    self.goToGame = function(object) { 
+        location.hash = "game/" + object.id
+    };
 
     //routing
-    var app = Davis(function () {
-          this.get('/search/:name', function (req) {
-            alert("Hello " + req.params['name'])
-          })
-        })
+    // Client-side routes    
+    Sammy(function() {
+        this.get('#search/:string', function() {
+            self.selectedGame(null);
+            self.searchGames(this.params.string);
+        });
 
-        app.start()
+        this.get(/#game\/(.*)(#.+)?/, function() {
+            console.log(this.params)
+            self.searchedGames.removeAll();
+            self.getGameDetails(this.params.splat[0]);
+        });
+        this.get('', function() {
+        });
+    
+        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
+    }).run();
  };
 
  function equalHeight(group) {
