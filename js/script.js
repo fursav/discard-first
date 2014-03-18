@@ -1,24 +1,6 @@
 $(function() { 
  $(document).foundation(); 
- ko.applyBindings(new ViewModel); 
-    /*
-    // Client-side routes    
-    Sammy(function() {
-        this.get('#search/:string', function() {
-            self.selectedGame(null);
-            self.searchGames(this.params.string);
-        });
-
-        this.get(/#game\/(.*)(#.+)?/, function() {
-            console.log(this.params)
-            self.searchedGames.removeAll();
-            self.getGameDetails(this.params.splat[0]);
-        });
-        this.get('', function() {
-        });
-    
-        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
-    }).run();*/
+ ko.applyBindings(new ViewModel);
 
  });
 ViewModel = function() { 
@@ -31,21 +13,6 @@ ViewModel = function() {
     console.log(self.baseURL)
     var nameDirection = -1;
     var bratingDirection = 1;
-
-    self.goToSearch = function() {
-        if (!window.location.origin)
-            window.location.origin = window.location.protocol+"//"+window.location.host;
-        console.log(window.location.origin)
-        str = encodeURIComponent($("#search").val());
-        window.location.href = self.baseURL + "/search/" + str;
-    }
-
-    self.goToGame = function(object) { 
-        //console.log(object.id)
-        location.hash = "game/" + object.id
-    	//self.selectedGame(object);
-        //$(".columns-equal").equalize({reset: true});
-    };
 
     self.sortByName = function(i,j){
     	$("#results-table thead tr th").removeClass("headerSortUp")
@@ -257,14 +224,33 @@ ViewModel = function() {
         }        
     }   
 
-    //routing
-    var app = Davis(function () {
-          this.get('/search/:name', function (req) {
-            alert("Hello " + req.params['name'])
-          })
-        })
+    self.goToSearch = function() {
+        str = encodeURIComponent($("#search").val());
+        location.hash =  "search/" + str;
+    }
 
-        app.start()
+    self.goToGame = function(object) { 
+        location.hash = "game/" + object.id
+    };
+
+    //routing
+    // Client-side routes    
+    Sammy(function() {
+        this.get('#search/:string', function() {
+            self.selectedGame(null);
+            self.searchGames(this.params.string);
+        });
+
+        this.get(/#game\/(.*)(#.+)?/, function() {
+            console.log(this.params)
+            self.searchedGames.removeAll();
+            self.getGameDetails(this.params.splat[0]);
+        });
+        this.get('', function() {
+        });
+    
+        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
+    }).run();
  };
 
  function equalHeight(group) {
