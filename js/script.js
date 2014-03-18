@@ -1,6 +1,25 @@
 $(function() { 
  $(document).foundation(); 
  ko.applyBindings(new ViewModel); 
+    /*
+    // Client-side routes    
+    Sammy(function() {
+        this.get('#search/:string', function() {
+            self.selectedGame(null);
+            self.searchGames(this.params.string);
+        });
+
+        this.get(/#game\/(.*)(#.+)?/, function() {
+            console.log(this.params)
+            self.searchedGames.removeAll();
+            self.getGameDetails(this.params.splat[0]);
+        });
+        this.get('', function() {
+        });
+    
+        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
+    }).run();*/
+
  });
 ViewModel = function() { 
     var self; 
@@ -8,12 +27,17 @@ ViewModel = function() {
     self.searchedGames = ko.observableArray([]);
     self.selectedGame = ko.observable()
     self.searching = ko.observable(null);
+    self.baseURL = window.location.href
+    console.log(self.baseURL)
     var nameDirection = -1;
     var bratingDirection = 1;
 
     self.goToSearch = function() {
+        if (!window.location.origin)
+            window.location.origin = window.location.protocol+"//"+window.location.host;
+        console.log(window.location.origin)
         str = encodeURIComponent($("#search").val());
-        location.hash = "search/" + str;
+        window.location.href = self.baseURL + "/search/" + str;
     }
 
     self.goToGame = function(object) { 
@@ -57,7 +81,30 @@ ViewModel = function() {
         });
     };
 
+    self.getGoodComments = function(comments) {
+        gc = comments.comment.filter(function(el) {
+            return el.value.length > 119 && parseInt(el.rating) > 0
+        })
+        return gc[Math.floor(Math.random()*gc.length)]
+    }
 
+    self.getRankLink = function(name,id,value) {
+        if (name == "boardgame") {
+            return 'http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=' + 
+            id + '&rank=' + value + '#' + value
+        }
+        return 'http://boardgamegeek.com/' + name + '/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=' + 
+            id + '&rank=' + value + '#' + value
+        
+    }
+
+    self.getRanks = function(stats) {
+        return stats.ratings.ranks.rank
+    }
+
+    self.getAverageRating = function(stats) {
+        return stats.ratings.average.value
+    }
 
     self.getBRating = function(stats) {
         //console.log(stats)
@@ -94,8 +141,11 @@ ViewModel = function() {
 
     self.parseDescription = function(description) {
     	var regex = new RegExp('&#10;', 'g');
+        description = description.replace(regex,"<br>")
+        regex = new RegExp(self.getName(self.selectedGame().name), 'g');
+        description = description.replace(regex,"<b>" + self.getName(self.selectedGame().name) + "</b>")
     	//console.log(description.replace(regex,"<br>"));
-    	return description.replace(regex,"<br>")
+    	return description
     }
 
     self.searchGames = function(str) { 
@@ -144,7 +194,7 @@ ViewModel = function() {
     }
 
     self.getGameDetails = function (id) {
-        url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ id + "&stats=1"
+        url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ id + "&stats=1&comments=1"
         $.getJSON("http://query.yahooapis.com/v1/public/yql?" +
          "q=select%20*%20from%20xml%20where%20url%3D%22" + 
          encodeURIComponent(url) + 
@@ -205,25 +255,16 @@ ViewModel = function() {
                 }
              });
         }        
-    }
+    }   
 
-    // Client-side routes    
-    Sammy(function() {
-        this.get('#search/:string', function() {
-            self.selectedGame(null);
-            self.searchGames(this.params.string);
-        });
+    //routing
+    var app = Davis(function () {
+          this.get('/search/:name', function (req) {
+            alert("Hello " + req.params['name'])
+          })
+        })
 
-        this.get('#game/:gameid', function() {
-            //console.log(this.params.gameid)
-            self.searchedGames.removeAll();
-            self.getGameDetails(this.params.gameid);
-        });
-        this.get('', function() {
-        });
-    
-        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
-    }).run();   
+        app.start()
  };
 
  function equalHeight(group) {

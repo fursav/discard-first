@@ -27,6 +27,25 @@
 
     </div>
 
+    <div data-bind="visible:selectedGame">
+    <div data-magellan-expedition="fixed" data-options="destination_threshold:65;throttle_delay:0;" >
+      <dl class="sub-nav">
+        <dd data-magellan-arrival="info">
+          <a href="#info" rel='bookmark'>Quick Info</a>
+        </dd> 
+        <dd data-magellan-arrival="description">
+          <a href="#description">Description</a>
+        </dd> 
+        <dd data-magellan-arrival="ranks">
+          <a href="#ranks">Ranks</a>
+        </dd> 
+        <dd data-magellan-arrival="comments">
+          <a href="#comments">Comments</a>
+        </dd> 
+      </dl> 
+    </div>
+    </div> 
+
     <div class="row" data-bind="if: searchedGames().length>0 || searching">
       <div id="results" class="large-12 columns" >
         <div class="text-center" data-bind="if: searching"><i class="icon ion-loading-c icon-large"></i></div>
@@ -60,8 +79,10 @@
               <div class="column small-3" style="padding:0px;position: relative;"  data-equalizer-watch>
                 <img  class="radius" style="max-width:100%; position:absolute;height:16.563em;" data-bind="attr:{src: image}">
               </div>
-              <div class="column small-8 panel spaced-rows radius" data-equalizer-watch>
-                <h4 class="text-center">Quick Stats</h4>
+              <!-- Quick Info -->
+              <a name="info"></a>
+              <div class="column small-8 panel spaced-rows radius" data-magellan-destination="info" data-equalizer-watch>
+                <h4 class="text-center">Quick Info</h4>
                 <hr noshade="">
                 <div class="row">
                   <div style="font-weight: bold;" class="column small-6">
@@ -107,11 +128,52 @@
                 </div>                  
               </div>
             </div>
-            <div class="row">
-              <div class="column small-8 panel">
+            <!-- Description -->
+            <div class="row">              
+              <a name="description"></a>
+              <div class="column small-8 panel" data-magellan-destination="description">
                 <h4 class="text-center">Description</h4>
                 <hr noshade="">
                 <p data-bind="html: $root.parseDescription(description)"></p>
+              </div>
+            </div>
+            <!-- Ranks and Ratings -->
+            <div class="row">
+              <a name="ranks"></a>
+              <div class="column small-8 panel" data-magellan-destination="ranks">
+                <h4 class="text-center">Ranks and Ratings</h4>
+                <hr noshade="">
+                <div class="row">
+                  <div style="font-weight: bold;" class="column small-6">
+                    Average Rating
+                  </div>
+                  <div class="column small-6">
+                    <span data-bind="text:Math.floor($root.getAverageRating(statistics)*100)/100"></span> / 10
+                  </div>
+                </div>
+                <!-- ko foreach: $root.getRanks(statistics) -->  
+                <div class="row">
+                  <div style="font-weight: bold;" class="column small-6">
+                    <span data-bind="text:friendlyname"></span>
+                  </div>
+                  <div class="column small-6">
+                    <a data-bind="text:value, attr: {href: $root.getRankLink(name,id,value)}"></a>
+                  </div>
+                </div>
+                <!-- /ko -->
+              </div>
+            </div>
+            <!-- Comments -->
+            <div class="row">
+              <a name="comments"></a>
+              <div class="column small-8 panel" data-bind="with: $root.getGoodComments(comments)" data-magellan-destination="comments">
+                <h4 class="text-center">Comments</h4>
+                <hr noshade="">
+                <blockquote> 
+                <p data-bind="html: $root.parseDescription(value)"></p>
+                <cite data-bind="html: username"></cite>
+                </blockquote>
+                <p>Rating: <span data-bind="text: rating"></span></p>
               </div>
             </div>
         </div>
@@ -258,12 +320,17 @@
         </div>
       </div>
     </div>
+    <a href="/welcome/oliver">greet oliver</a>
     
     <script src="js/vendor/jquery.js"></script>
     <script src="js/foundation.min.js"></script>
     <script src="js/foundation/foundation.equalizer.js"></script>
+    <script src="js/foundation/foundation.magellan.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
-    <script src="js/sammy-latest.min.js"></script>
+    <script src="js/davis.min.js"></script>
+    <script src="js/signals.min.js"></script>
+    <script src="js/crossroads.min.js"></script>
+    <script src="js/hasher.min.js"></script>
     <script src="js/jquery.xml2json.js"></script>
     <script src="js/equalize.min.js"></script>
     <script src="js/script.js"></script>
