@@ -27,26 +27,7 @@
 
     </div>
 
-    <div data-bind="visible:selectedGame">
-    <div data-magellan-expedition="fixed" data-options="destination_threshold:65;throttle_delay:0;" >
-      <dl class="sub-nav">
-        <dd data-magellan-arrival="info">
-          <a href="#info" rel='bookmark'>Quick Info</a>
-        </dd> 
-        <dd data-magellan-arrival="description">
-          <a href="#description">Description</a>
-        </dd> 
-        <dd data-magellan-arrival="ranks">
-          <a href="#ranks">Ranks</a>
-        </dd> 
-        <dd data-magellan-arrival="comments">
-          <a href="#comments">Comments</a>
-        </dd> 
-      </dl> 
-    </div>
-    </div> 
-
-    <div class="row" data-bind="if: searchedGames().length>0 || searching">
+    <div class="row" data-bind="if: (searchedGames().length>0 || searching) ">
       <div id="results" class="large-12 columns" >
         <div class="text-center" data-bind="if: searching"><i class="icon ion-loading-c icon-large"></i></div>
           <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">
@@ -72,18 +53,38 @@
     </div>
 
     <!-- Selected game -->
-    <div data-bind="with: selectedGame">
-        <div class="spaced-rows">
-            <h1 class="text-center"><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h1>
-            <div class="row columns-equal" data-equalizer >
-              <div class="column small-4" style="padding:0px;"  data-equalizer-watch>
+    <div data-bind="visible: selectedGame">
+    <div class="column" style="position:relative">
+        <div  data-magellan-expedition data-options="destination_threshold:65;throttle_delay:0;" >
+          <ul class="sub-nav-vertical">
+            <li>
+                <h4 data-bind="with: selectedGame"><span data-bind="text: $root.getName(name)"></span></h4>
+            </li>
+            <li data-magellan-arrival="info">
+              <a href="#info" rel='bookmark'>Quick Info</a>
+            </li> 
+            <li data-magellan-arrival="description">
+              <a href="#description">Description</a>
+            </li> 
+            <li data-magellan-arrival="ranks">
+              <a href="#ranks">Ranks</a>
+            </li> 
+            <li data-magellan-arrival="comments">
+              <a href="#comments">Comments</a>
+            </li> 
+          </ul> 
+        </div>
+    </div>
+    <div class="left-edge-shadow column " style="width:85%;" data-bind="with: selectedGame">
+            <div class="section row" style="padding-bottom:10px;padding-left:0px;margin-left:0px;" >
+              <div class="column small-5" >
                 <img  class="radius" style="max-width:100%; height:16.563em;" data-bind="attr:{src: image}">
               </div>
               <!-- Quick Info -->
               <a name="info"></a>
-              <div class="column small-8 panel spaced-rows radius" data-magellan-destination="info" data-equalizer-watch>
-                <h4 class="text-center">Quick Info</h4>
-                <hr noshade="">
+              <div class=" column small-7 spaced-rows" data-magellan-destination="info">
+                <h1 class="text-center"><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h1>
+                <br>
                 <div class="row">
                   <div style="font-weight: bold;" class="column small-6">
                     Designer
@@ -125,9 +126,10 @@
                     <span data-bind="text: $data"></span> 
                     <!-- /ko -->
                   </div>
-                </div>                  
+                </div>                 
               </div>
             </div>
+            <br>
             <!-- Description -->
             <div class="row">              
               <a name="description"></a>
@@ -176,7 +178,7 @@
                 <p>Rating: <span data-bind="text: rating"></span></p>
               </div>
             </div>
-        </div>
+    </div>
     </div>
     
     <script src="js/vendor/jquery.js"></script>
