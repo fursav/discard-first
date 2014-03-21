@@ -60,16 +60,16 @@
               <h4 data-bind="with: selectedGame"><span data-bind="text: $root.getName(name)"></span></h4>
           </li>
           <li data-magellan-arrival="info">
-            <a href="#info" rel='bookmark'>Quick Info</a>
+            <a href="#info" rel='bookmark'><i class="icon ion-information-circled"></i> Quick Info</a>
           </li> 
           <li data-magellan-arrival="description">
-            <a href="#description">Description</a>
+            <a href="#description"><i class="icon ion-clipboard"></i> Description</a>
           </li> 
           <li data-magellan-arrival="ranks">
-            <a href="#ranks">Ranks</a>
+            <a href="#ranks"><i class="icon ion-arrow-graph-up-right"></i> Ranks</a>
           </li> 
           <li data-magellan-arrival="comments">
-            <a href="#comments">Comments</a>
+            <a href="#comments"><i class="icon ion-chatbox-working"></i> Comments</a>
           </li> 
         </ul> 
       </div>
@@ -133,9 +133,15 @@
       <section class="section section-gray">  
       <div class="row">          
         <div data-magellan-destination="description">
+          <div class="column small-3">
           <h4 class="text-center">Description</h4>
-          <br>
+          <div class="text-center">
+          <i class="icon ion-clipboard icon-huge"></i>
+          </div>
+          </div>
+          <div class="column small-9">
           <p data-bind="html: $root.parseDescription(description)"></p>
+          </div>
         </div>
       </div>
       </section>

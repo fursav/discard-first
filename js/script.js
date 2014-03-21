@@ -9,8 +9,6 @@ ViewModel = function() {
     self.searchedGames = ko.observableArray([]);
     self.selectedGame = ko.observable()
     self.searching = ko.observable(null);
-    self.baseURL = window.location.href
-    console.log(self.baseURL)
     var nameDirection = -1;
     var bratingDirection = 1;
 
@@ -50,7 +48,7 @@ ViewModel = function() {
 
     self.getGoodComments = function(comments) {
         gc = comments.comment.filter(function(el) {
-            return el.value.length > 119 && parseInt(el.rating) > 0
+            return el.value.length > 119 && parseInt(el.rating) > 0 && el.value.length < 600
         })
         return gc[Math.floor(Math.random()*gc.length)]
     }
@@ -107,8 +105,38 @@ ViewModel = function() {
     } 
 
     self.parseDescription = function(description) {
-    	var regex = new RegExp('&#10;', 'g');
-        description = description.replace(regex,"<br>")
+    	var paragraphs = 1;
+    	var contenthid = false;
+    	console.log(description)
+    	var regex = new RegExp('&#10;&#10;&#10;    ', 'g');
+        description = description.replace(regex,"<ul><li>")
+        var regex = new RegExp('&#10;&#10;&#10;', 'g');
+        description = description.replace(regex,"</li></ul>")
+    	var regex = new RegExp('&#10;    ', 'g');
+        description = description.replace(regex,"</li><li>")
+        description = "<p>" + description
+    	var regex = new RegExp('&#10;&#10;', 'g');
+        description = description.replace(regex,"</p><p>")
+        description += "</p>"
+        for (var i = 0; i < description.length; i++) {
+        	if (description.slice(i,i+5) == "</ul>"){
+        		console.log("uled")
+        	}
+        	if(description.slice(i,i+3) == "<p>" || description.slice(i-5,i) == "</ul>") {
+        		paragraphs += 1;        		
+	        	if ((paragraphs > 3 && i > 600 && description.length-i > 7) && contenthid == false){
+	        		console.log(description.slice(0,i) )
+	        		description = description.slice(0,i) + "<div class='full-description' style='display:none'>" + description.slice(i,description.length)
+	        		contenthid = true
+	        		break;
+	        	}
+        	}
+        };
+        if (contenthid) {
+        	description += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>"
+        }
+    	console.log(description)
+        console.log(paragraphs)
         regex = new RegExp(self.getName(self.selectedGame().name), 'g');
         description = description.replace(regex,"<b>" + self.getName(self.selectedGame().name) + "</b>")
     	//console.log(description.replace(regex,"<br>"));
@@ -127,6 +155,7 @@ ViewModel = function() {
             var ids = eval('(' + localStorage["searched_bg_ids_"+str] + ')');
             if (ids) {
                 self.getGamesDetails(ids,str)
+       			self.searching(null);
                 return
             }  
         } else {

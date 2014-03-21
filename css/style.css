@@ -10,6 +10,10 @@ body *{
 .icon-large{
 	font-size: 2em;
 }
+
+.icon-huge{
+	font-size: 10em;
+}
 /* tables */
 
 table {
@@ -71,11 +75,11 @@ img.radius {
 }
 
 .section {
-    margin-bottom: .5em;
+    margin-bottom: .2em;
     padding: 5em 0;
-    -webkit-box-shadow: 0 8px 6px -6px black;
-       -moz-box-shadow: 0 8px 6px -6px black;
-            box-shadow: 0 8px 6px -6px black;
+    -webkit-box-shadow: 0 .3em .3em -.3em black;
+       -moz-box-shadow: 0 .3em .3em -.3em black;
+            box-shadow: 0 .3em .3em -.3em black;
 }
 
 footer {
