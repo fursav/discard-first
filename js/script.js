@@ -151,8 +151,8 @@ ViewModel = function() {
         var regex = new RegExp(' ', 'g');
         str = str.replace(regex,"+");
         self.searching(true);
-        if (Modernizr.localstorage) {
-            var ids = eval('(' + localStorage["searched_bg_ids_"+str] + ')');
+        if (Modernizr.sessionstorage) {
+            var ids = eval('(' + sessionStorage["searched_bg_ids_"+str] + ')');
             if (ids) {
                 self.getGamesDetails(ids,str)
        			self.searching(null);
@@ -166,7 +166,7 @@ ViewModel = function() {
         $.getJSON(self.getYQLurl(url), function(data){
             ids = self.extractIdsFromSearch(data);
             //cache the ids
-            localStorage["searched_bg_ids_"+str] = JSON.stringify(ids)
+            sessionStorage["searched_bg_ids_"+str] = JSON.stringify(ids)
             self.getGamesDetails(ids,str)
          });
         }; 
@@ -207,12 +207,10 @@ ViewModel = function() {
     }
 
     self.getGameDetails = function (id) {
-        if (Modernizr.localstorage) {
-            var gdata = eval('(' + localStorage["bg"+id] + ')');
+        if (Modernizr.sessionstorage) {
+            var gdata = eval('(' + sessionStorage["bg"+id] + ')');
             if (gdata) {
                 console.log("using cache")
-                console.log(gdata)
-                console.log(gdata.image)
                 self.selectedGame(gdata);
                 $('html, body').animate({scrollTop:0}, 'slow');
                 return
@@ -228,7 +226,7 @@ ViewModel = function() {
                 if (gdata["thumbnail"] == null) {
                     gdata["thumbnail"] = "";
                 }
-                localStorage["bg"+id] = JSON.stringify(gdata);
+                sessionStorage["bg"+id] = JSON.stringify(gdata);
                 self.selectedGame(gdata);
                 console.log(gdata)
                 $('html, body').animate({scrollTop:0}, 'slow');
@@ -239,8 +237,8 @@ ViewModel = function() {
     }
 
     self.getGamesDetails = function(gameids,str) {
-        if (Modernizr.localstorage) {
-            var gdata = eval('(' + localStorage["searched_bgs_"+str] + ')');
+        if (Modernizr.sessionstorage) {
+            var gdata = eval('(' + sessionStorage["searched_bgs_"+str] + ')');
             if (gdata) {
                 console.log("using cached search games")
                 self.searching(null);
@@ -263,9 +261,9 @@ ViewModel = function() {
                     }
                     self.searchedGames.push(gdata);
                 }
-                if (counter == gameids.length - 1) {
+                if (counter == gameids.length) {
                     self.searching(null);
-                    localStorage["searched_bgs_"+str] = JSON.stringify(self.searchedGames());
+                    sessionStorage["searched_bgs_"+str] = JSON.stringify(self.searchedGames());
                 }
              })
         };   
