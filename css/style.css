@@ -71,9 +71,52 @@ img.radius {
 }
 
 .section {
-	-webkit-box-shadow: 0 8px 6px -6px black;
-	   -moz-box-shadow: 0 8px 6px -6px black;
-	        box-shadow: 0 8px 6px -6px black;
+    margin-bottom: .5em;
+    padding: 5em 0;
+    -webkit-box-shadow: 0 8px 6px -6px black;
+       -moz-box-shadow: 0 8px 6px -6px black;
+            box-shadow: 0 8px 6px -6px black;
+}
+
+footer {
+  background: #333333;
+  padding: 24px 0 10px;
+  margin-top: -.5em; }
+  footer ul{
+    margin: 0;
+    display: inline-block;
+    padding-bottom: 0px; }
+    footer ul li {
+        list-style: none;
+      display: block;
+      float: left;
+      margin-left: 10px;
+      margin-left: 6px;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+    footer ul li a {
+        color: #666666;
+        padding: 3px 6px;
+    }
+    footer ul li a:hover{
+        color: #777777;
+        }
+
+.section-white {
+    
+background-color: #a1dafa;
+background-image: -webkit-linear-gradient(bottom, #F5F3EB 0%, #FFFFFF 0%);
+background-image: -ms-linear-gradient(bottom, #F5F3EB 0%, #FFFFFF 0%);
+background-image: linear-gradient(to bottom, #F5F3EB 0%, #FFFFFF 0%);
+}
+
+.section-gray {  
+background-image: -moz-linear-gradient(bottom, #F5F3EB 0%, #E8E8E8 100%);
+background-image: -webkit-linear-gradient(bottom, #F5F3EB 0%, #E8E8E8 100%);
+background-image: -ms-linear-gradient(bottom, #F5F3EB 0%, #E8E8E8 100%);
+background-image: linear-gradient(to bottom, #F5F3EB 0%, #E8E8E8 100%);
 }
 
 .sidewrap {
@@ -88,14 +131,21 @@ img.radius {
 
 
 .sub-nav-vertical {
+  background-color: white;
+  -webkit-box-shadow: 5px 6px 6px -6px black;
+  -moz-box-shadow: 5px 6px 6px -6px black;
+  box-shadow: 5px 6px 6px -6px black;
   position: fixed; 
   display: block;
   list-style-type: none;
   overflow: hidden;
+  width: 10.5em;
   margin: -0.25rem 0 1.125rem;
-  padding-top: 0.25rem;
-  margin-right: 0;
-  margin-left: -0.75rem; }
+  padding-top: 1rem;
+  padding-right: 1.7em;
+  margin-top: 2em;
+  margin-right: 0em;
+  margin-left: -0.6rem; }
   .sub-nav-vertical dt {
     text-transform: uppercase; }
   .sub-nav-vertical dt,

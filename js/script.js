@@ -120,32 +120,41 @@ ViewModel = function() {
         if (str == ""){
             return
         }
-        self.searching(true);
         var regex = new RegExp(' ', 'g');
         str = str.replace(regex,"+");
+        self.searching(true);
+        if (Modernizr.localstorage) {
+            var ids = eval('(' + localStorage["searched_bg_ids_"+str] + ')');
+            if (ids) {
+                self.getGamesDetails(ids,str)
+                return
+            }  
+        } else {
+          // no native support for HTML5 storage :(
+          // maybe try dojox.storage or a third-party solution
+        }
         url = 'http://www.boardgamegeek.com/xmlapi/search?search='+str
-        $.getJSON("http://query.yahooapis.com/v1/public/yql?" +
-         "q=select%20*%20from%20xml%20where%20url%3D%22" + 
-         encodeURIComponent(url) + 
-         "%22&format=xml'&callback=?", function(data){
-            console.log(url)
-            self.populateGames(data);
+        $.getJSON(self.getYQLurl(url), function(data){
+            ids = self.extractIdsFromSearch(data);
+            //cache the ids
+            localStorage["searched_bg_ids_"+str] = JSON.stringify(ids)
+            self.getGamesDetails(ids,str)
          });
         }; 
-    self.populateGames = function(data) {
-        if(data.results[0]) {
-            xml = $.parseXML(data.results[0])
-            jdata = $.xml2json(xml);
+    self.extractIdsFromSearch = function(data) {
+        console.log(data)
+        if(data.query.results) {
+            jdata = data.query.results.boardgames["boardgame"];
             ids = []
-            if (Array.isArray(jdata["boardgame"])) {
-                for (var i = 0; i < jdata["boardgame"].length; i++) {
-                    ids.push(jdata["boardgame"][i]["objectid"])
+            if (Array.isArray(jdata)) {
+                for (var i = 0; i < jdata.length; i++) {
+                    ids.push(jdata[i]["objectid"])
                 }       
             }
             else {
-                ids.push(jdata["boardgame"]["objectid"])    
+                ids.push(jdata["objectid"])    
             }
-            self.getGamesDetails(ids)
+            return ids
         }
     };
 
@@ -160,68 +169,77 @@ ViewModel = function() {
     	})
     }
 
+    self.getYQLurl = function(str) {
+        q = "select * from xml where url="
+        url = "'" + str + "'"
+        return "http://query.yahooapis.com/v1/public/yql?q=" +
+         encodeURIComponent(q+url) + 
+         "&format=json&callback=?"
+    }
+
     self.getGameDetails = function (id) {
-        url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ id + "&stats=1&comments=1"
-        $.getJSON("http://query.yahooapis.com/v1/public/yql?" +
-         "q=select%20*%20from%20xml%20where%20url%3D%22" + 
-         encodeURIComponent(url) + 
-         "%22&format=xml'&callback=?", function(data){
-            if(data.results[0]) {
-                xml = $.parseXML(data.results[0])
-                gdata = $.xml2json(xml)["item"];
+        if (Modernizr.localstorage) {
+            var gdata = eval('(' + localStorage["bg"+id] + ')');
+            if (gdata) {
+                console.log("using cache")
+                console.log(gdata)
+                console.log(gdata.image)
+                self.selectedGame(gdata);
+                $('html, body').animate({scrollTop:0}, 'slow');
+                return
+            }  
+        } else {
+          // no native support for HTML5 storage :(
+          // maybe try dojox.storage or a third-party solution
+        }
+        url = "http://www.boardgamegeek.com/xmlapi2/thing?id="+ id + "&stats=1&comments=1"
+        $.getJSON(self.getYQLurl(url), function(data){
+            if(data.query.results) {
+                gdata = data.query.results.items["item"];
                 if (gdata["thumbnail"] == null) {
                     gdata["thumbnail"] = "";
                 }
+                localStorage["bg"+id] = JSON.stringify(gdata);
                 self.selectedGame(gdata);
                 console.log(gdata)
                 $('html, body').animate({scrollTop:0}, 'slow');
+
                 //equalHeight($(".columns-equal > div"));
             }
-         });   
+         });  
     }
 
-    self.getGamesDetails = function(gameids) {
-        if (gameids.length>20 || gameids.length == 1) {
-            for (var i = 0; i < gameids.length; i++) {
-                url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ gameids[i] + "&stats=1"
-                $.getJSON("http://query.yahooapis.com/v1/public/yql?" +
-                 "q=select%20*%20from%20xml%20where%20url%3D%22" + 
-                 encodeURIComponent(url) + 
-                 "%22&format=xml'&callback=?", function(data){
-                    if(data.results[0]) {
-                        xml = $.parseXML(data.results[0])
-                        gdata = $.xml2json(xml)["item"];
-                        if (gdata["thumbnail"] == null) {
-                            gdata["thumbnail"] = "";
-                        }
-                        //console.log(gdata)
-                        //onsole.log($("<div/>").html(gdata.description).text())
-                        //console.log(gdata.description)
-                        self.searchedGames.push(gdata);
-                    }
-                 });
-            };
-            self.searching(null);
+    self.getGamesDetails = function(gameids,str) {
+        if (Modernizr.localstorage) {
+            var gdata = eval('(' + localStorage["searched_bgs_"+str] + ')');
+            if (gdata) {
+                console.log("using cached search games")
+                self.searching(null);
+                self.searchedGames(gdata);
+                return
+            }  
+        } else {
+          // no native support for HTML5 storage :(
+          // maybe try dojox.storage or a third-party solution
         }
-        else {
-            url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ gameids + "&stats=1"
-            $.getJSON("http://query.yahooapis.com/v1/public/yql?" +
-             "q=select%20*%20from%20xml%20where%20url%3D%22" + 
-             encodeURIComponent(url) + 
-             "%22&format=xml'&callback=?", function(data){
-                if(data.results[0]) {
-                    xml = $.parseXML(data.results[0])
-                    jdata = $.xml2json(xml)["item"];
-                    for (var i = 0; i < jdata.length; i++) {
-                        if (jdata[i]["thumbnail"] == null) {
-                            jdata[i]["thumbnail"] = "";
-                        }
-                        self.searchedGames.push(jdata[i]);
+        var counter = 0;
+        for (var i = 0; i < gameids.length; i++) {
+            url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ gameids[i] + "&stats=1"
+            $.getJSON(self.getYQLurl(url), function(data){
+                counter += 1;
+                if(data.query.results) {
+                    gdata = data.query.results.items["item"];
+                    if (gdata["thumbnail"] == null) {
+                        gdata["thumbnail"] = "";
                     }
-                    self.searching(null);       
+                    self.searchedGames.push(gdata);
                 }
-             });
-        }        
+                if (counter == gameids.length - 1) {
+                    self.searching(null);
+                    localStorage["searched_bgs_"+str] = JSON.stringify(self.searchedGames());
+                }
+             })
+        };   
     }   
 
     self.goToSearch = function() {
