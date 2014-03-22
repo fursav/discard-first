@@ -4,27 +4,29 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Search</title>
+    <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/hans-kendrick" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/gen-light" rel="stylesheet" type="text/css"/>  
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" href="css/ionicons.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <script src="js/vendor/modernizr.js"></script>
   </head>
   <body>
-
-    <div class="row">
-      <div class="large-12 columns text-center">
-        <h1>Search</h1>
-      </div>
-    </div>
-
-    <div class="row collapse">
-          <div class="small-11 columns">
-            <input id="search" type="text" placeholder="Search" data-bind="event: { change: goToSearch }" />
-          </div>
-          <div class="small-1 columns">
-            <button data-bind="click: goToSearch" class="postfix text-center"><i class="icon ion-search medium-icon"></i></button>
-          </div>
-
+    <div class="contain-to-grid sticky top-nav" style="height:3em;margin-bottom:1em;" data-options="sticky_on: large">
+      <nav style="padding:0;" data-topbar>
+        <ul class="inline-list" style="margin:0 20%">
+          <li class="">
+            <div class="row collapse" style="height:2em;margin:0.3em 0">
+              <div class="small-11 columns">
+                <input id="search" type="text" placeholder="Search" data-bind="event: { change: goToSearch }" />
+              </div>
+              <div class="small-1 columns">
+                <button data-bind="click: goToSearch" class="postfix text-center"><i class="icon ion-search medium-icon"></i></button>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </nav>
     </div>
 
     <div class="row" data-bind="if: (searchedGames().length>0 || searching) ">
@@ -120,9 +122,9 @@
               Categories
             </div>
             <div class="column small-6">
-              <!-- ko foreach: $root.getCategoriesFromLinks(link) -->  
-              <span data-bind="text: $data"></span> 
-              <!-- /ko -->
+              <ul class="inline-list categories" data-bind="foreach: $root.getCategoriesFromLinks(link)">
+                <li data-bind="text: $data"></li> 
+              </ul>
             </div>
           </div>                 
         </div>
@@ -148,11 +150,15 @@
       <!-- Ranks and Ratings -->
       <a name="ranks"></a>
       <section class="section section-white">  
-      <div class="row">
-        <div class="column small-8 small-centered spaced-rows" data-magellan-destination="ranks">
+      <div class="row" data-magellan-destination="ranks">
+        <div class="column small-3">
           <h4 class="text-center">Ranks and Ratings</h4>
-          <br>
-          <div class="row">
+          <div class="text-center">
+          <i class="icon ion-arrow-graph-up-right icon-huge"></i>   
+          </div>       
+        </div>
+        <div class="column small-9 spaced-rows">
+          <div class="row" style="padding-top:3em;">
             <div style="font-weight: bold;" class="column small-6">
               Average Rating
             </div>
@@ -176,15 +182,18 @@
       <!-- Comments -->
       <section class="section section-gray"> 
       <a name="comments"></a>
-      <div class="row">
-        <div class="column small-8 small-centered" data-bind="with: $root.getGoodComments(comments)" data-magellan-destination="comments">
+      <div class="row" data-bind="with: $root.getGoodComments(comments)" data-magellan-destination="comments">
+        <div class="column small-3">
           <h4 class="text-center">Comments</h4>
-          <br>
+          <div class="text-center"><i class="icon ion-chatbox-working icon-huge"></i></div>
+        </div>
+        <div class="column small-9" >
           <blockquote> 
           <p data-bind="html: $root.parseDescription(value)"></p>
           <cite data-bind="html: username"></cite>
           </blockquote>
-          <p>Rating: <span data-bind="text: rating"></span></p>
+          <p>Rating: <span data-bind="text: rating" ></span></p>
+          <a data-bind="click: $root.getGoodComments($parent.comments)"><i class="icon ion-refresh"></i></a>
         </div>
       </div>
       </section>
