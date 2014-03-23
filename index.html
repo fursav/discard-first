@@ -36,8 +36,8 @@
             <thead>
               <tr>
                 <th width="200"></th>
-                <th data-bind="click: sortByName">Title</th>
-                <th data-bind="click: sortByBRating">BGG Rating</th>
+                <th data-bind="click: handleSort.bind($data,'name')">Title</th>
+                <th data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
               </tr>
             </thead>
             <tbody data-bind="foreach: searchedGames">
@@ -56,7 +56,7 @@
 
     <!-- Selected game -->
     <div data-bind="visible: selectedGame">
-      <div  data-magellan-expedition data-options="destination_threshold:140;throttle_delay:0;" >
+      <div  data-magellan-expedition data-options="destination_threshold:200;throttle_delay:0;" >
         <ul class="sub-nav-vertical">
           <li>
               <h4 data-bind="with: selectedGame"><span data-bind="text: $root.getName(name)"></span></h4>
@@ -224,6 +224,6 @@
     <script src="js/foundation/foundation.magellan.js"></script>
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/script2.js"></script>
   </body>
 </html>
