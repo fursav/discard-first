@@ -89,7 +89,6 @@
     self.getCategoriesFromLinks = function(link) {
       var categories, i;
       categories = [];
-      console.log("here");
       i = 0;
       while (i < link.length) {
         if (link[i]["type"] === "boardgamecategory") {
@@ -97,7 +96,6 @@
         }
         i++;
       }
-      console.log(categories);
       return categories;
     };
     self.getDesignerFromLinks = function(link) {
@@ -216,6 +214,12 @@
         gdata = eval("(" + sessionStorage["bg" + id] + ")");
         if (gdata) {
           console.log("using cache");
+          console.log(gdata);
+          gdata["featuredComment"] = ko.observable();
+          gdata.pickFeaturedComment = function() {
+            gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)]);
+          };
+          gdata.pickFeaturedComment();
           self.selectedGame(gdata);
           $("html, body").animate({
             scrollTop: 0
@@ -227,14 +231,25 @@
       }
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1";
       $.getJSON(self.getYQLurl(url), function(data) {
+        var p;
         if (data.query.results) {
-          gdata = data.query.results.items["item"];
+          gdata = new function() {};
+          for (p in data.query.results.items["item"]) {
+            gdata[p] = data.query.results.items["item"][p];
+          }
           if (gdata["thumbnail"] == null) {
             gdata["thumbnail"] = "";
           }
-          sessionStorage["bg" + id] = JSON.stringify(gdata);
+          gdata["goodComments"] = gdata.comments.comment.filter(function(el) {
+            return el.value.length > 119 && parseInt(el.rating) > 0 && el.value.length < 600;
+          });
+          gdata["featuredComment"] = ko.observable();
+          gdata.pickFeaturedComment = function() {
+            gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)]);
+          };
+          gdata.pickFeaturedComment();
+          sessionStorage["bg" + id] = ko.toJSON(gdata);
           self.selectedGame(gdata);
-          console.log(gdata);
           $("html, body").animate({
             scrollTop: 0
           }, "slow");

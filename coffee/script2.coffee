@@ -95,13 +95,11 @@ ViewModel = ->
 
   self.getCategoriesFromLinks = (link) ->
     categories = []
-    console.log "here"
     i = 0
 
     while i < link.length
       categories.push link[i]["value"]  if link[i]["type"] is "boardgamecategory"
       i++
-    console.log categories
     categories
 
   self.getDesignerFromLinks = (link) ->
@@ -206,6 +204,12 @@ ViewModel = ->
       gdata = eval("(" + sessionStorage["bg" + id] + ")")
       if gdata
         console.log "using cache"
+        console.log gdata
+        gdata["featuredComment"] = ko.observable()
+        gdata.pickFeaturedComment = ->
+          gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)])
+          return
+        gdata.pickFeaturedComment()
         self.selectedGame gdata
         $("html, body").animate
           scrollTop: 0
@@ -216,11 +220,20 @@ ViewModel = ->
     url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1"
     $.getJSON self.getYQLurl(url), (data) ->
       if data.query.results
-        gdata = data.query.results.items["item"]
+        gdata = new ->
+        for p of data.query.results.items["item"]
+          gdata[p] = data.query.results.items["item"][p]
         gdata["thumbnail"] = ""  unless gdata["thumbnail"]?
-        sessionStorage["bg" + id] = JSON.stringify(gdata)
+        gdata["goodComments"] =   gdata.comments.comment.filter((el) ->
+          el.value.length > 119 and parseInt(el.rating) > 0 and el.value.length < 600
+        )
+        gdata["featuredComment"] = ko.observable()
+        gdata.pickFeaturedComment = ->
+          gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)])
+          return
+        gdata.pickFeaturedComment()
+        sessionStorage["bg" + id] = ko.toJSON(gdata)
         self.selectedGame gdata
-        console.log gdata
         $("html, body").animate
           scrollTop: 0
         , "slow"

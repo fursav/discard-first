@@ -37,7 +37,7 @@
               <tr>
                 <th width="200"></th>
                 <th data-bind="click: handleSort.bind($data,'name')">Title</th>
-                <th data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
+                <th data-bind="click: handleSort.bind($data,'name')">BGG Rating</th>
               </tr>
             </thead>
             <tbody data-bind="foreach: searchedGames">
@@ -182,7 +182,7 @@
       <!-- Comments -->
       <section class="section section-gray"> 
       <a name="comments"></a>
-      <div class="row" data-bind="with: $root.getGoodComments(comments)" data-magellan-destination="comments">
+      <div class="row" data-bind="with: featuredComment" data-magellan-destination="comments">
         <div class="column small-3">
           <h4 class="text-center">Comments</h4>
           <div class="text-center"><i class="icon ion-chatbox-working icon-huge"></i></div>
@@ -193,7 +193,7 @@
           <cite data-bind="html: username"></cite>
           </blockquote>
           <p>Rating: <span data-bind="text: rating" ></span></p>
-          <a data-bind="click: $root.getGoodComments($parent.comments)"><i class="icon ion-refresh"></i></a>
+          <a data-bind="click: $parent.pickFeaturedComment()"><i class="icon ion-refresh"></i></a>
         </div>
       </div>
       </section>
