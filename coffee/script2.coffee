@@ -98,9 +98,9 @@ ViewModel = ->
   # Invoked when user clicks on a table header of search results
   # Calls appropriate sort method 
   # Calls method to update icons representing sort direction
-  # type [String] (name,brating)
-  # vm [ViewModel]
-  # event [jQueryEvent]
+  # @param type [String] (name,brating)
+  # @param vm [ViewModel]
+  # @param event [jQueryEvent]
   self.handleSort = (type,vm,event) ->
     #default to descending sort
     #unless already sorted by the same type
@@ -112,8 +112,8 @@ ViewModel = ->
       when "brating" then self.sortByBRating()
     return
   # Updates sort direction icons
-  # type [String] (name,brating)
-  # event [jQueryEvent]
+  # @param type [String] (name,brating)
+  # @param event [jQueryEvent]
   self.updateTableHeaders = (type,event) ->
     $("#results-table thead tr th").removeClass "headerSortUp"
     $("#results-table thead tr th").removeClass "headerSortDown"
@@ -126,30 +126,30 @@ ViewModel = ->
   # get information from boardgame object
 
   # Returns link to bgg rank page for given rank
-  # name [String] (type of rank/game)
-  # id [String] (id of the rank)
-  # value [String] (rank value)
+  # @param name [String] type of rank/game
+  # @param id [String] id of the rank
+  # @param value [String] rank value
   self.getRankLink = (name, id, value) ->
     return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"  if name is "boardgame"
     return "http://boardgamegeek.com/#{name}/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"
 
-  # Returns all the ranks a boardgame has
-  # stats [Object]
+  # Returns all the ranks of a boardgame
+  # @param stats [Object]
   self.getRanks = (stats) ->
     stats.ratings.ranks.rank
 
   # Returns average rating of a boardgame
-  # stats [Object]
+  # @param stats [Object]
   self.getAverageRating = (stats) ->
     stats.ratings.average.value
 
   # Returns Bayes Rating of boardgame
-  # stats [Object]
+  # @param stats [Object]
   self.getBRating = (stats) ->
     stats.ratings.bayesaverage.value
 
   # Returns all the categories of a boardgame
-  # links [Array]
+  # @param links [Array]
   self.getCategoriesFromLinks = (links) ->
     # [Array]
     categories = []
@@ -158,7 +158,7 @@ ViewModel = ->
     return categories
 
   # Returns the designer of a boardgame
-  # links [Array]
+  # @param links [Array]
   self.getDesignerFromLinks = (link) ->
 
     for link in links
@@ -166,20 +166,20 @@ ViewModel = ->
     return
 
   # Returns the primary name of a boardgame
-  # name [Array or String]
+  # @param name [Array or String]
   self.getName = (name) ->
     return name[0].value  if Array.isArray(name)
     name.value
 
   # Returns shorted description of a boardgame
-  # description [String]
+  # @param description [String]
   self.getShortDescription = (description) ->
     description.slice(0, 100) + "..."
 
   # utilities
 
   # Returns the html of description string
-  # description [String]
+  # @param description [String]
   self.parseDescription = (description) ->
     paragraphs = 1
     contenthid = false
@@ -220,7 +220,7 @@ ViewModel = ->
     return description
 
   # Searches games that match input string
-  # str [String]
+  # @param str [String]
   self.searchGames = (str) ->
     # Clear previous search results
     self.searchedGames.removeAll()
@@ -251,7 +251,7 @@ ViewModel = ->
     return
 
   # Returns the list of ids of the boardgames that match the search string
-  # data [Object]
+  # @param data [Object]
   self.extractIdsFromSearch = (data) ->
     console.log data
     if data.query.results
@@ -276,14 +276,14 @@ ViewModel = ->
     return
 
   # Returns the YQL query
-  # str [String]
+  # @param str [String]
   self.getYQLurl = (str) ->
     q = "select * from xml where url="
     url = "'#{str}'"
     return "http://query.yahooapis.com/v1/public/yql?q=#{encodeURIComponent(q + url)}&format=json&callback=?"
 
   # Loads data for a given boardgame id
-  # id [String]
+  # @param id [String]
   self.getGameDetails = (id) ->
     if Modernizr.sessionstorage
       gdata = eval("(" + sessionStorage["bg" + id] + ")")
@@ -363,7 +363,8 @@ ViewModel = ->
     str = encodeURIComponent($("#search").val())
     location.hash = "search/" + str
     return
-
+    
+  # @param object [Object] boardgame object
   self.goToGame = (object) ->
     location.hash = "game/" + object.id
     return
