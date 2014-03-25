@@ -64,6 +64,19 @@ $ ->
   ko.applyBindings new ViewModel()
   return
 
+class BoardGame
+  constructor: (data) ->
+    for key,value of data
+      @[key] = value
+    @thumbnail ?= ""
+    @goodComments ?= (comment for comment in @comments.comment when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
+    @featuredComment = ko.observable()
+    @pickFeaturedComment()
+
+  pickFeaturedComment: ->
+      @featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
+      return
+
 class ViewModel
   constructor: ->
     self = this
@@ -132,7 +145,7 @@ class ViewModel
   # Updates sort direction icons
   # @param type [String] (name,brating)
   # @param event [jQueryEvent]
-  updateTableHeaders: (type,event) ->
+  updateTableHeaders: (type,event) =>
     $("#results-table thead tr th").removeClass "headerSortUp"
     $("#results-table thead tr th").removeClass "headerSortDown"
     if sortDirection is -1
@@ -376,6 +389,9 @@ class ViewModel
         return
 
       i++
+    return
+
+  saveToCache: (type,key,data) ->
     return
 
   goToSearch: ->
