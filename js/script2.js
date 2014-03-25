@@ -6,56 +6,77 @@
     ko.applyBindings(new ViewModel());
   });
 
-  ViewModel = function() {
-    var currentSort, self, sortDirection;
-    self = this;
-    self.searchedGames = ko.observableArray([]);
-    self.selectedGame = ko.observable();
-    self.searching = ko.observable(null);
-    sortDirection = -1;
-    currentSort = 'brating';
-    self.sortByName = function(direction) {
+  ViewModel = (function() {
+    function ViewModel() {
+      var self;
+      self = this;
+      this.searchedGames = ko.observableArray([]);
+      this.selectedGame = ko.observable();
+      this.searching = ko.observable(null);
+      this.sortDirection = -1;
+      this.currentSort = 'brating';
+      Sammy(function() {
+        this.get("#search/:string", function() {
+          self.selectedGame(null);
+          self.searchGames(this.params.string);
+        });
+        this.get(/#game\/(.*)(#.+)?/, function() {
+          self.searchedGames.removeAll();
+          self.getGameDetails(this.params.splat[0]);
+        });
+        this.get("", function() {});
+      }).run();
+    }
+
+    ViewModel.prototype.sortByName = function(direction) {
+      var sortDirection,
+        _this = this;
       if (direction != null) {
         sortDirection = direction;
       }
-      self.searchedGames.sort(function(a, b) {
-        if (self.getName(a.name) > self.getName(b.name)) {
+      this.searchedGames.sort(function(a, b) {
+        if (_this.getName(a.name) > _this.getName(b.name)) {
           return 1 * sortDirection;
         }
-        if (self.getName(a.name) < self.getName(b.name)) {
+        if (_this.getName(a.name) < _this.getName(b.name)) {
           return -1 * sortDirection;
         }
         return 0;
       });
     };
-    self.sortByBRating = function(direction) {
-      console.log('sorting');
+
+    ViewModel.prototype.sortByBRating = function(direction) {
+      var sortDirection,
+        _this = this;
       if (direction != null) {
         sortDirection = direction;
       }
-      self.searchedGames.sort(function(a, b) {
-        if (self.getBRating(a.statistics) > self.getBRating(b.statistics)) {
+      this.searchedGames.sort(function(a, b) {
+        if (_this.getBRating(a.statistics) > _this.getBRating(b.statistics)) {
           return 1 * sortDirection;
         }
-        if (self.getBRating(a.statistics) < self.getBRating(b.statistics)) {
+        if (_this.getBRating(a.statistics) < _this.getBRating(b.statistics)) {
           return -1 * sortDirection;
         }
         return 0;
       });
     };
-    self.handleSort = function(type, vm, event) {
+
+    ViewModel.prototype.handleSort = function(type, vm, event) {
+      var currentSort, sortDirection;
       sortDirection = type === currentSort ? -sortDirection : -1;
       currentSort = type;
-      self.updateTableHeaders(type, event);
+      this.updateTableHeaders(type, event);
       switch (type) {
         case "name":
-          self.sortByName();
+          this.sortByName();
           break;
         case "brating":
-          self.sortByBRating();
+          this.sortByBRating();
       }
     };
-    self.updateTableHeaders = function(type, event) {
+
+    ViewModel.prototype.updateTableHeaders = function(type, event) {
       $("#results-table thead tr th").removeClass("headerSortUp");
       $("#results-table thead tr th").removeClass("headerSortDown");
       if (sortDirection === -1) {
@@ -64,60 +85,60 @@
         $(event.toElement).addClass("headerSortUp");
       }
     };
-    self.getGoodComments = function(comments) {
-      var gc;
-      gc = comments.comment.filter(function(el) {
-        return el.value.length > 119 && parseInt(el.rating) > 0 && el.value.length < 600;
-      });
-      return gc[Math.floor(Math.random() * gc.length)];
-    };
-    self.getRankLink = function(name, id, value) {
+
+    ViewModel.prototype.getRankLink = function(name, id, value) {
       if (name === "boardgame") {
         return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
       }
       return "http://boardgamegeek.com/" + name + "/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
     };
-    self.getRanks = function(stats) {
+
+    ViewModel.prototype.getRanks = function(stats) {
       return stats.ratings.ranks.rank;
     };
-    self.getAverageRating = function(stats) {
+
+    ViewModel.prototype.getAverageRating = function(stats) {
       return stats.ratings.average.value;
     };
-    self.getBRating = function(stats) {
+
+    ViewModel.prototype.getBRating = function(stats) {
       return stats.ratings.bayesaverage.value;
     };
-    self.getCategoriesFromLinks = function(link) {
-      var categories, i;
+
+    ViewModel.prototype.getCategoriesFromLinks = function(links) {
+      var categories, link, _i, _len;
       categories = [];
-      i = 0;
-      while (i < link.length) {
-        if (link[i]["type"] === "boardgamecategory") {
-          categories.push(link[i]["value"]);
+      for (_i = 0, _len = links.length; _i < _len; _i++) {
+        link = links[_i];
+        if (link["type"] === "boardgamecategory") {
+          categories.push(link["value"]);
         }
-        i++;
       }
       return categories;
     };
-    self.getDesignerFromLinks = function(link) {
-      var i;
-      i = 0;
-      while (i < link.length) {
-        if (link[i]["type"] === "boardgamedesigner") {
-          return link[i]["value"];
+
+    ViewModel.prototype.getDesignerFromLinks = function(link) {
+      var _i, _len;
+      for (_i = 0, _len = links.length; _i < _len; _i++) {
+        link = links[_i];
+        if (link["type"] === "boardgamedesigner") {
+          return link["value"];
         }
-        i++;
       }
     };
-    self.getName = function(name) {
+
+    ViewModel.prototype.getName = function(name) {
       if (Array.isArray(name)) {
         return name[0].value;
       }
       return name.value;
     };
-    self.getShortDescription = function(description) {
+
+    ViewModel.prototype.getShortDescription = function(description) {
       return description.slice(0, 100) + "...";
     };
-    self.parseDescription = function(description) {
+
+    ViewModel.prototype.parseDescription = function(description) {
       var contenthid, i, paragraphs, regex;
       paragraphs = 1;
       contenthid = false;
@@ -146,47 +167,47 @@
       if (contenthid) {
         description += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>";
       }
-      regex = new RegExp(self.getName(self.selectedGame().name), "g");
-      description = description.replace(regex, "<b>" + self.getName(self.selectedGame().name) + "</b>");
+      regex = new RegExp(this.getName(this.selectedGame().name), "g");
+      description = description.replace(regex, "<b>" + this.getName(this.selectedGame().name) + "</b>");
       return description;
     };
-    self.searchGames = function(str) {
-      var ids, regex, url;
-      self.searchedGames.removeAll();
+
+    ViewModel.prototype.searchGames = function(str) {
+      var ids, regex, url,
+        _this = this;
+      this.searchedGames.removeAll();
       if (str === "") {
         return;
       }
       regex = new RegExp(" ", "g");
       str = str.replace(regex, "+");
-      self.searching(true);
+      this.searching(true);
       if (Modernizr.sessionstorage) {
         ids = eval("(" + sessionStorage["searched_bg_ids_" + str] + ")");
         if (ids) {
-          self.getGamesDetails(ids, str);
-          self.searching(null);
+          this.getGamesDetails(ids, str);
+          this.searching(null);
           return;
         }
-      } else {
-
       }
       url = "http://www.boardgamegeek.com/xmlapi/search?search=" + str;
-      $.getJSON(self.getYQLurl(url), function(data) {
-        ids = self.extractIdsFromSearch(data);
+      $.getJSON(this.getYQLurl(url), function(data) {
+        ids = _this.extractIdsFromSearch(data);
         sessionStorage["searched_bg_ids_" + str] = JSON.stringify(ids);
-        self.getGamesDetails(ids, str);
+        _this.getGamesDetails(ids, str);
       });
     };
-    self.extractIdsFromSearch = function(data) {
-      var i, ids, jdata;
+
+    ViewModel.prototype.extractIdsFromSearch = function(data) {
+      var ids, jdata, object, _i, _len;
       console.log(data);
       if (data.query.results) {
         jdata = data.query.results.boardgames["boardgame"];
         ids = [];
         if (Array.isArray(jdata)) {
-          i = 0;
-          while (i < jdata.length) {
-            ids.push(jdata[i]["objectid"]);
-            i++;
+          for (_i = 0, _len = jdata.length; _i < _len; _i++) {
+            object = jdata[_i];
+            ids.push(object["objectid"]);
           }
         } else {
           ids.push(jdata["objectid"]);
@@ -194,7 +215,8 @@
         return ids;
       }
     };
-    self.getSomething = function() {
+
+    ViewModel.prototype.getSomething = function() {
       var url;
       console.log("here");
       url = "http://www.boardgamegeek.com/boardgame/125618/libertalia";
@@ -202,14 +224,17 @@
         console.log(data);
       });
     };
-    self.getYQLurl = function(str) {
+
+    ViewModel.prototype.getYQLurl = function(str) {
       var q, url;
       q = "select * from xml where url=";
       url = "'" + str + "'";
-      return "http://query.yahooapis.com/v1/public/yql?q=" + encodeURIComponent(q + url) + "&format=json&callback=?";
+      return "http://query.yahooapis.com/v1/public/yql?q=" + (encodeURIComponent(q + url)) + "&format=json&callback=?";
     };
-    self.getGameDetails = function(id) {
-      var gdata, url;
+
+    ViewModel.prototype.getGameDetails = function(id) {
+      var gdata, url,
+        _this = this;
       if (Modernizr.sessionstorage) {
         gdata = eval("(" + sessionStorage["bg" + id] + ")");
         if (gdata) {
@@ -220,7 +245,7 @@
             gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)]);
           };
           gdata.pickFeaturedComment();
-          self.selectedGame(gdata);
+          this.selectedGame(gdata);
           $("html, body").animate({
             scrollTop: 0
           }, "slow");
@@ -230,7 +255,7 @@
 
       }
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1";
-      $.getJSON(self.getYQLurl(url), function(data) {
+      $.getJSON(this.getYQLurl(url), function(data) {
         var p;
         if (data.query.results) {
           gdata = new function() {};
@@ -249,22 +274,24 @@
           };
           gdata.pickFeaturedComment();
           sessionStorage["bg" + id] = ko.toJSON(gdata);
-          self.selectedGame(gdata);
+          _this.selectedGame(gdata);
           $("html, body").animate({
             scrollTop: 0
           }, "slow");
         }
       });
     };
-    self.getGamesDetails = function(gameids, str) {
-      var counter, gdata, i, url;
+
+    ViewModel.prototype.getGamesDetails = function(gameids, str) {
+      var counter, gdata, i, url,
+        _this = this;
       if (Modernizr.sessionstorage) {
         gdata = eval("(" + sessionStorage["searched_bgs_" + str] + ")");
         if (gdata) {
           console.log("using cached search games");
-          self.searching(null);
-          self.searchedGames(gdata);
-          self.sortByBRating(-1);
+          this.searching(null);
+          this.searchedGames(gdata);
+          this.sortByBRating(-1);
           return;
         }
       } else {
@@ -274,45 +301,38 @@
       i = 0;
       while (i < gameids.length) {
         url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + gameids[i] + "&stats=1";
-        $.getJSON(self.getYQLurl(url), function(data) {
+        $.getJSON(this.getYQLurl(url), function(data) {
           counter += 1;
           if (data.query.results) {
             gdata = data.query.results.items["item"];
             if (gdata["thumbnail"] == null) {
               gdata["thumbnail"] = "";
             }
-            self.searchedGames.push(gdata);
+            _this.searchedGames.push(gdata);
           }
           if (counter === gameids.length) {
-            self.searching(null);
-            sessionStorage["searched_bgs_" + str] = JSON.stringify(self.searchedGames());
-            self.sortByBRating(-1);
+            _this.searching(null);
+            sessionStorage["searched_bgs_" + str] = JSON.stringify(_this.searchedGames());
+            _this.sortByBRating(-1);
           }
         });
         i++;
       }
     };
-    self.goToSearch = function() {
+
+    ViewModel.prototype.goToSearch = function() {
       var str;
       str = encodeURIComponent($("#search").val());
       location.hash = "search/" + str;
     };
-    self.goToGame = function(object) {
+
+    ViewModel.prototype.goToGame = function(object) {
       location.hash = "game/" + object.id;
     };
-    Sammy(function() {
-      this.get("#search/:string", function() {
-        self.selectedGame(null);
-        self.searchGames(this.params.string);
-      });
-      this.get(/#game\/(.*)(#.+)?/, function() {
-        console.log(this.params);
-        self.searchedGames.removeAll();
-        self.getGameDetails(this.params.splat[0]);
-      });
-      this.get("", function() {});
-    }).run();
-  };
+
+    return ViewModel;
+
+  })();
 
 }).call(this);
 

@@ -64,34 +64,52 @@ $ ->
   ko.applyBindings new ViewModel()
   return
 
-ViewModel = ->
-  self = this
-  self.searchedGames = ko.observableArray([])
-  self.selectedGame = ko.observable()
-  # Indicates that information is currently loading
-  self.searching = ko.observable(null)
-  # 1 is ascending, -1 is descending
-  sortDirection = -1
-  currentSort = 'brating'
+class ViewModel
+  constructor: ->
+    self = this
+    # [Array]
+    @searchedGames = ko.observableArray([])
+    @selectedGame = ko.observable()
+    # Indicates that information is currently loading
+    @searching = ko.observable(null)
+    # 1 is ascending, -1 is descending
+    @sortDirection = -1
+    @currentSort = 'brating'
+    # Client-side routes   
+    Sammy(->
+      @get "#search/:string", ->
+        self.selectedGame(null)
+        self.searchGames @params.string
+        return
+
+      @get /#game\/(.*)(#.+)?/, ->
+        self.searchedGames.removeAll()
+        self.getGameDetails @params.splat[0]
+        return
+
+      @get "", ->
+
+      return
+    ).run()
 
   # Sorting of search results by name/title
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
-  self.sortByName = (direction) ->
+  sortByName: (direction) ->
     sortDirection = direction if direction?
-    self.searchedGames.sort (a, b) ->
-      return 1 * sortDirection  if self.getName(a.name) > self.getName(b.name)
-      return -1 * sortDirection  if self.getName(a.name) < self.getName(b.name)
+    @searchedGames.sort (a, b) =>
+      return 1 * sortDirection  if @getName(a.name) > @getName(b.name)
+      return -1 * sortDirection  if @getName(a.name) < @getName(b.name)
       0
 
     return
 
   # Sorting of search results by bayes rating
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
-  self.sortByBRating = (direction) ->
+  sortByBRating: (direction) ->
     sortDirection = direction if direction?
-    self.searchedGames.sort (a, b) ->
-      return 1 * sortDirection  if self.getBRating(a.statistics) > self.getBRating(b.statistics)
-      return -1 * sortDirection  if self.getBRating(a.statistics) < self.getBRating(b.statistics)
+    @searchedGames.sort (a, b) =>
+      return 1 * sortDirection  if @getBRating(a.statistics) > @getBRating(b.statistics)
+      return -1 * sortDirection  if @getBRating(a.statistics) < @getBRating(b.statistics)
       0
 
     return
@@ -101,20 +119,20 @@ ViewModel = ->
   # @param type [String] (name,brating)
   # @param vm [ViewModel]
   # @param event [jQueryEvent]
-  self.handleSort = (type,vm,event) ->
+  handleSort: (type,vm,event) ->
     #default to descending sort
     #unless already sorted by the same type
     sortDirection = if type is currentSort then -sortDirection else -1
     currentSort = type
-    self.updateTableHeaders(type, event)
+    @updateTableHeaders(type, event)
     switch type
-      when "name" then self.sortByName()
-      when "brating" then self.sortByBRating()
+      when "name" then @sortByName()
+      when "brating" then @sortByBRating()
     return
   # Updates sort direction icons
   # @param type [String] (name,brating)
   # @param event [jQueryEvent]
-  self.updateTableHeaders = (type,event) ->
+  updateTableHeaders: (type,event) ->
     $("#results-table thead tr th").removeClass "headerSortUp"
     $("#results-table thead tr th").removeClass "headerSortDown"
     if sortDirection is -1
@@ -129,28 +147,28 @@ ViewModel = ->
   # @param name [String] type of rank/game
   # @param id [String] id of the rank
   # @param value [String] rank value
-  self.getRankLink = (name, id, value) ->
+  getRankLink: (name, id, value) ->
     return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"  if name is "boardgame"
     return "http://boardgamegeek.com/#{name}/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"
 
   # Returns all the ranks of a boardgame
   # @param stats [Object]
-  self.getRanks = (stats) ->
+  getRanks: (stats) ->
     stats.ratings.ranks.rank
 
   # Returns average rating of a boardgame
   # @param stats [Object]
-  self.getAverageRating = (stats) ->
+  getAverageRating: (stats) ->
     stats.ratings.average.value
 
   # Returns Bayes Rating of boardgame
   # @param stats [Object]
-  self.getBRating = (stats) ->
+  getBRating: (stats) ->
     stats.ratings.bayesaverage.value
 
   # Returns all the categories of a boardgame
   # @param links [Array]
-  self.getCategoriesFromLinks = (links) ->
+  getCategoriesFromLinks: (links) ->
     # [Array]
     categories = []
     for link in links
@@ -159,7 +177,7 @@ ViewModel = ->
 
   # Returns the designer of a boardgame
   # @param links [Array]
-  self.getDesignerFromLinks = (link) ->
+  getDesignerFromLinks: (link) ->
 
     for link in links
       return link["value"]  if link["type"] is "boardgamedesigner"
@@ -167,20 +185,20 @@ ViewModel = ->
 
   # Returns the primary name of a boardgame
   # @param name [Array or String]
-  self.getName = (name) ->
+  getName: (name) ->
     return name[0].value  if Array.isArray(name)
     name.value
 
   # Returns shorted description of a boardgame
   # @param description [String]
-  self.getShortDescription = (description) ->
+  getShortDescription: (description) ->
     description.slice(0, 100) + "..."
 
   # utilities
 
   # Returns the html of description string
   # @param description [String]
-  self.parseDescription = (description) ->
+  parseDescription: (description) ->
     paragraphs = 1
     contenthid = false
 
@@ -215,44 +233,44 @@ ViewModel = ->
       i++
     # Add a button to show the hidden part of the description
     description += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>"  if contenthid
-    regex = new RegExp(self.getName(self.selectedGame().name), "g")
-    description = description.replace(regex, "<b>" + self.getName(self.selectedGame().name) + "</b>")
+    regex = new RegExp(@getName(@selectedGame().name), "g")
+    description = description.replace(regex, "<b>" + @getName(@selectedGame().name) + "</b>")
     return description
 
   # Searches games that match input string
   # @param str [String]
-  self.searchGames = (str) ->
+  searchGames: (str) ->
     # Clear previous search results
-    self.searchedGames.removeAll()
+    @searchedGames.removeAll()
     # Do nothing if no characters are entered
     return  if str is ""
 
     regex = new RegExp(" ", "g")
     str = str.replace(regex, "+")
 
-    self.searching(true)
+    @searching(true)
 
     # Check if results are already cached
     if Modernizr.sessionstorage
       ids = eval("(" + sessionStorage["searched_bg_ids_#{str}"] + ")")
       if ids
-        self.getGamesDetails(ids, str)
-        self.searching(null)
+        @getGamesDetails(ids, str)
+        @searching(null)
         return
 
     url = "http://www.boardgamegeek.com/xmlapi/search?search=#{str}"
-    $.getJSON self.getYQLurl(url), (data) ->
+    $.getJSON @getYQLurl(url), (data) =>
       # [Array]
-      ids = self.extractIdsFromSearch(data)
+      ids = @extractIdsFromSearch(data)
       sessionStorage["searched_bg_ids_#{str}"] = JSON.stringify(ids)
-      self.getGamesDetails(ids, str)
+      @getGamesDetails(ids, str)
       return
 
     return
 
   # Returns the list of ids of the boardgames that match the search string
   # @param data [Object]
-  self.extractIdsFromSearch = (data) ->
+  extractIdsFromSearch: (data) ->
     console.log data
     if data.query.results
       # [Array] or Object
@@ -266,7 +284,7 @@ ViewModel = ->
         ids.push(jdata["objectid"])
       return ids
 
-  self.getSomething = ->
+  getSomething: ->
     console.log "here"
     url = "http://www.boardgamegeek.com/boardgame/125618/libertalia"
     $.getJSON "http://query.yahooapis.com/v1/public/yql?" + "q=select%20*%20from%20html%20where%20url%3D%22" + encodeURIComponent(url) + "%22&format=xml'&callback=?", (data) ->
@@ -277,14 +295,14 @@ ViewModel = ->
 
   # Returns the YQL query
   # @param str [String]
-  self.getYQLurl = (str) ->
+  getYQLurl: (str) ->
     q = "select * from xml where url="
     url = "'#{str}'"
     return "http://query.yahooapis.com/v1/public/yql?q=#{encodeURIComponent(q + url)}&format=json&callback=?"
 
   # Loads data for a given boardgame id
   # @param id [String]
-  self.getGameDetails = (id) ->
+  getGameDetails: (id) ->
     if Modernizr.sessionstorage
       gdata = eval("(" + sessionStorage["bg" + id] + ")")
       if gdata
@@ -295,7 +313,8 @@ ViewModel = ->
           gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)])
           return
         gdata.pickFeaturedComment()
-        self.selectedGame gdata
+        @selectedGame(gdata)
+        #@selectedGame gdata
         $("html, body").animate
           scrollTop: 0
         , "slow"
@@ -303,7 +322,7 @@ ViewModel = ->
     else
 
     url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1"
-    $.getJSON self.getYQLurl(url), (data) ->
+    $.getJSON @getYQLurl(url), (data) =>
       if data.query.results
         gdata = new ->
         for p of data.query.results.items["item"]
@@ -318,7 +337,7 @@ ViewModel = ->
           return
         gdata.pickFeaturedComment()
         sessionStorage["bg" + id] = ko.toJSON(gdata)
-        self.selectedGame gdata
+        @selectedGame gdata
         $("html, body").animate
           scrollTop: 0
         , "slow"
@@ -326,15 +345,15 @@ ViewModel = ->
 
     return
 
-  self.getGamesDetails = (gameids, str) ->
+  getGamesDetails: (gameids, str) ->
     if Modernizr.sessionstorage
       gdata = eval("(" + sessionStorage["searched_bgs_" + str] + ")")
       if gdata
         console.log "using cached search games"
-        self.searching null
-        self.searchedGames gdata
+        @searching null
+        @searchedGames gdata
         #perform sort by rank
-        self.sortByBRating(-1)
+        @sortByBRating(-1)
         return
     else
 
@@ -343,47 +362,28 @@ ViewModel = ->
 
     while i < gameids.length
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + gameids[i] + "&stats=1"
-      $.getJSON self.getYQLurl(url), (data) ->
+      $.getJSON @getYQLurl(url), (data) =>
         counter += 1
         if data.query.results
           gdata = data.query.results.items["item"]
           gdata["thumbnail"] = ""  unless gdata["thumbnail"]?
-          self.searchedGames.push gdata
+          @searchedGames.push gdata
         if counter is gameids.length
-          self.searching null
-          sessionStorage["searched_bgs_" + str] = JSON.stringify(self.searchedGames())
+          @searching null
+          sessionStorage["searched_bgs_" + str] = JSON.stringify(@searchedGames())
           #perform sort by rank
-          self.sortByBRating(-1)
+          @sortByBRating(-1)
         return
 
       i++
     return
 
-  self.goToSearch = ->
+  goToSearch: ->
     str = encodeURIComponent($("#search").val())
     location.hash = "search/" + str
     return
     
   # @param object [Object] boardgame object
-  self.goToGame = (object) ->
+  goToGame: (object) ->
     location.hash = "game/" + object.id
     return
-
-  # Client-side routes   
-
-  Sammy(->
-    @get "#search/:string", ->
-      self.selectedGame null
-      self.searchGames @params.string
-      return
-
-    @get /#game\/(.*)(#.+)?/, ->
-      self.searchedGames.removeAll()
-      self.getGameDetails @params.splat[0]
-      return
-
-    @get "", ->
-
-    return
-  ).run()
-  return
