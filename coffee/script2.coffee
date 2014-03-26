@@ -1,15 +1,15 @@
-#Code Convetions
+# Code Convetions
 
 #---------------------------------------------------------------------------------------------------
-#https://github.com/polarmobile/coffeescript-style-guide
-
-#---------------------------------------------------------------------------------------------------
-
-#Use spaces only, with 2 spaces per indentation level. Never mix tabs and spaces.
+# https://github.com/polarmobile/coffeescript-style-guide
 
 #---------------------------------------------------------------------------------------------------
 
-#Always surround these binary operators with a single space on either side
+# Use spaces only, with 2 spaces per indentation level. Never mix tabs and spaces.
+
+#---------------------------------------------------------------------------------------------------
+
+# Always surround these binary operators with a single space on either side
 # assignment: =
 # augmented assignment: +=, -=, etc.
 # comparisons: ==, <, >, <=, >=, unless, etc.
@@ -64,10 +64,93 @@ $ ->
   ko.applyBindings new ViewModel()
   return
 
-class BoardGame
+class BoardGameResult
   constructor: (data) ->
+    console.log data
     for key,value of data
       @[key] = value
+    @thumbnail ?= ""
+
+  # Returns all the ranks of a boardgame
+  getRanks: ->
+    @statistics.ratings.ranks.rank
+
+  # Returns average rating of a boardgame
+  getAverageRating: ->
+    @statistics.ratings.average.value
+
+  # Returns Bayes Rating of boardgame
+  getBRating: ->
+    @statistics.ratings.bayesaverage.value
+
+  # Returns all the categories of a boardgame
+  getCategories: ->
+    # [Array]
+    categories = []
+    for link in @link
+      categories.push(link["value"])  if link["type"] is "boardgamecategory"
+    return categories
+
+  # Returns the designer of a boardgame
+  getDesigner: ->
+    for link in @link
+      return link["value"]  if link["type"] is "boardgamedesigner"
+    return
+
+  # Returns the primary name of a boardgame
+  getName: ->
+    return @name[0].value  if $.type(@name) is "array"
+    @name.value
+
+  # Returns shorted description of a boardgame
+  getShortDescription: ->
+    @description.slice(0, 100) + "..."
+
+  # Returns the html of description string
+  getHTMLDescription: ->
+    paragraphs = 1
+    contenthid = false
+
+    regex = new RegExp("&#10;&#10;&#10;    ", "g")
+    # [String]
+    htmlDescription = @description.replace(regex, "<ul><li>")
+
+    regex = new RegExp("&#10;&#10;&#10;", "g")
+    htmlDescription = htmlDescription.replace(regex, "</li></ul>")
+
+    regex = new RegExp("&#10;    ", "g")
+    htmlDescription = htmlDescription.replace(regex, "</li><li>")
+
+    htmlDescription = "<p>" + htmlDescription
+ 
+    regex = new RegExp("&#10;&#10;", "g")
+    htmlDescription = htmlDescription.replace(regex, "</p><p>")
+
+    htmlDescription += "</p>"
+    i = 0
+
+    while i < htmlDescription.length
+      # Count the number of paragraphs
+      # Unordered lists count as paragraphs
+      if htmlDescription.slice(i, i + 3) is "<p>" or htmlDescription.slice(i - 5, i) is "</ul>"
+        paragraphs += 1
+        # If past the defined limit of characters or paragraphs
+        # hide the rest of the description
+        if (paragraphs > 3 and i > 600 and htmlDescription.length - i > 7) and contenthid is false
+          htmlDescription = htmlDescription.slice(0, i) + "<div class='full-description' style='display:none'>" + htmlDescription.slice(i, htmlDescription.length)
+          contenthid = true
+          break
+      i++
+    # Add a button to show the hidden part of the description
+    htmlDescription += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>"  if contenthid
+    regex = new RegExp(@getName(), "g")
+    htmlDescription = htmlDescription.replace(regex, "<b>" + @getName() + "</b>")
+    return htmlDescription
+
+
+class BoardGame extends BoardGameResult
+  constructor: (data) ->
+    super(data)
     @thumbnail ?= ""
     @goodComments ?= (comment for comment in @comments.comment when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
     @featuredComment = ko.observable()
@@ -77,6 +160,15 @@ class BoardGame
       @featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
       return
 
+  # Returns link to bgg rank page for given rank
+  # @param name [String] type of rank/game
+  # @param id [String] id of the rank
+  # @param value [String] rank value
+  getRankLink: (name, id, value) ->
+    return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"  if name is "boardgame"
+    return "http://boardgamegeek.com/#{name}/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"
+
+  
 class ViewModel
   constructor: ->
     self = this
@@ -108,10 +200,12 @@ class ViewModel
   # Sorting of search results by name/title
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
   sortByName: (direction) ->
-    sortDirection = direction if direction?
+    @sortDirection = direction if direction?
+    # a [BoardGameResult]
+    # b [BoardGameResult]
     @searchedGames.sort (a, b) =>
-      return 1 * sortDirection  if @getName(a.name) > @getName(b.name)
-      return -1 * sortDirection  if @getName(a.name) < @getName(b.name)
+      return 1 * @sortDirection  if a.getName() > b.getName()
+      return -1 * @sortDirection  if a.getName() < b.getName()
       0
 
     return
@@ -119,10 +213,10 @@ class ViewModel
   # Sorting of search results by bayes rating
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
   sortByBRating: (direction) ->
-    sortDirection = direction if direction?
+    @sortDirection = direction if direction?
     @searchedGames.sort (a, b) =>
-      return 1 * sortDirection  if @getBRating(a.statistics) > @getBRating(b.statistics)
-      return -1 * sortDirection  if @getBRating(a.statistics) < @getBRating(b.statistics)
+      return 1 * @sortDirection  if a.getBRating() > b.getBRating()
+      return -1 * @sortDirection  if a.getBRating() < b.getBRating()
       0
 
     return
@@ -135,120 +229,25 @@ class ViewModel
   handleSort: (type,vm,event) ->
     #default to descending sort
     #unless already sorted by the same type
-    sortDirection = if type is currentSort then -sortDirection else -1
-    currentSort = type
+    @sortDirection = if type is @currentSort then -(@sortDirection) else -1
+    @currentSort = type
     @updateTableHeaders(type, event)
     switch type
       when "name" then @sortByName()
       when "brating" then @sortByBRating()
     return
+
   # Updates sort direction icons
   # @param type [String] (name,brating)
   # @param event [jQueryEvent]
   updateTableHeaders: (type,event) =>
     $("#results-table thead tr th").removeClass "headerSortUp"
     $("#results-table thead tr th").removeClass "headerSortDown"
-    if sortDirection is -1
+    if @sortDirection is -1
       $(event.toElement).addClass "headerSortDown"
     else
       $(event.toElement).addClass "headerSortUp"
     return  
-
-  # get information from boardgame object
-
-  # Returns link to bgg rank page for given rank
-  # @param name [String] type of rank/game
-  # @param id [String] id of the rank
-  # @param value [String] rank value
-  getRankLink: (name, id, value) ->
-    return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"  if name is "boardgame"
-    return "http://boardgamegeek.com/#{name}/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"
-
-  # Returns all the ranks of a boardgame
-  # @param stats [Object]
-  getRanks: (stats) ->
-    stats.ratings.ranks.rank
-
-  # Returns average rating of a boardgame
-  # @param stats [Object]
-  getAverageRating: (stats) ->
-    stats.ratings.average.value
-
-  # Returns Bayes Rating of boardgame
-  # @param stats [Object]
-  getBRating: (stats) ->
-    stats.ratings.bayesaverage.value
-
-  # Returns all the categories of a boardgame
-  # @param links [Array]
-  getCategoriesFromLinks: (links) ->
-    # [Array]
-    categories = []
-    for link in links
-      categories.push(link["value"])  if link["type"] is "boardgamecategory"
-    return categories
-
-  # Returns the designer of a boardgame
-  # @param links [Array]
-  getDesignerFromLinks: (link) ->
-
-    for link in links
-      return link["value"]  if link["type"] is "boardgamedesigner"
-    return
-
-  # Returns the primary name of a boardgame
-  # @param name [Array or String]
-  getName: (name) ->
-    return name[0].value  if Array.isArray(name)
-    name.value
-
-  # Returns shorted description of a boardgame
-  # @param description [String]
-  getShortDescription: (description) ->
-    description.slice(0, 100) + "..."
-
-  # utilities
-
-  # Returns the html of description string
-  # @param description [String]
-  parseDescription: (description) ->
-    paragraphs = 1
-    contenthid = false
-
-    regex = new RegExp("&#10;&#10;&#10;    ", "g")
-    description = description.replace(regex, "<ul><li>")
-
-    regex = new RegExp("&#10;&#10;&#10;", "g")
-    description = description.replace(regex, "</li></ul>")
-
-    regex = new RegExp("&#10;    ", "g")
-    description = description.replace(regex, "</li><li>")
-
-    description = "<p>" + description
- 
-    regex = new RegExp("&#10;&#10;", "g")
-    description = description.replace(regex, "</p><p>")
-
-    description += "</p>"
-    i = 0
-
-    while i < description.length
-      # Count the number of paragraphs
-      # Unordered lists count as paragraphs
-      if description.slice(i, i + 3) is "<p>" or description.slice(i - 5, i) is "</ul>"
-        paragraphs += 1
-        # If past the defined limit of characters or paragraphs
-        # hide the rest of the description
-        if (paragraphs > 3 and i > 600 and description.length - i > 7) and contenthid is false
-          description = description.slice(0, i) + "<div class='full-description' style='display:none'>" + description.slice(i, description.length)
-          contenthid = true
-          break
-      i++
-    # Add a button to show the hidden part of the description
-    description += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>"  if contenthid
-    regex = new RegExp(@getName(@selectedGame().name), "g")
-    description = description.replace(regex, "<b>" + @getName(@selectedGame().name) + "</b>")
-    return description
 
   # Searches games that match input string
   # @param str [String]
@@ -264,18 +263,18 @@ class ViewModel
     @searching(true)
 
     # Check if results are already cached
-    if Modernizr.sessionstorage
-      ids = eval("(" + sessionStorage["searched_bg_ids_#{str}"] + ")")
-      if ids
-        @getGamesDetails(ids, str)
-        @searching(null)
-        return
+    ids = @loadFromCache("searched_bgs_ids", str)
+    if ids
+      console.log "ids"
+      @searching null
+      @getGamesDetails(ids, str)
+      return
 
     url = "http://www.boardgamegeek.com/xmlapi/search?search=#{str}"
     $.getJSON @getYQLurl(url), (data) =>
       # [Array]
       ids = @extractIdsFromSearch(data)
-      sessionStorage["searched_bg_ids_#{str}"] = JSON.stringify(ids)
+      @saveToCache("searched_bgs_ids", str, ids)
       @getGamesDetails(ids, str)
       return
 
@@ -316,59 +315,29 @@ class ViewModel
   # Loads data for a given boardgame id
   # @param id [String]
   getGameDetails: (id) ->
-    if Modernizr.sessionstorage
-      gdata = eval("(" + sessionStorage["bg" + id] + ")")
-      if gdata
-        console.log "using cache"
-        console.log gdata
-        gdata["featuredComment"] = ko.observable()
-        gdata.pickFeaturedComment = ->
-          gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)])
-          return
-        gdata.pickFeaturedComment()
-        @selectedGame(gdata)
-        #@selectedGame gdata
-        $("html, body").animate
-          scrollTop: 0
-        , "slow"
-        return
-    else
+
+    data = @loadFromCache("bg", id)
+    if data
+      @selectedGame(new BoardGame(data))
+      return
 
     url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1"
     $.getJSON @getYQLurl(url), (data) =>
       if data.query.results
-        gdata = new ->
-        for p of data.query.results.items["item"]
-          gdata[p] = data.query.results.items["item"][p]
-        gdata["thumbnail"] = ""  unless gdata["thumbnail"]?
-        gdata["goodComments"] =   gdata.comments.comment.filter((el) ->
-          el.value.length > 119 and parseInt(el.rating) > 0 and el.value.length < 600
-        )
-        gdata["featuredComment"] = ko.observable()
-        gdata.pickFeaturedComment = ->
-          gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)])
-          return
-        gdata.pickFeaturedComment()
-        sessionStorage["bg" + id] = ko.toJSON(gdata)
-        @selectedGame gdata
-        $("html, body").animate
-          scrollTop: 0
-        , "slow"
+        @selectedGame(new BoardGame(data.query.results.items["item"]))
+        @saveToCache("bg", id, @selectedGame())        
       return
-
     return
 
   getGamesDetails: (gameids, str) ->
-    if Modernizr.sessionstorage
-      gdata = eval("(" + sessionStorage["searched_bgs_" + str] + ")")
-      if gdata
-        console.log "using cached search games"
-        @searching null
-        @searchedGames gdata
-        #perform sort by rank
-        @sortByBRating(-1)
-        return
-    else
+
+    data = @loadFromCache("searched_bgs", str)
+    if data
+      console.log "using cached search games"
+      @searching null
+      @searchedGames((new BoardGameResult(result) for result in data))
+      @sortByBRating(-1)
+      return
 
     counter = 0
     i = 0
@@ -378,13 +347,10 @@ class ViewModel
       $.getJSON @getYQLurl(url), (data) =>
         counter += 1
         if data.query.results
-          gdata = data.query.results.items["item"]
-          gdata["thumbnail"] = ""  unless gdata["thumbnail"]?
-          @searchedGames.push gdata
+          @searchedGames.push(new BoardGameResult(data.query.results.items["item"]))
         if counter is gameids.length
           @searching null
-          sessionStorage["searched_bgs_" + str] = JSON.stringify(@searchedGames())
-          #perform sort by rank
+          @saveToCache("searched_bgs", str, @searchedGames()) 
           @sortByBRating(-1)
         return
 
@@ -392,6 +358,14 @@ class ViewModel
     return
 
   saveToCache: (type,key,data) ->
+    if Modernizr.sessionstorage
+      sessionStorage["#{type}_#{key}"] = ko.toJSON(data)
+    return
+  loadFromCache: (type,key) ->
+    if Modernizr.sessionstorage
+      data = sessionStorage["#{type}_#{key}"]
+      data = JSON.parse(data) if data
+      return data
     return
 
   goToSearch: ->
@@ -402,4 +376,7 @@ class ViewModel
   # @param object [Object] boardgame object
   goToGame: (object) ->
     location.hash = "game/" + object.id
+    $("html, body").animate
+          scrollTop: 0
+        , "slow"
     return

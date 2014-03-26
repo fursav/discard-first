@@ -1,13 +1,157 @@
 (function() {
-  var ViewModel;
+  var BoardGame, BoardGameResult, ViewModel,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   $(function() {
     $(document).foundation();
     ko.applyBindings(new ViewModel());
   });
 
+  BoardGameResult = (function() {
+    function BoardGameResult(data) {
+      var key, value;
+      console.log(data);
+      for (key in data) {
+        value = data[key];
+        this[key] = value;
+      }
+      if (this.thumbnail == null) {
+        this.thumbnail = "";
+      }
+    }
+
+    BoardGameResult.prototype.getRanks = function() {
+      return this.statistics.ratings.ranks.rank;
+    };
+
+    BoardGameResult.prototype.getAverageRating = function() {
+      return this.statistics.ratings.average.value;
+    };
+
+    BoardGameResult.prototype.getBRating = function() {
+      return this.statistics.ratings.bayesaverage.value;
+    };
+
+    BoardGameResult.prototype.getCategories = function() {
+      var categories, link, _i, _len, _ref;
+      categories = [];
+      _ref = this.link;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        link = _ref[_i];
+        if (link["type"] === "boardgamecategory") {
+          categories.push(link["value"]);
+        }
+      }
+      return categories;
+    };
+
+    BoardGameResult.prototype.getDesigner = function() {
+      var link, _i, _len, _ref;
+      _ref = this.link;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        link = _ref[_i];
+        if (link["type"] === "boardgamedesigner") {
+          return link["value"];
+        }
+      }
+    };
+
+    BoardGameResult.prototype.getName = function() {
+      if ($.type(this.name) === "array") {
+        return this.name[0].value;
+      }
+      return this.name.value;
+    };
+
+    BoardGameResult.prototype.getShortDescription = function() {
+      return this.description.slice(0, 100) + "...";
+    };
+
+    BoardGameResult.prototype.getHTMLDescription = function() {
+      var contenthid, htmlDescription, i, paragraphs, regex;
+      paragraphs = 1;
+      contenthid = false;
+      regex = new RegExp("&#10;&#10;&#10;    ", "g");
+      htmlDescription = this.description.replace(regex, "<ul><li>");
+      regex = new RegExp("&#10;&#10;&#10;", "g");
+      htmlDescription = htmlDescription.replace(regex, "</li></ul>");
+      regex = new RegExp("&#10;    ", "g");
+      htmlDescription = htmlDescription.replace(regex, "</li><li>");
+      htmlDescription = "<p>" + htmlDescription;
+      regex = new RegExp("&#10;&#10;", "g");
+      htmlDescription = htmlDescription.replace(regex, "</p><p>");
+      htmlDescription += "</p>";
+      i = 0;
+      while (i < htmlDescription.length) {
+        if (htmlDescription.slice(i, i + 3) === "<p>" || htmlDescription.slice(i - 5, i) === "</ul>") {
+          paragraphs += 1;
+          if ((paragraphs > 3 && i > 600 && htmlDescription.length - i > 7) && contenthid === false) {
+            htmlDescription = htmlDescription.slice(0, i) + "<div class='full-description' style='display:none'>" + htmlDescription.slice(i, htmlDescription.length);
+            contenthid = true;
+            break;
+          }
+        }
+        i++;
+      }
+      if (contenthid) {
+        htmlDescription += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>";
+      }
+      regex = new RegExp(this.getName(), "g");
+      htmlDescription = htmlDescription.replace(regex, "<b>" + this.getName() + "</b>");
+      return htmlDescription;
+    };
+
+    return BoardGameResult;
+
+  })();
+
+  BoardGame = (function(_super) {
+    __extends(BoardGame, _super);
+
+    function BoardGame(data) {
+      var comment;
+      BoardGame.__super__.constructor.call(this, data);
+      if (this.thumbnail == null) {
+        this.thumbnail = "";
+      }
+      if (this.goodComments == null) {
+        this.goodComments = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.comments.comment;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            comment = _ref[_i];
+            if (comment.value.length > 119 && parseInt(comment.rating) > 0 && comment.value.length < 600) {
+              _results.push(comment);
+            }
+          }
+          return _results;
+        }).call(this);
+      }
+      this.featuredComment = ko.observable();
+      this.pickFeaturedComment();
+    }
+
+    BoardGame.prototype.pickFeaturedComment = function() {
+      this.featuredComment(this.goodComments[Math.floor(Math.random() * this.goodComments.length)]);
+    };
+
+    BoardGame.prototype.getRankLink = function(name, id, value) {
+      if (name === "boardgame") {
+        return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
+      }
+      return "http://boardgamegeek.com/" + name + "/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
+    };
+
+    return BoardGame;
+
+  })(BoardGameResult);
+
   ViewModel = (function() {
     function ViewModel() {
+      this.updateTableHeaders = __bind(this.updateTableHeaders, this);
       var self;
       self = this;
       this.searchedGames = ko.observableArray([]);
@@ -29,43 +173,40 @@
     }
 
     ViewModel.prototype.sortByName = function(direction) {
-      var sortDirection,
-        _this = this;
+      var _this = this;
       if (direction != null) {
-        sortDirection = direction;
+        this.sortDirection = direction;
       }
       this.searchedGames.sort(function(a, b) {
-        if (_this.getName(a.name) > _this.getName(b.name)) {
-          return 1 * sortDirection;
+        if (a.getName() > b.getName()) {
+          return 1 * _this.sortDirection;
         }
-        if (_this.getName(a.name) < _this.getName(b.name)) {
-          return -1 * sortDirection;
+        if (a.getName() < b.getName()) {
+          return -1 * _this.sortDirection;
         }
         return 0;
       });
     };
 
     ViewModel.prototype.sortByBRating = function(direction) {
-      var sortDirection,
-        _this = this;
+      var _this = this;
       if (direction != null) {
-        sortDirection = direction;
+        this.sortDirection = direction;
       }
       this.searchedGames.sort(function(a, b) {
-        if (_this.getBRating(a.statistics) > _this.getBRating(b.statistics)) {
-          return 1 * sortDirection;
+        if (a.getBRating() > b.getBRating()) {
+          return 1 * _this.sortDirection;
         }
-        if (_this.getBRating(a.statistics) < _this.getBRating(b.statistics)) {
-          return -1 * sortDirection;
+        if (a.getBRating() < b.getBRating()) {
+          return -1 * _this.sortDirection;
         }
         return 0;
       });
     };
 
     ViewModel.prototype.handleSort = function(type, vm, event) {
-      var currentSort, sortDirection;
-      sortDirection = type === currentSort ? -sortDirection : -1;
-      currentSort = type;
+      this.sortDirection = type === this.currentSort ? -this.sortDirection : -1;
+      this.currentSort = type;
       this.updateTableHeaders(type, event);
       switch (type) {
         case "name":
@@ -79,97 +220,11 @@
     ViewModel.prototype.updateTableHeaders = function(type, event) {
       $("#results-table thead tr th").removeClass("headerSortUp");
       $("#results-table thead tr th").removeClass("headerSortDown");
-      if (sortDirection === -1) {
+      if (this.sortDirection === -1) {
         $(event.toElement).addClass("headerSortDown");
       } else {
         $(event.toElement).addClass("headerSortUp");
       }
-    };
-
-    ViewModel.prototype.getRankLink = function(name, id, value) {
-      if (name === "boardgame") {
-        return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
-      }
-      return "http://boardgamegeek.com/" + name + "/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
-    };
-
-    ViewModel.prototype.getRanks = function(stats) {
-      return stats.ratings.ranks.rank;
-    };
-
-    ViewModel.prototype.getAverageRating = function(stats) {
-      return stats.ratings.average.value;
-    };
-
-    ViewModel.prototype.getBRating = function(stats) {
-      return stats.ratings.bayesaverage.value;
-    };
-
-    ViewModel.prototype.getCategoriesFromLinks = function(links) {
-      var categories, link, _i, _len;
-      categories = [];
-      for (_i = 0, _len = links.length; _i < _len; _i++) {
-        link = links[_i];
-        if (link["type"] === "boardgamecategory") {
-          categories.push(link["value"]);
-        }
-      }
-      return categories;
-    };
-
-    ViewModel.prototype.getDesignerFromLinks = function(link) {
-      var _i, _len;
-      for (_i = 0, _len = links.length; _i < _len; _i++) {
-        link = links[_i];
-        if (link["type"] === "boardgamedesigner") {
-          return link["value"];
-        }
-      }
-    };
-
-    ViewModel.prototype.getName = function(name) {
-      if (Array.isArray(name)) {
-        return name[0].value;
-      }
-      return name.value;
-    };
-
-    ViewModel.prototype.getShortDescription = function(description) {
-      return description.slice(0, 100) + "...";
-    };
-
-    ViewModel.prototype.parseDescription = function(description) {
-      var contenthid, i, paragraphs, regex;
-      paragraphs = 1;
-      contenthid = false;
-      regex = new RegExp("&#10;&#10;&#10;    ", "g");
-      description = description.replace(regex, "<ul><li>");
-      regex = new RegExp("&#10;&#10;&#10;", "g");
-      description = description.replace(regex, "</li></ul>");
-      regex = new RegExp("&#10;    ", "g");
-      description = description.replace(regex, "</li><li>");
-      description = "<p>" + description;
-      regex = new RegExp("&#10;&#10;", "g");
-      description = description.replace(regex, "</p><p>");
-      description += "</p>";
-      i = 0;
-      while (i < description.length) {
-        if (description.slice(i, i + 3) === "<p>" || description.slice(i - 5, i) === "</ul>") {
-          paragraphs += 1;
-          if ((paragraphs > 3 && i > 600 && description.length - i > 7) && contenthid === false) {
-            description = description.slice(0, i) + "<div class='full-description' style='display:none'>" + description.slice(i, description.length);
-            contenthid = true;
-            break;
-          }
-        }
-        i++;
-      }
-      if (contenthid) {
-        description += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>";
-      }
-      regex = new RegExp(this.getName(this.selectedGame().name), "g");
-      description = description.replace(regex, "<b>" + this.getName(this.selectedGame().name) + "</b>");
-      return description;
     };
 
     ViewModel.prototype.searchGames = function(str) {
@@ -182,18 +237,17 @@
       regex = new RegExp(" ", "g");
       str = str.replace(regex, "+");
       this.searching(true);
-      if (Modernizr.sessionstorage) {
-        ids = eval("(" + sessionStorage["searched_bg_ids_" + str] + ")");
-        if (ids) {
-          this.getGamesDetails(ids, str);
-          this.searching(null);
-          return;
-        }
+      ids = this.loadFromCache("searched_bgs_ids", str);
+      if (ids) {
+        console.log("ids");
+        this.searching(null);
+        this.getGamesDetails(ids, str);
+        return;
       }
       url = "http://www.boardgamegeek.com/xmlapi/search?search=" + str;
       $.getJSON(this.getYQLurl(url), function(data) {
         ids = _this.extractIdsFromSearch(data);
-        sessionStorage["searched_bg_ids_" + str] = JSON.stringify(ids);
+        _this.saveToCache("searched_bgs_ids", str, ids);
         _this.getGamesDetails(ids, str);
       });
     };
@@ -233,69 +287,40 @@
     };
 
     ViewModel.prototype.getGameDetails = function(id) {
-      var gdata, url,
+      var data, url,
         _this = this;
-      if (Modernizr.sessionstorage) {
-        gdata = eval("(" + sessionStorage["bg" + id] + ")");
-        if (gdata) {
-          console.log("using cache");
-          console.log(gdata);
-          gdata["featuredComment"] = ko.observable();
-          gdata.pickFeaturedComment = function() {
-            gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)]);
-          };
-          gdata.pickFeaturedComment();
-          this.selectedGame(gdata);
-          $("html, body").animate({
-            scrollTop: 0
-          }, "slow");
-          return;
-        }
-      } else {
-
+      data = this.loadFromCache("bg", id);
+      if (data) {
+        this.selectedGame(new BoardGame(data));
+        return;
       }
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1";
       $.getJSON(this.getYQLurl(url), function(data) {
-        var p;
         if (data.query.results) {
-          gdata = new function() {};
-          for (p in data.query.results.items["item"]) {
-            gdata[p] = data.query.results.items["item"][p];
-          }
-          if (gdata["thumbnail"] == null) {
-            gdata["thumbnail"] = "";
-          }
-          gdata["goodComments"] = gdata.comments.comment.filter(function(el) {
-            return el.value.length > 119 && parseInt(el.rating) > 0 && el.value.length < 600;
-          });
-          gdata["featuredComment"] = ko.observable();
-          gdata.pickFeaturedComment = function() {
-            gdata.featuredComment(gdata.goodComments[Math.floor(Math.random() * gdata.goodComments.length)]);
-          };
-          gdata.pickFeaturedComment();
-          sessionStorage["bg" + id] = ko.toJSON(gdata);
-          _this.selectedGame(gdata);
-          $("html, body").animate({
-            scrollTop: 0
-          }, "slow");
+          _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+          _this.saveToCache("bg", id, _this.selectedGame());
         }
       });
     };
 
     ViewModel.prototype.getGamesDetails = function(gameids, str) {
-      var counter, gdata, i, url,
+      var counter, data, i, result, url,
         _this = this;
-      if (Modernizr.sessionstorage) {
-        gdata = eval("(" + sessionStorage["searched_bgs_" + str] + ")");
-        if (gdata) {
-          console.log("using cached search games");
-          this.searching(null);
-          this.searchedGames(gdata);
-          this.sortByBRating(-1);
-          return;
-        }
-      } else {
-
+      data = this.loadFromCache("searched_bgs", str);
+      if (data) {
+        console.log("using cached search games");
+        this.searching(null);
+        this.searchedGames((function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            result = data[_i];
+            _results.push(new BoardGameResult(result));
+          }
+          return _results;
+        })());
+        this.sortByBRating(-1);
+        return;
       }
       counter = 0;
       i = 0;
@@ -304,19 +329,32 @@
         $.getJSON(this.getYQLurl(url), function(data) {
           counter += 1;
           if (data.query.results) {
-            gdata = data.query.results.items["item"];
-            if (gdata["thumbnail"] == null) {
-              gdata["thumbnail"] = "";
-            }
-            _this.searchedGames.push(gdata);
+            _this.searchedGames.push(new BoardGameResult(data.query.results.items["item"]));
           }
           if (counter === gameids.length) {
             _this.searching(null);
-            sessionStorage["searched_bgs_" + str] = JSON.stringify(_this.searchedGames());
+            _this.saveToCache("searched_bgs", str, _this.searchedGames());
             _this.sortByBRating(-1);
           }
         });
         i++;
+      }
+    };
+
+    ViewModel.prototype.saveToCache = function(type, key, data) {
+      if (Modernizr.sessionstorage) {
+        sessionStorage["" + type + "_" + key] = ko.toJSON(data);
+      }
+    };
+
+    ViewModel.prototype.loadFromCache = function(type, key) {
+      var data;
+      if (Modernizr.sessionstorage) {
+        data = sessionStorage["" + type + "_" + key];
+        if (data) {
+          data = JSON.parse(data);
+        }
+        return data;
       }
     };
 
@@ -328,6 +366,9 @@
 
     ViewModel.prototype.goToGame = function(object) {
       location.hash = "game/" + object.id;
+      $("html, body").animate({
+        scrollTop: 0
+      }, "slow");
     };
 
     return ViewModel;

@@ -37,17 +37,17 @@
               <tr>
                 <th width="200"></th>
                 <th data-bind="click: handleSort.bind($data,'name')">Title</th>
-                <th data-bind="click: handleSort.bind($data,'name')">BGG Rating</th>
+                <th data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
               </tr>
             </thead>
             <tbody data-bind="foreach: searchedGames">
               <tr>
                 <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
                 <td>
-                  <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
-                  <blockquote data-bind="html: $root.getShortDescription(description)"></blockquote>
+                  <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
+                  <blockquote data-bind="html: getShortDescription()"></blockquote>
                 </td>
-                <td data-bind="text:$root.getBRating(statistics)"></td>
+                <td data-bind="text:getBRating()"></td>
               </tr>
             </tbody>
           </table>
@@ -59,7 +59,7 @@
       <div  data-magellan-expedition data-options="destination_threshold:200;throttle_delay:0;" >
         <ul class="sub-nav-vertical">
           <li>
-              <h4 data-bind="with: selectedGame"><span data-bind="text: $root.getName(name)"></span></h4>
+              <h4 data-bind="with: selectedGame"><span data-bind="text: getName()"></span></h4>
           </li>
           <li data-magellan-arrival="info">
             <a href="#info" rel='bookmark'><i class="icon ion-information-circled"></i> Quick Info</a>
@@ -84,12 +84,12 @@
         </div>
         <!-- Quick Info -->
         <div class=" column small-7 spaced-rows" data-magellan-destination="info">
-          <h1 class="text-center"><span data-bind="text:$root.getName(name)"></span> <small data-bind="text:yearpublished['value']"></small></h1>
+          <h1 class="text-center"><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h1>
           <div class="row">
             <div style="font-weight: bold;" class="column small-6">
               Designer
             </div>
-            <div data-bind="text: $root.getDesignerFromLinks(link)" class="column small-6">
+            <div data-bind="text: getDesigner()" class="column small-6">
               
             </div>
           </div>
@@ -122,7 +122,7 @@
               Categories
             </div>
             <div class="column small-6">
-              <ul class="inline-list categories" data-bind="foreach: $root.getCategoriesFromLinks(link)">
+              <ul class="inline-list categories" data-bind="foreach: getCategories()">
                 <li data-bind="text: $data"></li> 
               </ul>
             </div>
@@ -142,7 +142,7 @@
           </div>
           </div>
           <div class="column small-9">
-          <p data-bind="html: $root.parseDescription(description)"></p>
+          <p data-bind="html: getHTMLDescription()"></p>
           </div>
         </div>
       </div>
@@ -163,16 +163,16 @@
               Average Rating
             </div>
             <div class="column small-6">
-              <span data-bind="text:Math.floor($root.getAverageRating(statistics)*100)/100"></span> / 10
+              <span data-bind="text:Math.floor(getAverageRating()*100)/100"></span> / 10
             </div>
           </div>
-          <!-- ko foreach: $root.getRanks(statistics) -->  
+          <!-- ko foreach: getRanks() -->  
           <div class="row">
             <div style="font-weight: bold;" class="column small-6">
               <span data-bind="text:friendlyname"></span>
             </div>
             <div class="column small-6">
-              <a data-bind="text:value, attr: {href: $root.getRankLink(name,id,value)}"></a>
+              <a data-bind="text:value, attr: {href: $parent.getRankLink(name,id,value)}"></a>
             </div>
           </div>
           <!-- /ko -->
@@ -189,7 +189,7 @@
         </div>
         <div class="column small-9" >
           <blockquote> 
-          <p data-bind="html: $root.parseDescription(value)"></p>
+          <p data-bind="html: value"></p>
           <cite data-bind="html: username"></cite>
           </blockquote>
           <p>Rating: <span data-bind="text: rating" ></span></p>
