@@ -134,6 +134,18 @@
       this.pickFeaturedComment();
     }
 
+    BoardGame.prototype.getComments = function() {
+      console.log("here");
+      return this.comments.comment;
+    };
+
+    BoardGame.prototype.getCommentsPages = function() {
+      return {
+        page: this.comments.page,
+        pages: Math.ceil(this.comments.totalitems / 100)
+      };
+    };
+
     BoardGame.prototype.pickFeaturedComment = function() {
       this.featuredComment(this.goodComments[Math.floor(Math.random() * this.goodComments.length)]);
     };
@@ -152,8 +164,10 @@
   ViewModel = (function() {
     function ViewModel() {
       this.updateTableHeaders = __bind(this.updateTableHeaders, this);
+      this.goToGameComments = __bind(this.goToGameComments, this);
       var self;
       self = this;
+      this.currentPage = ko.observable();
       this.searchedGames = ko.observableArray([]);
       this.selectedGame = ko.observable();
       this.searching = ko.observable(null);
@@ -161,16 +175,39 @@
       this.currentSort = 'brating';
       Sammy(function() {
         this.get("#search/:string", function() {
+          self.currentPage("searchGames");
           self.selectedGame(null);
           self.searchGames(this.params.string);
         });
+        this.get("#game/:oid/comments/page/:num", function() {
+          self.currentPage("gameComments");
+          return self.getGameDetails(this.params.oid);
+        });
         this.get(/#game\/(.*)(#.+)?/, function() {
+          self.currentPage("gameOverview");
           self.searchedGames.removeAll();
           self.getGameDetails(this.params.splat[0]);
         });
         this.get("", function() {});
       }).run();
     }
+
+    ViewModel.prototype.goToGameComments = function() {
+      location.hash = "game/" + (this.selectedGame().id) + "/comments/page/1";
+    };
+
+    ViewModel.prototype.goToSearch = function() {
+      var str;
+      str = encodeURIComponent($("#search").val());
+      location.hash = "search/" + str;
+    };
+
+    ViewModel.prototype.goToGame = function(object) {
+      location.hash = "game/" + object.id;
+      $("html, body").animate({
+        scrollTop: 0
+      }, "slow");
+    };
 
     ViewModel.prototype.sortByName = function(direction) {
       var _this = this;
@@ -294,7 +331,7 @@
         this.selectedGame(new BoardGame(data));
         return;
       }
-      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1";
+      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100";
       $.getJSON(this.getYQLurl(url), function(data) {
         if (data.query.results) {
           _this.selectedGame(new BoardGame(data.query.results.items["item"]));
@@ -356,19 +393,6 @@
         }
         return data;
       }
-    };
-
-    ViewModel.prototype.goToSearch = function() {
-      var str;
-      str = encodeURIComponent($("#search").val());
-      location.hash = "search/" + str;
-    };
-
-    ViewModel.prototype.goToGame = function(object) {
-      location.hash = "game/" + object.id;
-      $("html, body").animate({
-        scrollTop: 0
-      }, "slow");
     };
 
     return ViewModel;

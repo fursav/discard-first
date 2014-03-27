@@ -29,7 +29,7 @@
       </nav>
     </div>
 
-    <div class="row" data-bind="if: (searchedGames().length>0 || searching) ">
+    <div class="row" data-bind="if: currentPage() === 'searchGames' ">
       <div id="results" class="large-12 columns" >
         <div class="text-center" data-bind="if: searching"><i class="icon ion-loading-c icon-large"></i></div>
           <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">
@@ -55,7 +55,7 @@
     </div>
 
     <!-- Selected game -->
-    <div data-bind="visible: selectedGame">
+    <div data-bind="visible: currentPage() === 'gameOverview'">
       <div  data-magellan-expedition data-options="destination_threshold:200;throttle_delay:0;" >
         <ul class="sub-nav-vertical">
           <li>
@@ -75,128 +75,155 @@
           </li> 
         </ul> 
       </div>
-    <div data-bind="with: selectedGame">
-      <a name="info"></a>
-      <section class="section section-white">
-      <div class="row" style="padding-bottom:10px;" >
-        <div class="column small-5" >
-          <img  class="radius" style="height:16.563em;" data-bind="attr:{src: image}">
+      <div data-bind="with: selectedGame">
+        <a name="info"></a>
+        <section class="section section-white">
+        <div class="row" style="padding-bottom:10px;" >
+          <div class="column small-5" >
+            <img  class="radius" style="height:16.563em;" data-bind="attr:{src: image}">
+          </div>
+          <!-- Quick Info -->
+          <div class=" column small-7 spaced-rows" data-magellan-destination="info">
+            <h1 class="text-center"><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h1>
+            <div class="row">
+              <div style="font-weight: bold;" class="column small-6">
+                Designer
+              </div>
+              <div data-bind="text: getDesigner()" class="column small-6">
+                
+              </div>
+            </div>
+            <div class="row">
+              <div style="font-weight: bold;" class="column small-6">
+                Num of players
+              </div>
+              <div class="column small-6">
+                <span data-bind="text: minplayers.value"></span> - <span data-bind="text: maxplayers.value"></span>
+              </div>
+            </div>
+            <div class="row">
+              <div style="font-weight: bold;" class="column small-6">
+                Suggested age
+              </div>
+              <div class="column small-6">
+                <span data-bind="text: minage.value"></span> and up
+              </div>
+            </div>
+            <div class="row">
+              <div style="font-weight: bold;" class="column small-6">
+                Playing Time
+              </div>
+              <div class="column small-6">
+                <span data-bind="text: playingtime.value"></span> minutes</span>
+              </div>
+            </div>
+            <div class="row">
+              <div style="font-weight: bold;" class="column small-6">
+                Categories
+              </div>
+              <div class="column small-6">
+                <ul class="inline-list categories" data-bind="foreach: getCategories()">
+                  <li data-bind="text: $data"></li> 
+                </ul>
+              </div>
+            </div>                 
+          </div>
         </div>
-        <!-- Quick Info -->
-        <div class=" column small-7 spaced-rows" data-magellan-destination="info">
-          <h1 class="text-center"><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h1>
-          <div class="row">
-            <div style="font-weight: bold;" class="column small-6">
-              Designer
+        </section>
+        <!-- Description -->        
+        <a name="description"></a>
+        <section class="section section-gray">  
+        <div class="row">          
+          <div data-magellan-destination="description">
+            <div class="column small-3">
+            <h4 class="text-center">Description</h4>
+            <div class="text-center">
+            <i class="icon ion-clipboard icon-huge"></i>
             </div>
-            <div data-bind="text: getDesigner()" class="column small-6">
-              
             </div>
-          </div>
-          <div class="row">
-            <div style="font-weight: bold;" class="column small-6">
-              Num of players
-            </div>
-            <div class="column small-6">
-              <span data-bind="text: minplayers.value"></span> - <span data-bind="text: maxplayers.value"></span>
+            <div class="column small-9">
+            <p data-bind="html: getHTMLDescription()"></p>
             </div>
           </div>
-          <div class="row">
-            <div style="font-weight: bold;" class="column small-6">
-              Suggested age
-            </div>
-            <div class="column small-6">
-              <span data-bind="text: minage.value"></span> and up
-            </div>
-          </div>
-          <div class="row">
-            <div style="font-weight: bold;" class="column small-6">
-              Playing Time
-            </div>
-            <div class="column small-6">
-              <span data-bind="text: playingtime.value"></span> minutes</span>
-            </div>
-          </div>
-          <div class="row">
-            <div style="font-weight: bold;" class="column small-6">
-              Categories
-            </div>
-            <div class="column small-6">
-              <ul class="inline-list categories" data-bind="foreach: getCategories()">
-                <li data-bind="text: $data"></li> 
-              </ul>
-            </div>
-          </div>                 
         </div>
-      </div>
-      </section>
-      <!-- Description -->        
-      <a name="description"></a>
-      <section class="section section-gray">  
-      <div class="row">          
-        <div data-magellan-destination="description">
+        </section>
+        <!-- Ranks and Ratings -->
+        <a name="ranks"></a>
+        <section class="section section-white">  
+        <div class="row" data-magellan-destination="ranks">
           <div class="column small-3">
-          <h4 class="text-center">Description</h4>
-          <div class="text-center">
-          <i class="icon ion-clipboard icon-huge"></i>
+            <h4 class="text-center">Ranks and Ratings</h4>
+            <div class="text-center">
+            <i class="icon ion-arrow-graph-up-right icon-huge"></i>   
+            </div>       
           </div>
-          </div>
-          <div class="column small-9">
-          <p data-bind="html: getHTMLDescription()"></p>
+          <div class="column small-9 spaced-rows">
+            <div class="row" style="padding-top:3em;">
+              <div style="font-weight: bold;" class="column small-6">
+                Average Rating
+              </div>
+              <div class="column small-6">
+                <span data-bind="text:Math.floor(getAverageRating()*100)/100"></span> / 10
+              </div>
+            </div>
+            <!-- ko foreach: getRanks() -->  
+            <div class="row">
+              <div style="font-weight: bold;" class="column small-6">
+                <span data-bind="text:friendlyname"></span>
+              </div>
+              <div class="column small-6">
+                <a data-bind="text:value, attr: {href: $parent.getRankLink(name,id,value)}"></a>
+              </div>
+            </div>
+            <!-- /ko -->
           </div>
         </div>
+        </section>
+        <!-- Comments -->
+        <section class="section section-gray"> 
+        <a name="comments"></a>
+        <div class="row" data-bind="with: featuredComment" data-magellan-destination="comments">
+          <div class="column small-3">
+            <h4 class="text-center">Comments</h4>
+            <div class="text-center"><i class="icon ion-chatbox-working icon-huge"></i></div>
+          </div>
+          <div class="column small-9" >
+            <blockquote> 
+            <p data-bind="html: value"></p>
+            <cite data-bind="html: username"></cite>
+            </blockquote>
+            <p>Rating: <span data-bind="text: rating" ></span>
+              <a data-bind="click: $parent.pickFeaturedComment()"><i class="icon ion-refresh"></i></a>
+            </p>
+            <a data-bind="click: $root.goToGameComments">View All</a>
+          </div>
+        </div>
+        </section>
       </div>
-      </section>
-      <!-- Ranks and Ratings -->
-      <a name="ranks"></a>
-      <section class="section section-white">  
-      <div class="row" data-magellan-destination="ranks">
-        <div class="column small-3">
-          <h4 class="text-center">Ranks and Ratings</h4>
-          <div class="text-center">
-          <i class="icon ion-arrow-graph-up-right icon-huge"></i>   
-          </div>       
-        </div>
-        <div class="column small-9 spaced-rows">
-          <div class="row" style="padding-top:3em;">
-            <div style="font-weight: bold;" class="column small-6">
-              Average Rating
-            </div>
-            <div class="column small-6">
-              <span data-bind="text:Math.floor(getAverageRating()*100)/100"></span> / 10
-            </div>
-          </div>
-          <!-- ko foreach: getRanks() -->  
-          <div class="row">
-            <div style="font-weight: bold;" class="column small-6">
-              <span data-bind="text:friendlyname"></span>
-            </div>
-            <div class="column small-6">
-              <a data-bind="text:value, attr: {href: $parent.getRankLink(name,id,value)}"></a>
-            </div>
-          </div>
-          <!-- /ko -->
-        </div>
+    </div>
+
+    <!-- Selected Game Comments Page -->
+    <div data-bind="if: currentPage() === 'gameComments'">
+      <div data-bind="with: selectedGame">
+        Page <span data-bind="text: getCommentsPages().page"></span> out of <span data-bind="text: getCommentsPages().pages"></span>
+        <div class="range-slider" data-slider> <span class="range-slider-handle"></span> <span class="range-slider-active-segment"></span> <input type="hidden"> </div>
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Rating</th>
+              <th>Comments</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: getComments()">
+            <tr>
+              <td data-bind="text: username"></td>
+              <td data-bind="text: rating"></td>
+              <td><p data-bind="html: value"></p></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      </section>
-      <!-- Comments -->
-      <section class="section section-gray"> 
-      <a name="comments"></a>
-      <div class="row" data-bind="with: featuredComment" data-magellan-destination="comments">
-        <div class="column small-3">
-          <h4 class="text-center">Comments</h4>
-          <div class="text-center"><i class="icon ion-chatbox-working icon-huge"></i></div>
-        </div>
-        <div class="column small-9" >
-          <blockquote> 
-          <p data-bind="html: value"></p>
-          <cite data-bind="html: username"></cite>
-          </blockquote>
-          <p>Rating: <span data-bind="text: rating" ></span></p>
-          <a data-bind="click: $parent.pickFeaturedComment()"><i class="icon ion-refresh"></i></a>
-        </div>
-      </div>
-      </section>
     </div>
 
     <footer>
@@ -222,6 +249,7 @@
     <script src="js/vendor/jquery.js"></script>
     <script src="js/foundation.min.js"></script>
     <script src="js/foundation/foundation.magellan.js"></script>
+    <script src="js/foundation/foundation.slider.js"></script>
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
     <script src="js/script2.js"></script>

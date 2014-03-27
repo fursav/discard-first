@@ -156,6 +156,13 @@ class BoardGame extends BoardGameResult
     @featuredComment = ko.observable()
     @pickFeaturedComment()
 
+  getComments: ->
+    console.log "here"
+    @comments.comment
+  getCommentsPages: ->
+    page: @comments.page
+    pages: Math.ceil(@comments.totalitems/100)
+
   pickFeaturedComment: ->
       @featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
       return
@@ -172,6 +179,10 @@ class BoardGame extends BoardGameResult
 class ViewModel
   constructor: ->
     self = this
+
+    # Page
+    @currentPage = ko.observable()
+
     # [Array]
     @searchedGames = ko.observableArray([])
     @selectedGame = ko.observable()
@@ -183,11 +194,18 @@ class ViewModel
     # Client-side routes   
     Sammy(->
       @get "#search/:string", ->
-        self.selectedGame(null)
+        self.currentPage "searchGames"
+        self.selectedGame null
         self.searchGames @params.string
         return
 
+      @get "#game/:oid/comments/page/:num", ->
+        self.currentPage "gameComments"
+        self.getGameDetails(@params.oid)
+
+
       @get /#game\/(.*)(#.+)?/, ->
+        self.currentPage "gameOverview"
         self.searchedGames.removeAll()
         self.getGameDetails @params.splat[0]
         return
@@ -196,6 +214,23 @@ class ViewModel
 
       return
     ).run()
+
+  goToGameComments: =>
+    location.hash = "game/#{@selectedGame().id}/comments/page/1" 
+    return
+
+  goToSearch: ->
+    str = encodeURIComponent($("#search").val())
+    location.hash = "search/" + str
+    return
+    
+  # @param object [Object] boardgame object
+  goToGame: (object) ->
+    location.hash = "game/" + object.id
+    $("html, body").animate
+          scrollTop: 0
+        , "slow"
+    return
 
   # Sorting of search results by name/title
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
@@ -321,7 +356,7 @@ class ViewModel
       @selectedGame(new BoardGame(data))
       return
 
-    url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1"
+    url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100"
     $.getJSON @getYQLurl(url), (data) =>
       if data.query.results
         @selectedGame(new BoardGame(data.query.results.items["item"]))
@@ -366,17 +401,4 @@ class ViewModel
       data = sessionStorage["#{type}_#{key}"]
       data = JSON.parse(data) if data
       return data
-    return
-
-  goToSearch: ->
-    str = encodeURIComponent($("#search").val())
-    location.hash = "search/" + str
-    return
-    
-  # @param object [Object] boardgame object
-  goToGame: (object) ->
-    location.hash = "game/" + object.id
-    $("html, body").animate
-          scrollTop: 0
-        , "slow"
     return
