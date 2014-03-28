@@ -8,6 +8,7 @@
     <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/gen-light" rel="stylesheet" type="text/css"/>  
     <link rel="stylesheet" href="css/foundation.css" />
     <link rel="stylesheet" href="css/ionicons.min.css" />
+    <link rel="stylesheet" href="css/jquery.nouislider.min.css" />
     <link rel="stylesheet" href="css/style.css" />
     <script src="js/vendor/modernizr.js"></script>
   </head>
@@ -31,7 +32,7 @@
 
     <div class="row" data-bind="if: currentPage() === 'searchGames' ">
       <div id="results" class="large-12 columns" >
-        <div class="text-center" data-bind="if: searching"><i class="icon ion-loading-c icon-large"></i></div>
+        <div class="text-center" data-bind="if: loading"><i class="icon ion-loading-c icon-large"></i></div>
           <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">
             <thead>
               <tr>
@@ -205,24 +206,47 @@
     <!-- Selected Game Comments Page -->
     <div data-bind="if: currentPage() === 'gameComments'">
       <div data-bind="with: selectedGame">
-        Page <span data-bind="text: getCommentsPages().page"></span> out of <span data-bind="text: getCommentsPages().pages"></span>
-        <div class="range-slider" data-slider> <span class="range-slider-handle"></span> <span class="range-slider-active-segment"></span> <input type="hidden"> </div>
-        <table id="results-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Rating</th>
-              <th>Comments</th>
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: getComments()">
-            <tr>
-              <td data-bind="text: username"></td>
-              <td data-bind="text: rating"></td>
-              <td><p data-bind="html: value"></p></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="row">
+          <div class="column small-8 small-centered">          
+            <div class="page-slider"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="column small-12 small-centered">
+             <div class="row">
+              <div class="small-3 column small-centered">
+                <div class="row collapse" style="margin:0.3em 0">
+                  <div class="small-6 columns">
+                    <label for="page-num" class="right inline">Page:</label>
+                  </div>
+                  <div class="small-3 columns">
+                    <input type="text" id="page-num" data-bind="value: commentsPage, event:{change: $root.goToGameComments.bind(id, $('#page-num').val())}" >
+                  </div>
+                  <div class="small-3 columns">
+                    <span class="postfix" data-bind="text: getCommentsTotalPages()"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="text-center" data-bind="if: $root.loading"><i class="icon ion-loading-c icon-large"></i></div>
+            <table id="results-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Rating</th>
+                  <th>Comments</th>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: comments">
+                <tr>
+                  <td data-bind="text: username"></td>
+                  <td data-bind="text: rating"></td>
+                  <td><p data-bind="html: value"></p></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -252,6 +276,7 @@
     <script src="js/foundation/foundation.slider.js"></script>
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
+    <script src="js/jquery.nouislider.min.js"></script>
     <script src="js/script2.js"></script>
   </body>
 </html>

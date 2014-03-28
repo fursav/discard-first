@@ -1,26 +1,42 @@
 (function() {
   var BoardGame, BoardGameResult, ViewModel,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
     $(document).foundation();
-    ko.applyBindings(new ViewModel());
+    window.vm = new ViewModel();
+    ko.applyBindings(window.vm);
   });
 
   BoardGameResult = (function() {
     function BoardGameResult(data) {
+      this.processComments = __bind(this.processComments, this);
       var key, value;
-      console.log(data);
       for (key in data) {
         value = data[key];
-        this[key] = value;
+        if (key === "comments") {
+          this.comments = ko.observableArray([]);
+          this.commentsPage = ko.observable();
+          this.processComments(value);
+        } else {
+          this[key] = value;
+        }
       }
       if (this.thumbnail == null) {
         this.thumbnail = "";
       }
     }
+
+    BoardGameResult.prototype.processComments = function(data) {
+      this.comments(data.comment);
+      this.commentsPage(data.page);
+      return this.commentsData = {
+        page: data.page,
+        totalitems: data.totalitems
+      };
+    };
 
     BoardGameResult.prototype.getRanks = function() {
       return this.statistics.ratings.ranks.rank;
@@ -119,7 +135,7 @@
       if (this.goodComments == null) {
         this.goodComments = (function() {
           var _i, _len, _ref, _results;
-          _ref = this.comments.comment;
+          _ref = this.comments;
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             comment = _ref[_i];
@@ -134,16 +150,8 @@
       this.pickFeaturedComment();
     }
 
-    BoardGame.prototype.getComments = function() {
-      console.log("here");
-      return this.comments.comment;
-    };
-
-    BoardGame.prototype.getCommentsPages = function() {
-      return {
-        page: this.comments.page,
-        pages: Math.ceil(this.comments.totalitems / 100)
-      };
+    BoardGame.prototype.getCommentsTotalPages = function() {
+      return Math.ceil(this.commentsData.totalitems / 100);
     };
 
     BoardGame.prototype.pickFeaturedComment = function() {
@@ -170,7 +178,7 @@
       this.currentPage = ko.observable();
       this.searchedGames = ko.observableArray([]);
       this.selectedGame = ko.observable();
-      this.searching = ko.observable(null);
+      this.loading = ko.observable(null);
       this.sortDirection = -1;
       this.currentSort = 'brating';
       Sammy(function() {
@@ -181,7 +189,7 @@
         });
         this.get("#game/:oid/comments/page/:num", function() {
           self.currentPage("gameComments");
-          return self.getGameDetails(this.params.oid);
+          self.getGameDetails(this.params.oid, this.params.num);
         });
         this.get(/#game\/(.*)(#.+)?/, function() {
           self.currentPage("gameOverview");
@@ -207,6 +215,10 @@
       $("html, body").animate({
         scrollTop: 0
       }, "slow");
+    };
+
+    ViewModel.prototype.goToGameComments = function(page, bg) {
+      return location.hash = "#game/" + bg.id + "/comments/page/" + page;
     };
 
     ViewModel.prototype.sortByName = function(direction) {
@@ -273,11 +285,11 @@
       }
       regex = new RegExp(" ", "g");
       str = str.replace(regex, "+");
-      this.searching(true);
+      this.loading(true);
       ids = this.loadFromCache("searched_bgs_ids", str);
       if (ids) {
         console.log("ids");
-        this.searching(null);
+        this.loading(null);
         this.getGamesDetails(ids, str);
         return;
       }
@@ -323,19 +335,62 @@
       return "http://query.yahooapis.com/v1/public/yql?q=" + (encodeURIComponent(q + url)) + "&format=json&callback=?";
     };
 
-    ViewModel.prototype.getGameDetails = function(id) {
+    ViewModel.prototype.getGameDetails = function(id, page) {
       var data, url,
         _this = this;
+      if (page) {
+        url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
+        $.getJSON(this.getYQLurl(url), function(data) {
+          if (data.query.results) {
+            _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+          }
+        });
+        return;
+      }
+      if (page == null) {
+        page = 1;
+      }
       data = this.loadFromCache("bg", id);
       if (data) {
         this.selectedGame(new BoardGame(data));
         return;
       }
-      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100";
+      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
       $.getJSON(this.getYQLurl(url), function(data) {
         if (data.query.results) {
           _this.selectedGame(new BoardGame(data.query.results.items["item"]));
           _this.saveToCache("bg", id, _this.selectedGame());
+        }
+      });
+    };
+
+    ViewModel.prototype.getGameComments = function(id, page) {
+      var url,
+        _this = this;
+      this.loading(true);
+      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&comments=1&pagesize=100&page=" + page;
+      $.getJSON(this.getYQLurl(url), function(data) {
+        if (data.query.results) {
+          _this.selectedGame().processComments(data.query.results.items["item"]["comments"]);
+          _this.loading(null);
+          $(".page-slider").noUiSlider({
+            start: parseInt(_this.params.num),
+            step: 1,
+            range: {
+              'min': 1,
+              'max': parseInt(self.selectedGame().getCommentsTotalPages())
+            },
+            serialization: {
+              lower: [
+                new Link({
+                  target: $('#page-num')
+                })
+              ],
+              format: {
+                decimals: 0
+              }
+            }
+          }, true);
         }
       });
     };
@@ -346,7 +401,7 @@
       data = this.loadFromCache("searched_bgs", str);
       if (data) {
         console.log("using cached search games");
-        this.searching(null);
+        this.loading(null);
         this.searchedGames((function() {
           var _i, _len, _results;
           _results = [];
@@ -369,7 +424,7 @@
             _this.searchedGames.push(new BoardGameResult(data.query.results.items["item"]));
           }
           if (counter === gameids.length) {
-            _this.searching(null);
+            _this.loading(null);
             _this.saveToCache("searched_bgs", str, _this.searchedGames());
             _this.sortByBRating(-1);
           }

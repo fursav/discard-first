@@ -61,15 +61,27 @@
 
 $ ->
   $(document).foundation()
-  ko.applyBindings new ViewModel()
+  window.vm = new ViewModel()
+  ko.applyBindings window.vm
   return
 
 class BoardGameResult
   constructor: (data) ->
-    console.log data
     for key,value of data
-      @[key] = value
+      if key is "comments"
+        @comments = ko.observableArray([])
+        @commentsPage = ko.observable()
+        @processComments value
+      else
+        @[key] = value
     @thumbnail ?= ""
+
+  processComments: (data) =>
+    @comments(data.comment)
+    @commentsPage(data.page)
+    @commentsData = 
+      page:data.page
+      totalitems:data.totalitems
 
   # Returns all the ranks of a boardgame
   getRanks: ->
@@ -152,16 +164,25 @@ class BoardGame extends BoardGameResult
   constructor: (data) ->
     super(data)
     @thumbnail ?= ""
-    @goodComments ?= (comment for comment in @comments.comment when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
+    @goodComments ?= (comment for comment in @comments when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
     @featuredComment = ko.observable()
     @pickFeaturedComment()
+    # @commentsPage = ko.observable(@commentsData.page)
+    # @commentsPage = ko.computed({
+    #   read: =>
+    #     @commentsData.page
+    #   write: (value) =>
+    #     console.log value
+    #     #window.vm.getGameComments(@id, value)
+    #     locaton.hash = "#game/#{@id}/comments/page/#{value}"
+    #     return
+    #   })
 
-  getComments: ->
-    console.log "here"
-    @comments.comment
-  getCommentsPages: ->
-    page: @comments.page
-    pages: Math.ceil(@comments.totalitems/100)
+  # getComments: ->
+  #   console.log "here"
+  #   @comments.comment
+  getCommentsTotalPages: ->
+    Math.ceil(@commentsData.totalitems/100)
 
   pickFeaturedComment: ->
       @featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
@@ -185,9 +206,10 @@ class ViewModel
 
     # [Array]
     @searchedGames = ko.observableArray([])
+    # [BoardGame]
     @selectedGame = ko.observable()
     # Indicates that information is currently loading
-    @searching = ko.observable(null)
+    @loading = ko.observable(null)
     # 1 is ascending, -1 is descending
     @sortDirection = -1
     @currentSort = 'brating'
@@ -201,8 +223,9 @@ class ViewModel
 
       @get "#game/:oid/comments/page/:num", ->
         self.currentPage "gameComments"
-        self.getGameDetails(@params.oid)
-
+        self.getGameDetails(@params.oid, @params.num)
+        #elf.getGameComments(@params.oid, @params.num)
+        return
 
       @get /#game\/(.*)(#.+)?/, ->
         self.currentPage "gameOverview"
@@ -231,6 +254,9 @@ class ViewModel
           scrollTop: 0
         , "slow"
     return
+
+  goToGameComments: (page,bg) ->
+    location.hash = "#game/#{bg.id}/comments/page/#{page}"
 
   # Sorting of search results by name/title
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
@@ -295,13 +321,13 @@ class ViewModel
     regex = new RegExp(" ", "g")
     str = str.replace(regex, "+")
 
-    @searching(true)
+    @loading(true)
 
     # Check if results are already cached
     ids = @loadFromCache("searched_bgs_ids", str)
     if ids
       console.log "ids"
-      @searching null
+      @loading null
       @getGamesDetails(ids, str)
       return
 
@@ -349,14 +375,40 @@ class ViewModel
 
   # Loads data for a given boardgame id
   # @param id [String]
-  getGameDetails: (id) ->
-
+  getGameDetails: (id,page) ->
+    if page
+      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
+      $.getJSON @getYQLurl(url), (data) =>
+        if data.query.results
+          @selectedGame(new BoardGame(data.query.results.items["item"]))
+          # $(".page-slider").noUiSlider(
+          #   start: parseInt(page)
+          #   step: 1
+          #   range: {
+          #     'min': 1
+          #     'max': parseInt(@selectedGame().getCommentsTotalPages())
+          #   }
+          #   # serialization: {
+          #   #   lower: [
+          #   #     new Link({
+          #   #       target: $('#page-num')
+          #   #     })
+          #   #   ]
+          #   #   format:
+          #   #     decimals: 0
+          #   # }
+          #   ,
+          #   true
+          # )
+        return
+      return
+    page ?= 1
     data = @loadFromCache("bg", id)
     if data
       @selectedGame(new BoardGame(data))
       return
 
-    url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100"
+    url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
     $.getJSON @getYQLurl(url), (data) =>
       if data.query.results
         @selectedGame(new BoardGame(data.query.results.items["item"]))
@@ -364,12 +416,42 @@ class ViewModel
       return
     return
 
+  getGameComments: (id,page) ->
+    @loading(true)
+    url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&comments=1&pagesize=100&page=#{page}"
+    $.getJSON @getYQLurl(url), (data) =>
+      if data.query.results
+        @selectedGame().processComments(data.query.results.items["item"]["comments"])
+        @loading(null)
+        $(".page-slider").noUiSlider(
+          start: parseInt(@params.num)
+          step: 1
+          range: {
+            'min': 1
+            'max': parseInt(self.selectedGame().getCommentsTotalPages())
+          }
+          serialization: {
+            lower: [
+              new Link({
+                target: $('#page-num')
+              })
+            ]
+            format:
+              decimals: 0
+          }
+          ,
+          true
+        )
+      return
+    return
+
+
   getGamesDetails: (gameids, str) ->
 
     data = @loadFromCache("searched_bgs", str)
     if data
       console.log "using cached search games"
-      @searching null
+      @loading null
       @searchedGames((new BoardGameResult(result) for result in data))
       @sortByBRating(-1)
       return
@@ -384,7 +466,7 @@ class ViewModel
         if data.query.results
           @searchedGames.push(new BoardGameResult(data.query.results.items["item"]))
         if counter is gameids.length
-          @searching null
+          @loading null
           @saveToCache("searched_bgs", str, @searchedGames()) 
           @sortByBRating(-1)
         return
