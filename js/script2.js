@@ -12,31 +12,22 @@
 
   BoardGameResult = (function() {
     function BoardGameResult(data) {
-      this.processComments = __bind(this.processComments, this);
-      var key, value;
-      for (key in data) {
-        value = data[key];
-        if (key === "comments") {
-          this.comments = ko.observableArray([]);
-          this.commentsPage = ko.observable();
-          this.processComments(value);
-        } else {
-          this[key] = value;
-        }
-      }
+      this.id = data.id;
+      this.image = data.image;
+      this.description = data.description;
+      this.thumbnail = data.thumbnail;
+      this.link = data.link;
+      this.maxplayers = data.maxplayers;
+      this.minage = data.minage;
+      this.minplayers = data.minplayers;
+      this.name = data.name;
+      this.playingtime = data.playingtime;
+      this.statistics = data.statistics;
+      this.yearpublished = data.yearpublished;
       if (this.thumbnail == null) {
         this.thumbnail = "";
       }
     }
-
-    BoardGameResult.prototype.processComments = function(data) {
-      this.comments(data.comment);
-      this.commentsPage(data.page);
-      return this.commentsData = {
-        page: data.page,
-        totalitems: data.totalitems
-      };
-    };
 
     BoardGameResult.prototype.getRanks = function() {
       return this.statistics.ratings.ranks.rank;
@@ -127,15 +118,41 @@
     __extends(BoardGame, _super);
 
     function BoardGame(data) {
-      var comment;
+      this.changePageBy = __bind(this.changePageBy, this);
+      this.processComments = __bind(this.processComments, this);
+      var comment,
+        _this = this;
       BoardGame.__super__.constructor.call(this, data);
-      if (this.thumbnail == null) {
-        this.thumbnail = "";
-      }
+      this.comments = data.comments;
+      this.commentsko = ko.observableArray([]);
+      this.commentsData = {
+        page: data.comments.page,
+        totalitems: data.comments.totalitems
+      };
+      this.commentsPage = ko.computed({
+        read: function() {
+          return _this.commentsData.page;
+        },
+        write: function(value) {
+          var vtw;
+          vtw = parseInt(value);
+          if ((0 < vtw && vtw < _this.getCommentsTotalPages() + 1)) {
+            _this.commentsData.page = vtw;
+            $(function() {
+              if (window.vm.currentPage() === "gameComments") {
+                location.hash = "#game/" + _this.id + "/comments/page/" + vtw;
+              }
+            });
+          }
+        }
+      }).extend({
+        notify: 'always'
+      });
+      this.processComments();
       if (this.goodComments == null) {
         this.goodComments = (function() {
           var _i, _len, _ref, _results;
-          _ref = this.comments;
+          _ref = this.commentsko();
           _results = [];
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             comment = _ref[_i];
@@ -149,6 +166,19 @@
       this.featuredComment = ko.observable();
       this.pickFeaturedComment();
     }
+
+    BoardGame.prototype.processComments = function() {
+      var data;
+      data = this.comments;
+      this.commentsko(data.comment);
+      this.commentsPage(data.page);
+      return console.log(this.commentsPage());
+    };
+
+    BoardGame.prototype.changePageBy = function(num) {
+      this.commentsPage(this.commentsData.page + parseInt(num));
+      return console.log(this.commentsData);
+    };
 
     BoardGame.prototype.getCommentsTotalPages = function() {
       return Math.ceil(this.commentsData.totalitems / 100);
@@ -201,7 +231,12 @@
     }
 
     ViewModel.prototype.goToGameComments = function() {
-      location.hash = "game/" + (this.selectedGame().id) + "/comments/page/1";
+      var x;
+      x = this.selectedGame().commentsPage();
+      location.hash = "game/" + (this.selectedGame().id) + "/comments/page/" + x;
+      $("html, body").animate({
+        scrollTop: 0
+      }, "slow");
     };
 
     ViewModel.prototype.goToSearch = function() {
@@ -215,10 +250,6 @@
       $("html, body").animate({
         scrollTop: 0
       }, "slow");
-    };
-
-    ViewModel.prototype.goToGameComments = function(page, bg) {
-      return location.hash = "#game/" + bg.id + "/comments/page/" + page;
     };
 
     ViewModel.prototype.sortByName = function(direction) {
@@ -288,7 +319,6 @@
       this.loading(true);
       ids = this.loadFromCache("searched_bgs_ids", str);
       if (ids) {
-        console.log("ids");
         this.loading(null);
         this.getGamesDetails(ids, str);
         return;
@@ -338,11 +368,13 @@
     ViewModel.prototype.getGameDetails = function(id, page) {
       var data, url,
         _this = this;
+      this.loading(true);
       if (page) {
         url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
         $.getJSON(this.getYQLurl(url), function(data) {
           if (data.query.results) {
             _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+            _this.loading(null);
           }
         });
         return;
@@ -353,12 +385,14 @@
       data = this.loadFromCache("bg", id);
       if (data) {
         this.selectedGame(new BoardGame(data));
+        this.loading(null);
         return;
       }
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
       $.getJSON(this.getYQLurl(url), function(data) {
         if (data.query.results) {
           _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+          _this.loading(null);
           _this.saveToCache("bg", id, _this.selectedGame());
         }
       });

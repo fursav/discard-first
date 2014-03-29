@@ -67,21 +67,19 @@ $ ->
 
 class BoardGameResult
   constructor: (data) ->
-    for key,value of data
-      if key is "comments"
-        @comments = ko.observableArray([])
-        @commentsPage = ko.observable()
-        @processComments value
-      else
-        @[key] = value
+    @id = data.id
+    @image = data.image
+    @description = data.description
+    @thumbnail = data.thumbnail
+    @link = data.link
+    @maxplayers = data.maxplayers
+    @minage = data.minage
+    @minplayers = data.minplayers
+    @name = data.name
+    @playingtime = data.playingtime
+    @statistics = data.statistics
+    @yearpublished = data.yearpublished
     @thumbnail ?= ""
-
-  processComments: (data) =>
-    @comments(data.comment)
-    @commentsPage(data.page)
-    @commentsData = 
-      page:data.page
-      totalitems:data.totalitems
 
   # Returns all the ranks of a boardgame
   getRanks: ->
@@ -163,8 +161,26 @@ class BoardGameResult
 class BoardGame extends BoardGameResult
   constructor: (data) ->
     super(data)
-    @thumbnail ?= ""
-    @goodComments ?= (comment for comment in @comments when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
+    @comments = data.comments
+    @commentsko = ko.observableArray([])
+    @commentsData = 
+      page:data.comments.page
+      totalitems:data.comments.totalitems
+    @commentsPage = ko.computed({
+      read: =>
+        @commentsData.page
+      write: (value) =>
+        vtw = parseInt(value)
+        if 0 < vtw < @getCommentsTotalPages()+1
+          @commentsData.page = vtw
+          $ =>
+            location.hash = "#game/#{@id}/comments/page/#{vtw}" if window.vm.currentPage() is "gameComments"
+            return
+        return
+      }).extend({ notify: 'always' })
+    @processComments()
+
+    @goodComments ?= (comment for comment in @commentsko() when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
     @featuredComment = ko.observable()
     @pickFeaturedComment()
     # @commentsPage = ko.observable(@commentsData.page)
@@ -177,6 +193,15 @@ class BoardGame extends BoardGameResult
     #     locaton.hash = "#game/#{@id}/comments/page/#{value}"
     #     return
     #   })
+
+  processComments: =>
+    data = @comments
+    @commentsko(data.comment)
+    @commentsPage(data.page)
+    console.log @commentsPage()
+  changePageBy: (num) =>
+    @commentsPage(@commentsData.page + parseInt(num))
+    console.log @commentsData
 
   # getComments: ->
   #   console.log "here"
@@ -239,7 +264,11 @@ class ViewModel
     ).run()
 
   goToGameComments: =>
-    location.hash = "game/#{@selectedGame().id}/comments/page/1" 
+    x = @selectedGame().commentsPage()
+    location.hash = "game/#{@selectedGame().id}/comments/page/#{x}" 
+    $("html, body").animate
+          scrollTop: 0
+        , "slow"
     return
 
   goToSearch: ->
@@ -254,9 +283,6 @@ class ViewModel
           scrollTop: 0
         , "slow"
     return
-
-  goToGameComments: (page,bg) ->
-    location.hash = "#game/#{bg.id}/comments/page/#{page}"
 
   # Sorting of search results by name/title
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
@@ -326,7 +352,6 @@ class ViewModel
     # Check if results are already cached
     ids = @loadFromCache("searched_bgs_ids", str)
     if ids
-      console.log "ids"
       @loading null
       @getGamesDetails(ids, str)
       return
@@ -376,42 +401,27 @@ class ViewModel
   # Loads data for a given boardgame id
   # @param id [String]
   getGameDetails: (id,page) ->
+    @loading(true)
     if page
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
       $.getJSON @getYQLurl(url), (data) =>
         if data.query.results
           @selectedGame(new BoardGame(data.query.results.items["item"]))
-          # $(".page-slider").noUiSlider(
-          #   start: parseInt(page)
-          #   step: 1
-          #   range: {
-          #     'min': 1
-          #     'max': parseInt(@selectedGame().getCommentsTotalPages())
-          #   }
-          #   # serialization: {
-          #   #   lower: [
-          #   #     new Link({
-          #   #       target: $('#page-num')
-          #   #     })
-          #   #   ]
-          #   #   format:
-          #   #     decimals: 0
-          #   # }
-          #   ,
-          #   true
-          # )
+          @loading(null)
         return
       return
     page ?= 1
     data = @loadFromCache("bg", id)
     if data
       @selectedGame(new BoardGame(data))
+      @loading(null)
       return
 
     url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
     $.getJSON @getYQLurl(url), (data) =>
       if data.query.results
         @selectedGame(new BoardGame(data.query.results.items["item"]))
+        @loading(null)
         @saveToCache("bg", id, @selectedGame())        
       return
     return
