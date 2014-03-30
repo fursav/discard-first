@@ -70,7 +70,7 @@ class BoardGameResult
     @id = data.id
     @image = data.image
     @description = data.description
-    @thumbnail = data.thumbnail
+    @thumbnail = if $.type(data.thumbnail) is "object" then data.thumbnail.value else data.thumbnail
     @link = data.link
     @maxplayers = data.maxplayers
     @minage = data.minage
@@ -80,6 +80,7 @@ class BoardGameResult
     @statistics = data.statistics
     @yearpublished = data.yearpublished
     @thumbnail ?= ""
+    @hotRank = data.rank or data.hotRank
 
   # Returns all the ranks of a boardgame
   getRanks: ->
@@ -228,9 +229,18 @@ class ViewModel
 
     # Page
     @currentPage = ko.observable()
+    @currentPageTitle = ko.computed(=>
+      return switch @currentPage()
+        when "searchGames" then 'Search Results'
+        when "gameComments" then  'Game Comments'
+        when "gameOverview" then 'Game Overview'
+        when "hotGames" then 'Hot Games'
+      )
 
     # [Array]
     @searchedGames = ko.observableArray([])
+    # [Array]
+    @hotGames = ko.observableArray([])
     # [BoardGame]
     @selectedGame = ko.observable()
     # Indicates that information is currently loading
@@ -241,24 +251,30 @@ class ViewModel
     # Client-side routes   
     Sammy(->
       @get "#search/:string", ->
-        self.currentPage "searchGames"
         self.selectedGame null
         self.searchGames @params.string
+        self.currentPage "searchGames"
         return
 
       @get "#game/:oid/comments/page/:num", ->
-        self.currentPage "gameComments"
         self.getGameDetails(@params.oid, @params.num)
+        self.currentPage "gameComments"
         #elf.getGameComments(@params.oid, @params.num)
         return
 
       @get /#game\/(.*)(#.+)?/, ->
-        self.currentPage "gameOverview"
         self.searchedGames.removeAll()
         self.getGameDetails @params.splat[0]
+        self.currentPage "gameOverview"
         return
 
       @get "", ->
+        this.title = "Hello"
+        self.selectedGame null
+        self.searchedGames.removeAll()
+        self.getHotItems()
+        self.currentPage "hotGames"
+        return
 
       return
     ).run()
@@ -398,6 +414,24 @@ class ViewModel
     url = "'#{str}'"
     return "http://query.yahooapis.com/v1/public/yql?q=#{encodeURIComponent(q + url)}&format=json&callback=?"
 
+  getHotItems: ->
+    @loading(true)
+    data = @loadFromCache("hot", "games")
+    if data
+      console.log data
+      @hotGames((new BoardGameResult(result) for result in data))
+      @loading(null)
+      return
+    url = "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame"
+    $.getJSON @getYQLurl(url), (data) =>
+      if data.query.results
+        #console.log (new BoardGameResult(result) for result in data.query.results.items.item)
+        @hotGames((new BoardGameResult(result) for result in data.query.results.items.item))
+        @loading(null)
+        @saveToCache("hot", "games", @hotGames())        
+      return
+    return
+
   # Loads data for a given boardgame id
   # @param id [String]
   getGameDetails: (id,page) ->
@@ -425,36 +459,6 @@ class ViewModel
         @saveToCache("bg", id, @selectedGame())        
       return
     return
-
-  getGameComments: (id,page) ->
-    @loading(true)
-    url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&comments=1&pagesize=100&page=#{page}"
-    $.getJSON @getYQLurl(url), (data) =>
-      if data.query.results
-        @selectedGame().processComments(data.query.results.items["item"]["comments"])
-        @loading(null)
-        $(".page-slider").noUiSlider(
-          start: parseInt(@params.num)
-          step: 1
-          range: {
-            'min': 1
-            'max': parseInt(self.selectedGame().getCommentsTotalPages())
-          }
-          serialization: {
-            lower: [
-              new Link({
-                target: $('#page-num')
-              })
-            ]
-            format:
-              decimals: 0
-          }
-          ,
-          true
-        )
-      return
-    return
-
 
   getGamesDetails: (gameids, str) ->
 
