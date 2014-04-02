@@ -153,7 +153,7 @@ class BoardGameResult
           break
       i++
     # Add a button to show the hidden part of the description
-    htmlDescription += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>"  if contenthid
+    htmlDescription += "</div><button class='link' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></button>"  if contenthid
     regex = new RegExp(@getName(), "g")
     htmlDescription = htmlDescription.replace(regex, "<b>" + @getName() + "</b>")
     return htmlDescription
@@ -212,7 +212,7 @@ class BoardGame extends BoardGameResult
 
   pickFeaturedComment: ->
       @featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
-      return
+      return false
 
   # Returns link to bgg rank page for given rank
   # @param name [String] type of rank/game

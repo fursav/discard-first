@@ -104,7 +104,7 @@
         i++;
       }
       if (contenthid) {
-        htmlDescription += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>";
+        htmlDescription += "</div><button class='link' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></button>";
       }
       regex = new RegExp(this.getName(), "g");
       htmlDescription = htmlDescription.replace(regex, "<b>" + this.getName() + "</b>");
@@ -187,6 +187,7 @@
 
     BoardGame.prototype.pickFeaturedComment = function() {
       this.featuredComment(this.goodComments[Math.floor(Math.random() * this.goodComments.length)]);
+      return false;
     };
 
     BoardGame.prototype.getRankLink = function(name, id, value) {

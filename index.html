@@ -229,9 +229,9 @@
             <cite data-bind="html: username"></cite>
             </blockquote>
             <p>Rating: <span data-bind="text: rating" ></span>
-              <a data-bind="click: $parent.pickFeaturedComment()"><i class="icon ion-refresh"></i></a>
+              <button class="link" data-bind="click: $parent.pickFeaturedComment()" ><i class="icon ion-refresh"></i></button>
             </p>
-            <a href="" data-bind="click: $root.goToGameComments">View All</a>
+            <a data-bind="click: $root.goToGameComments">View All</a>
           </div>
         </div>
         </section>
