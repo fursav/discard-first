@@ -116,7 +116,7 @@
         <section class="section section-white">
         <div class="row" style="padding-bottom:10px;" >
           <div class="column small-5" >
-            <img  class="radius" style="height:16.563em;" data-bind="attr:{src: image}">
+            <img  class="radius" style="height:16.563em;" data-bind="attr:{src:$(window).width() > 600 ? image : thumbnail}">
           </div>
           <!-- Quick Info -->
           <div class=" column small-7 spaced-rows" data-magellan-destination="info">
@@ -231,7 +231,7 @@
             <p>Rating: <span data-bind="text: rating" ></span>
               <button class="link" data-bind="click: $parent.pickFeaturedComment()" ><i class="icon ion-refresh"></i></button>
             </p>
-            <a data-bind="click: $root.goToGameComments">View All</a>
+            <a class="link-wide" data-bind="click: $root.goToGameComments">View All</a>
           </div>
         </div>
         </section>
@@ -305,6 +305,7 @@
     <script src="js/vendor/jquery.js"></script>
     <script src="js/foundation/foundation.js"></script>
     <script src="js/foundation/foundation.magellan.js"></script>
+    <script src="js/foundation/foundation.interchange.js"></script>
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
     <script src="js/script.js"></script>
