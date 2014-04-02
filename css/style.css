@@ -1,8 +1,11 @@
 p,a,button,input{font:17px "Gen Light"}
 h1,h2,h3,h4,h5{font-family:"Hans Kendrick"}
-.top-nav{background-color:#0b5da1;box-shadow:-.05em .3em .3em -.3em #000}
+.top-nav{background-color:#0b5da1;box-shadow:-.05em .3em .3em -.3em #000;text-align:center;}
+.top-nav li{text-align:center}
+.top-nav a{outline:none}
 .icon-large{font-size:2em}
 .icon-huge{font-size:10em}
+.icon-inline{vertical-align:bottom}
 table{border:0}
 table thead tr{cursor:pointer}
 .headerSortUp:after{font-family:"Ionicons";content:"\f10d";float:right}
@@ -10,19 +13,21 @@ table thead tr{cursor:pointer}
 .spaced-rows .row{margin-bottom:1em}
 img.radius{border-radius:5px}
 .section{margin-bottom:.2em;padding:5em 0;box-shadow:0 .3em .3em -.3em #000}
-footer{background:#333;padding:24px 0 10px;margin-top:-.5em;}
-footer ul{margin:0;display:inline-block;padding-bottom:0;}
-footer ul li{list-style:none;display:block;float:left;margin-left:10px;margin-left:6px;text-transform:uppercase;font-weight:700;font-size:.75rem;}
-footer ul li a{color:#666;padding:3px 6px}
+footer{background:#333;padding:1.7em 0;margin-top:-.5em;}
+footer ul{margin:0 auto;padding-bottom:0;text-align:center;list-style:none;}
+footer ul li{display:inline;margin:0 1em;font-size:.75rem;text-align:center;}
+footer ul li a{color:#fff;padding:0 .5em}
+footer ul li i{vertical-align:bottom;color:#fff}
 footer ul li:hover{color:#777}
 .section-white{background-color:#a1dafa;background-image:linear-gradient(to bottom,#f5f3eb 0%,#fff 0%)}
 .section-gray{background-image:linear-gradient(to bottom,#f5f3eb 0%,#e8e8e8 100%)}
 .categories{list-style:circle;}
 .categories li{list-style:circle}
-.sub-nav-vertical{background-color:#fff;box-shadow:5px 6px 6px -6px #000;position:fixed;display:block;list-style-type:none;overflow:hidden;width:10em;margin:-.25rem 0 1.125rem;padding:1em 0;margin-top:2em;margin-right:0;margin-left:-.6rem;}
-.sub-nav-vertical dt{text-transform:uppercase}
-.sub-nav-vertical dt,.sub-nav-vertical dd,.sub-nav-vertical li{margin-left:1em;margin-bottom:.625em;font-weight:normal;font-size:.3em;color:#999}
-.sub-nav-vertical dt a,.sub-nav-vertical dd a,.sub-nav-vertical li a{text-decoration:none;outline:none;color:#999;padding:.1875rem 1rem}
-.sub-nav-vertical dt a:hover,.sub-nav-vertical dd a:hover,.sub-nav-vertical li a:hover{color:#737373}
-.sub-nav-vertical dt.active a,.sub-nav-vertical dd.active a,.sub-nav-vertical li.active a{border-radius:3px;font-weight:normal;background:#008cba;padding:.1875rem 1rem;cursor:default;color:#fff}
-.sub-nav-vertical dt.active a:hover,.sub-nav-vertical dd.active a:hover,.sub-nav-vertical li.active a:hover{background:#0078a0}
+@media only screen and (min-width: 64.063em){.sub-nav{background-color:#fff;box-shadow:5px 6px 6px -6px #000;position:fixed;display:block;list-style-type:none;overflow:hidden;width:10em;margin:-.25rem 0 1.125rem;padding:1em 0;margin-top:2em;margin-right:0;margin-left:-.6rem;z-index:999;}
+.sub-nav dt{text-transform:uppercase}
+.sub-nav dt,.sub-nav dd,.sub-nav li{margin-left:1em;margin-bottom:.625em;font-weight:normal;font-size:.3em;color:#999}
+.sub-nav dt a,.sub-nav dd a,.sub-nav li a{text-decoration:none;outline:none;color:#999;padding:.1875rem 1rem}
+.sub-nav dt a:hover,.sub-nav dd a:hover,.sub-nav li a:hover{color:#737373}
+.sub-nav dt.active a,.sub-nav dd.active a,.sub-nav li.active a{border-radius:3px;font-weight:normal;background:#008cba;padding:.1875rem 1rem;cursor:default;color:#fff}
+.sub-nav dt.active a:hover,.sub-nav dd.active a:hover,.sub-nav li.active a:hover{background:#0078a0}
+}

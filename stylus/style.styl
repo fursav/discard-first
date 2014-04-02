@@ -16,6 +16,11 @@ h5
 .top-nav  
   background-color color-blue
   box-shadow -.05em .3em .3em -.3em black
+  text-align center
+  li
+    text-align center
+  a
+    outline none
 
 
 //icons
@@ -23,6 +28,8 @@ h5
     font-size 2em
 .icon-huge
     font-size 10em
+.icon-inline
+    vertical-align bottom
 table 
     border 0px
 table thead tr 
@@ -50,30 +57,28 @@ img.radius
     box-shadow 0 .3em .3em -.3em black
 
 footer 
-  background: #333333;
-  padding: 24px 0 10px;
-  margin-top: -.5em; 
+  background #333333
+  padding 1.7em 0
+  margin-top -.5em
   ul
-    margin: 0;
-    display: inline-block;
-    padding-bottom: 0px;
+    margin 0 auto
+    padding-bottom 0
+    text-align center
+    list-style none
     li 
-      list-style:none;
-      display: block;
-      float: left;
-      margin-left: 10px;
-      margin-left: 6px;
-      text-transform: uppercase;
-      font-weight: 700;
-      font-size: 0.75rem;
-    
+      display inline
+      margin 0 1em
+      font-size 0.75rem
+      text-align center
       a
-        color: #666666;
-        padding: 3px 6px;
+        color: white;
+        padding: 0 .5em
+      i
+        vertical-align bottom
+        color white
     
       &:hover
         color: #777777;
-        
 
 .section-white    
   background-color: #a1dafa;
@@ -89,51 +94,52 @@ footer
   li 
     list-style circle
 
-
-.sub-nav-vertical 
-  background-color: white;
-  box-shadow: 5px 6px 6px -6px black;
-  position: fixed; 
-  display: block;
-  list-style-type: none;
-  overflow: hidden;
-  width: 10em;
-  margin: -0.25rem 0 1.125rem;
-  padding 1em 0
-  margin-top: 2em;
-  margin-right: 0em;
-  margin-left: -0.6rem;
-  dt 
-    text-transform: uppercase;
-  dt,
-  dd,
-  li
-    margin-left: 1em
-    margin-bottom: 0.625em
-    font-weight: normal
-    font-size: .3em
-    color: #999999
-  dt a,
-  dd a,
-  li a 
-    text-decoration: none;
-    outline none
-    color: #999999;
-    padding: 0.1875rem 1rem; 
-  dt a:hover,
-  dd a:hover,
-  li a:hover
-    color: #737373; 
-  dt.active a,
-  dd.active a,
-  li.active a
-    border-radius: 3px;
-    font-weight: normal;
-    background: #008cba;
-    padding: 0.1875rem 1rem;
-    cursor: default;
-    color: white;
-  dt.active a:hover,
-  dd.active a:hover,
-  li.active a:hover 
-    background: #0078a0;
+@media only screen and (min-width: 64.063em)
+  .sub-nav
+    background-color: white;
+    box-shadow: 5px 6px 6px -6px black;
+    position: fixed; 
+    display: block;
+    list-style-type: none;
+    overflow: hidden;
+    width: 10em;
+    margin: -0.25rem 0 1.125rem;
+    padding 1em 0
+    margin-top: 2em;
+    margin-right: 0em;
+    margin-left: -0.6rem;
+    z-index 999
+    dt 
+      text-transform: uppercase;
+    dt,
+    dd,
+    li
+      margin-left: 1em
+      margin-bottom: 0.625em
+      font-weight: normal
+      font-size: .3em
+      color: #999999
+    dt a,
+    dd a,
+    li a 
+      text-decoration: none;
+      outline none
+      color: #999999;
+      padding: 0.1875rem 1rem; 
+    dt a:hover,
+    dd a:hover,
+    li a:hover
+      color: #737373; 
+    dt.active a,
+    dd.active a,
+    li.active a
+      border-radius: 3px;
+      font-weight: normal;
+      background: #008cba;
+      padding: 0.1875rem 1rem;
+      cursor: default;
+      color: white;
+    dt.active a:hover,
+    dd.active a:hover,
+    li.active a:hover 
+      background: #0078a0;

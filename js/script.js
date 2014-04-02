@@ -1,367 +1,523 @@
-$(function() { 
- $(document).foundation(); 
- ko.applyBindings(new ViewModel);
+(function() {
+  var BoardGame, BoardGameResult, ViewModel,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
- });
-ViewModel = function() { 
-    var self; 
-    self = this; 
-    self.searchedGames = ko.observableArray([]);
-    self.selectedGame = ko.observable()
-    self.searching = ko.observable(null);
-    var nameDirection = -1;
-    var bratingDirection = 1;
+  $(function() {
+    $(document).foundation();
+    window.vm = new ViewModel();
+    ko.applyBindings(window.vm);
+  });
 
-    self.sortByName = function(i,j){
-    	$("#results-table thead tr th").removeClass("headerSortUp")
-    	$("#results-table thead tr th").removeClass("headerSortDown")
-        nameDirection = -nameDirection;
-        if (nameDirection == 1) {        	
-    		$(j.toElement).addClass("headerSortDown") 
-        }
-        else {       	
-    		$(j.toElement).addClass("headerSortUp")
-        }
-        self.searchedGames.sort(function(a, b){
-            if (self.getName(a.name) > self.getName(b.name)) return 1 * nameDirection;
-            if (self.getName(a.name) < self.getName(b.name)) return -1 * nameDirection;
-            return 0;
-        });
+  BoardGameResult = (function() {
+    function BoardGameResult(data) {
+      this.id = data.id;
+      this.image = data.image;
+      this.description = data.description;
+      this.thumbnail = $.type(data.thumbnail) === "object" ? data.thumbnail.value : data.thumbnail;
+      this.link = data.link;
+      this.maxplayers = data.maxplayers;
+      this.minage = data.minage;
+      this.minplayers = data.minplayers;
+      this.name = data.name;
+      this.playingtime = data.playingtime;
+      this.statistics = data.statistics;
+      this.yearpublished = data.yearpublished;
+      if (this.thumbnail == null) {
+        this.thumbnail = "";
+      }
+      this.hotRank = data.rank || data.hotRank;
+    }
+
+    BoardGameResult.prototype.getRanks = function() {
+      return this.statistics.ratings.ranks.rank;
     };
 
-    self.sortByBRating = function(i,j){
-    	$("#results-table thead tr th").removeClass("headerSortUp")
-    	$("#results-table thead tr th").removeClass("headerSortDown")
-        bratingDirection = -bratingDirection;
-        if (bratingDirection == 1) {        	
-    		$(j.toElement).addClass("headerSortDown")  
-        }
-        else {      	
-    		$(j.toElement).addClass("headerSortUp")
-        }
-        self.searchedGames.sort(function(a, b){
-            if (self.getBRating(a.statistics) > self.getBRating(b.statistics)) return 1 * bratingDirection;
-            if (self.getBRating(a.statistics) < self.getBRating(b.statistics)) return -1 * bratingDirection;
-            return 0;
-        });
+    BoardGameResult.prototype.getAverageRating = function() {
+      return this.statistics.ratings.average.value;
     };
 
-    self.getGoodComments = function(comments) {
-        gc = comments.comment.filter(function(el) {
-            return el.value.length > 119 && parseInt(el.rating) > 0 && el.value.length < 600
-        })
-        return gc[Math.floor(Math.random()*gc.length)]
-    }
+    BoardGameResult.prototype.getBRating = function() {
+      return this.statistics.ratings.bayesaverage.value;
+    };
 
-    self.getRankLink = function(name,id,value) {
-        if (name == "boardgame") {
-            return 'http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=' + 
-            id + '&rank=' + value + '#' + value
+    BoardGameResult.prototype.getCategories = function() {
+      var categories, link, _i, _len, _ref;
+      categories = [];
+      _ref = this.link;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        link = _ref[_i];
+        if (link["type"] === "boardgamecategory") {
+          categories.push(link["value"]);
         }
-        return 'http://boardgamegeek.com/' + name + '/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=' + 
-            id + '&rank=' + value + '#' + value
-        
-    }
+      }
+      return categories;
+    };
 
-    self.getRanks = function(stats) {
-        return stats.ratings.ranks.rank
-    }
-
-    self.getAverageRating = function(stats) {
-        return stats.ratings.average.value
-    }
-
-    self.getBRating = function(stats) {
-        //console.log(stats)
-        return stats.ratings.bayesaverage.value
-    }
-
-    self.getCategoriesFromLinks = function(link) {
-    	var categories = []
-        console.log("here")
-    	for (var i = 0; i < link.length; i++) {
-    		if(link[i]["type"] == "boardgamecategory") {
-    			categories.push(link[i]["value"])
-    		}
-    	};
-        console.log(categories)
-    	return categories
-    }
-
-    self.getDesignerFromLinks = function(link) {
-    	for (var i = 0; i < link.length; i++) {
-    		if(link[i]["type"] == "boardgamedesigner") {
-    			return link[i]["value"]
-    		}
-    	};
-    }
-
-    self.getName = function(name) {
-        if(Array.isArray(name)) {
-            return name[0].value
+    BoardGameResult.prototype.getDesigner = function() {
+      var link, _i, _len, _ref;
+      _ref = this.link;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        link = _ref[_i];
+        if (link["type"] === "boardgamedesigner") {
+          return link["value"];
         }
-        return name.value
-    }
-    self.getShortDescription = function(description) {
-        return description.slice(0,100) + "...";
-    } 
+      }
+    };
 
-    self.parseDescription = function(description) {
-    	var paragraphs = 1;
-    	var contenthid = false;
-    	var regex = new RegExp('&#10;&#10;&#10;    ', 'g');
-        description = description.replace(regex,"<ul><li>")
-        var regex = new RegExp('&#10;&#10;&#10;', 'g');
-        description = description.replace(regex,"</li></ul>")
-    	var regex = new RegExp('&#10;    ', 'g');
-        description = description.replace(regex,"</li><li>")
-        description = "<p>" + description
-    	var regex = new RegExp('&#10;&#10;', 'g');
-        description = description.replace(regex,"</p><p>")
-        description += "</p>"
-        for (var i = 0; i < description.length; i++) {
-        	if(description.slice(i,i+3) == "<p>" || description.slice(i-5,i) == "</ul>") {
-        		paragraphs += 1;        		
-	        	if ((paragraphs > 3 && i > 600 && description.length-i > 7) && contenthid == false){
-	        		description = description.slice(0,i) + "<div class='full-description' style='display:none'>" + description.slice(i,description.length)
-	        		contenthid = true
-	        		break;
-	        	}
-        	}
-        };
-        if (contenthid) {
-        	description += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>"
-        }
-        regex = new RegExp(self.getName(self.selectedGame().name), 'g');
-        description = description.replace(regex,"<b>" + self.getName(self.selectedGame().name) + "</b>")
-    	return description
-    }
+    BoardGameResult.prototype.getName = function() {
+      if ($.type(this.name) === "array") {
+        return this.name[0].value;
+      }
+      return this.name.value;
+    };
 
-    self.searchGames = function(str) { 
-        self.searchedGames.removeAll();
-        if (str == ""){
-            return
+    BoardGameResult.prototype.getShortDescription = function() {
+      return this.description.slice(0, 100) + "...";
+    };
+
+    BoardGameResult.prototype.getHTMLDescription = function() {
+      var contenthid, htmlDescription, i, paragraphs, regex;
+      paragraphs = 1;
+      contenthid = false;
+      regex = new RegExp("&#10;&#10;&#10;    ", "g");
+      htmlDescription = this.description.replace(regex, "<ul><li>");
+      regex = new RegExp("&#10;&#10;&#10;", "g");
+      htmlDescription = htmlDescription.replace(regex, "</li></ul>");
+      regex = new RegExp("&#10;    ", "g");
+      htmlDescription = htmlDescription.replace(regex, "</li><li>");
+      htmlDescription = "<p>" + htmlDescription;
+      regex = new RegExp("&#10;&#10;", "g");
+      htmlDescription = htmlDescription.replace(regex, "</p><p>");
+      htmlDescription += "</p>";
+      i = 0;
+      while (i < htmlDescription.length) {
+        if (htmlDescription.slice(i, i + 3) === "<p>" || htmlDescription.slice(i - 5, i) === "</ul>") {
+          paragraphs += 1;
+          if ((paragraphs > 3 && i > 600 && htmlDescription.length - i > 7) && contenthid === false) {
+            htmlDescription = htmlDescription.slice(0, i) + "<div class='full-description' style='display:none'>" + htmlDescription.slice(i, htmlDescription.length);
+            contenthid = true;
+            break;
+          }
         }
-        var regex = new RegExp(' ', 'g');
-        str = str.replace(regex,"+");
-        self.searching(true);
-        if (Modernizr.sessionstorage) {
-            var ids = eval('(' + sessionStorage["searched_bg_ids_"+str] + ')');
-            if (ids) {
-                self.getGamesDetails(ids,str)
-       			self.searching(null);
-                return
-            }  
-        } else {
-          // no native support for HTML5 storage :(
-          // maybe try dojox.storage or a third-party solution
+        i++;
+      }
+      if (contenthid) {
+        htmlDescription += "</div><a onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></a>";
+      }
+      regex = new RegExp(this.getName(), "g");
+      htmlDescription = htmlDescription.replace(regex, "<b>" + this.getName() + "</b>");
+      return htmlDescription;
+    };
+
+    return BoardGameResult;
+
+  })();
+
+  BoardGame = (function(_super) {
+    __extends(BoardGame, _super);
+
+    function BoardGame(data) {
+      this.changePageBy = __bind(this.changePageBy, this);
+      this.processComments = __bind(this.processComments, this);
+      var comment,
+        _this = this;
+      BoardGame.__super__.constructor.call(this, data);
+      this.comments = data.comments;
+      this.commentsko = ko.observableArray([]);
+      this.commentsData = {
+        page: data.comments.page,
+        totalitems: data.comments.totalitems
+      };
+      this.commentsPage = ko.computed({
+        read: function() {
+          return _this.commentsData.page;
+        },
+        write: function(value) {
+          var vtw;
+          vtw = parseInt(value);
+          if ((0 < vtw && vtw < _this.getCommentsTotalPages() + 1)) {
+            _this.commentsData.page = vtw;
+            $(function() {
+              if (window.vm.currentPage() === "gameComments") {
+                location.hash = "#game/" + _this.id + "/comments/page/" + vtw;
+              }
+            });
+          }
         }
-        url = 'http://www.boardgamegeek.com/xmlapi/search?search='+str
-        $.getJSON(self.getYQLurl(url), function(data){
-            ids = self.extractIdsFromSearch(data);
-            //cache the ids
-            sessionStorage["searched_bg_ids_"+str] = JSON.stringify(ids)
-            self.getGamesDetails(ids,str)
-         });
-        }; 
-    self.extractIdsFromSearch = function(data) {
-        console.log(data)
-        if(data.query.results) {
-            jdata = data.query.results.boardgames["boardgame"];
-            ids = []
-            if (Array.isArray(jdata)) {
-                for (var i = 0; i < jdata.length; i++) {
-                    ids.push(jdata[i]["objectid"])
-                }       
+      }).extend({
+        notify: 'always'
+      });
+      this.processComments();
+      if (this.goodComments == null) {
+        this.goodComments = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this.commentsko();
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            comment = _ref[_i];
+            if (comment.value.length > 119 && parseInt(comment.rating) > 0 && comment.value.length < 600) {
+              _results.push(comment);
             }
-            else {
-                ids.push(jdata["objectid"])    
-            }
-            return ids
-        }
+          }
+          return _results;
+        }).call(this);
+      }
+      this.featuredComment = ko.observable();
+      this.pickFeaturedComment();
+    }
+
+    BoardGame.prototype.processComments = function() {
+      var data;
+      data = this.comments;
+      this.commentsko(data.comment);
+      this.commentsPage(data.page);
+      return console.log(this.commentsPage());
     };
 
-    self.getSomething = function() {
-    	console.log("here")
-    	url = "http://www.boardgamegeek.com/boardgame/125618/libertalia"
-    	$.getJSON("http://query.yahooapis.com/v1/public/yql?"+
-                "q=select%20*%20from%20html%20where%20url%3D%22"+
-                encodeURIComponent(url)+
-                "%22&format=xml'&callback=?", function(data){
-    			console.log(data)
-    	})
-    }
-
-    self.getYQLurl = function(str) {
-        q = "select * from xml where url="
-        url = "'" + str + "'"
-        return "http://query.yahooapis.com/v1/public/yql?q=" +
-         encodeURIComponent(q+url) + 
-         "&format=json&callback=?"
-    }
-
-    self.getGameDetails = function (id) {
-        if (Modernizr.sessionstorage) {
-            var gdata = eval('(' + sessionStorage["bg"+id] + ')');
-            if (gdata) {
-                console.log("using cache")
-                self.selectedGame(gdata);
-                $('html, body').animate({scrollTop:0}, 'slow');
-                return
-            }  
-        } else {
-          // no native support for HTML5 storage :(
-          // maybe try dojox.storage or a third-party solution
-        }
-        url = "http://www.boardgamegeek.com/xmlapi2/thing?id="+ id + "&stats=1&comments=1"
-        $.getJSON(self.getYQLurl(url), function(data){
-            if(data.query.results) {
-                gdata = data.query.results.items["item"];
-                if (gdata["thumbnail"] == null) {
-                    gdata["thumbnail"] = "";
-                }
-                sessionStorage["bg"+id] = JSON.stringify(gdata);
-                self.selectedGame(gdata);
-                console.log(gdata)
-                $('html, body').animate({scrollTop:0}, 'slow');
-
-                //equalHeight($(".columns-equal > div"));
-            }
-         });  
-    }
-
-    self.getGamesDetails = function(gameids,str) {
-        if (Modernizr.sessionstorage) {
-            var gdata = eval('(' + sessionStorage["searched_bgs_"+str] + ')');
-            if (gdata) {
-                console.log("using cached search games")
-                self.searching(null);
-                self.searchedGames(gdata);
-                return
-            }  
-        } else {
-          // no native support for HTML5 storage :(
-          // maybe try dojox.storage or a third-party solution
-        }
-        var counter = 0;
-        for (var i = 0; i < gameids.length; i++) {
-            url = 'http://www.boardgamegeek.com/xmlapi2/thing?id='+ gameids[i] + "&stats=1"
-            $.getJSON(self.getYQLurl(url), function(data){
-                counter += 1;
-                if(data.query.results) {
-                    gdata = data.query.results.items["item"];
-                    if (gdata["thumbnail"] == null) {
-                        gdata["thumbnail"] = "";
-                    }
-                    self.searchedGames.push(gdata);
-                }
-                if (counter == gameids.length) {
-                    self.searching(null);
-                    sessionStorage["searched_bgs_"+str] = JSON.stringify(self.searchedGames());
-                }
-             })
-        };   
-    }   
-
-    self.goToSearch = function() {
-        str = encodeURIComponent($("#search").val());
-        location.hash =  "search/" + str;
-    }
-
-    self.goToGame = function(object) { 
-        location.hash = "game/" + object.id
+    BoardGame.prototype.changePageBy = function(num) {
+      this.commentsPage(this.commentsData.page + parseInt(num));
+      return console.log(this.commentsData);
     };
 
-    //routing
-    // Client-side routes    
-    Sammy(function() {
-        this.get('#search/:string', function() {
-            self.selectedGame(null);
-            self.searchGames(this.params.string);
+    BoardGame.prototype.getCommentsTotalPages = function() {
+      return Math.ceil(this.commentsData.totalitems / 100);
+    };
+
+    BoardGame.prototype.pickFeaturedComment = function() {
+      this.featuredComment(this.goodComments[Math.floor(Math.random() * this.goodComments.length)]);
+    };
+
+    BoardGame.prototype.getRankLink = function(name, id, value) {
+      if (name === "boardgame") {
+        return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
+      }
+      return "http://boardgamegeek.com/" + name + "/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=" + id + "&rank=" + value + "#" + value;
+    };
+
+    return BoardGame;
+
+  })(BoardGameResult);
+
+  ViewModel = (function() {
+    function ViewModel() {
+      this.updateTableHeaders = __bind(this.updateTableHeaders, this);
+      this.goToGameComments = __bind(this.goToGameComments, this);
+      var self,
+        _this = this;
+      self = this;
+      this.currentPage = ko.observable();
+      this.currentPageTitle = ko.computed(function() {
+        switch (_this.currentPage()) {
+          case "searchGames":
+            return 'Search Results';
+          case "gameComments":
+            return 'Game Comments';
+          case "gameOverview":
+            return 'Game Overview';
+          case "hotGames":
+            return 'Hot Games';
+        }
+      });
+      this.searchedGames = ko.observableArray([]);
+      this.hotGames = ko.observableArray([]);
+      this.selectedGame = ko.observable();
+      this.loading = ko.observable(null);
+      this.sortDirection = -1;
+      this.currentSort = 'brating';
+      Sammy(function() {
+        this.get("#search/:string", function() {
+          self.selectedGame(null);
+          self.searchGames(this.params.string);
+          self.currentPage("searchGames");
         });
-
+        this.get("#game/:oid/comments/page/:num", function() {
+          self.getGameDetails(this.params.oid, this.params.num);
+          self.currentPage("gameComments");
+        });
         this.get(/#game\/(.*)(#.+)?/, function() {
-            console.log(this.params)
-            self.searchedGames.removeAll();
-            self.getGameDetails(this.params.splat[0]);
+          self.searchedGames.removeAll();
+          self.getGameDetails(this.params.splat[0]);
+          self.currentPage("gameOverview");
         });
-        this.get('', function() {
+        this.get("", function() {
+          this.title = "Hello";
+          self.selectedGame(null);
+          self.searchedGames.removeAll();
+          self.getHotItems();
+          self.currentPage("hotGames");
         });
-    
-        //this.get('', function() { this.app.runRoute('get', '#search/ ') });
-    }).run();
- };
-
- function equalHeight(group) {
-	var tallest = 0;
-	group.each(function() {
-		var thisHeight = $(this).height();
- 		console.log(thisHeight)
-		if(thisHeight > tallest) {
-			tallest = thisHeight;
-		}
-	});
-	group.height(tallest);
-}
-
-function OnImageLoad(evt) {
-    var img = evt.currentTarget;
-
-    // what's the size of this image and it's parent
-    var w = $(img).width();
-    var h = $(img).height();
-    var tw = $(img).parent().width();
-    var th = $(img).parent().height();
-	console.log(tw)
-	console.log(th)
-
-    // compute the new size and offsets
-    var result = ScaleImage(w, h, tw, th, false);
-
-    // adjust the image coordinates and size
-    img.width = result.width;
-    img.height = result.height;
-    $(img).css("left", result.targetleft);
-    $(img).css("top", result.targettop);
-}
-
-function ScaleImage(srcwidth, srcheight, targetwidth, targetheight, fLetterBox) {
-
-    var result = { width: 0, height: 0, fScaleToTargetWidth: true };
-
-    if ((srcwidth <= 0) || (srcheight <= 0) || (targetwidth <= 0) || (targetheight <= 0)) {
-        return result;
+      }).run();
     }
 
-    // scale to the target width
-    var scaleX1 = targetwidth;
-    var scaleY1 = (srcheight * targetwidth) / srcwidth;
+    ViewModel.prototype.goToGameComments = function() {
+      var x;
+      x = this.selectedGame().commentsPage();
+      location.hash = "game/" + (this.selectedGame().id) + "/comments/page/" + x;
+      $("html, body").animate({
+        scrollTop: 0
+      }, "slow");
+    };
 
-    // scale to the target height
-    var scaleX2 = (srcwidth * targetheight) / srcheight;
-    var scaleY2 = targetheight;
+    ViewModel.prototype.goToSearch = function() {
+      var str;
+      str = encodeURIComponent($("#search").val());
+      location.hash = "search/" + str;
+    };
 
-    // now figure out which one we should use
-    var fScaleOnWidth = (scaleX2 > targetwidth);
-    if (fScaleOnWidth) {
-        fScaleOnWidth = fLetterBox;
-    }
-    else {
-       fScaleOnWidth = !fLetterBox;
-    }
+    ViewModel.prototype.goToGame = function(object) {
+      location.hash = "game/" + object.id;
+      $("html, body").animate({
+        scrollTop: 0
+      }, "slow");
+    };
 
-    if (fScaleOnWidth) {
-        result.width = Math.floor(scaleX1);
-        result.height = Math.floor(scaleY1);
-        result.fScaleToTargetWidth = true;
-    }
-    else {
-        result.width = Math.floor(scaleX2);
-        result.height = Math.floor(scaleY2);
-        result.fScaleToTargetWidth = false;
-    }
-    result.targetleft = Math.floor((targetwidth - result.width) / 2);
-    result.targettop = Math.floor((targetheight - result.height) / 2);
+    ViewModel.prototype.sortByName = function(direction) {
+      var _this = this;
+      if (direction != null) {
+        this.sortDirection = direction;
+      }
+      this.searchedGames.sort(function(a, b) {
+        if (a.getName() > b.getName()) {
+          return 1 * _this.sortDirection;
+        }
+        if (a.getName() < b.getName()) {
+          return -1 * _this.sortDirection;
+        }
+        return 0;
+      });
+    };
 
-    return result;
-}
+    ViewModel.prototype.sortByBRating = function(direction) {
+      var _this = this;
+      if (direction != null) {
+        this.sortDirection = direction;
+      }
+      this.searchedGames.sort(function(a, b) {
+        if (a.getBRating() > b.getBRating()) {
+          return 1 * _this.sortDirection;
+        }
+        if (a.getBRating() < b.getBRating()) {
+          return -1 * _this.sortDirection;
+        }
+        return 0;
+      });
+    };
+
+    ViewModel.prototype.handleSort = function(type, vm, event) {
+      this.sortDirection = type === this.currentSort ? -this.sortDirection : -1;
+      this.currentSort = type;
+      this.updateTableHeaders(type, event);
+      switch (type) {
+        case "name":
+          this.sortByName();
+          break;
+        case "brating":
+          this.sortByBRating();
+      }
+    };
+
+    ViewModel.prototype.updateTableHeaders = function(type, event) {
+      $("#results-table thead tr th").removeClass("headerSortUp");
+      $("#results-table thead tr th").removeClass("headerSortDown");
+      if (this.sortDirection === -1) {
+        $(event.toElement).addClass("headerSortDown");
+      } else {
+        $(event.toElement).addClass("headerSortUp");
+      }
+    };
+
+    ViewModel.prototype.searchGames = function(str) {
+      var ids, regex, url,
+        _this = this;
+      this.searchedGames.removeAll();
+      if (str === "") {
+        return;
+      }
+      regex = new RegExp(" ", "g");
+      str = str.replace(regex, "+");
+      this.loading(true);
+      ids = this.loadFromCache("searched_bgs_ids", str);
+      if (ids) {
+        this.loading(null);
+        this.getGamesDetails(ids, str);
+        return;
+      }
+      url = "http://www.boardgamegeek.com/xmlapi/search?search=" + str;
+      $.getJSON(this.getYQLurl(url), function(data) {
+        ids = _this.extractIdsFromSearch(data);
+        _this.saveToCache("searched_bgs_ids", str, ids);
+        _this.getGamesDetails(ids, str);
+      });
+    };
+
+    ViewModel.prototype.extractIdsFromSearch = function(data) {
+      var ids, jdata, object, _i, _len;
+      console.log(data);
+      if (data.query.results) {
+        jdata = data.query.results.boardgames["boardgame"];
+        ids = [];
+        if (Array.isArray(jdata)) {
+          for (_i = 0, _len = jdata.length; _i < _len; _i++) {
+            object = jdata[_i];
+            ids.push(object["objectid"]);
+          }
+        } else {
+          ids.push(jdata["objectid"]);
+        }
+        return ids;
+      }
+    };
+
+    ViewModel.prototype.getSomething = function() {
+      var url;
+      console.log("here");
+      url = "http://www.boardgamegeek.com/boardgame/125618/libertalia";
+      $.getJSON("http://query.yahooapis.com/v1/public/yql?" + "q=select%20*%20from%20html%20where%20url%3D%22" + encodeURIComponent(url) + "%22&format=xml'&callback=?", function(data) {
+        console.log(data);
+      });
+    };
+
+    ViewModel.prototype.getYQLurl = function(str) {
+      var q, url;
+      q = "select * from xml where url=";
+      url = "'" + str + "'";
+      return "http://query.yahooapis.com/v1/public/yql?q=" + (encodeURIComponent(q + url)) + "&format=json&callback=?";
+    };
+
+    ViewModel.prototype.getHotItems = function() {
+      var data, result, url,
+        _this = this;
+      this.loading(true);
+      data = this.loadFromCache("hot", "games");
+      if (data) {
+        console.log(data);
+        this.hotGames((function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            result = data[_i];
+            _results.push(new BoardGameResult(result));
+          }
+          return _results;
+        })());
+        this.loading(null);
+        return;
+      }
+      url = "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame";
+      $.getJSON(this.getYQLurl(url), function(data) {
+        if (data.query.results) {
+          _this.hotGames((function() {
+            var _i, _len, _ref, _results;
+            _ref = data.query.results.items.item;
+            _results = [];
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              result = _ref[_i];
+              _results.push(new BoardGameResult(result));
+            }
+            return _results;
+          })());
+          _this.loading(null);
+          _this.saveToCache("hot", "games", _this.hotGames());
+        }
+      });
+    };
+
+    ViewModel.prototype.getGameDetails = function(id, page) {
+      var data, url,
+        _this = this;
+      this.loading(true);
+      if (page) {
+        url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
+        $.getJSON(this.getYQLurl(url), function(data) {
+          if (data.query.results) {
+            _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+            _this.loading(null);
+          }
+        });
+        return;
+      }
+      if (page == null) {
+        page = 1;
+      }
+      data = this.loadFromCache("bg", id);
+      if (data) {
+        this.selectedGame(new BoardGame(data));
+        this.loading(null);
+        return;
+      }
+      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
+      $.getJSON(this.getYQLurl(url), function(data) {
+        if (data.query.results) {
+          _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+          _this.loading(null);
+          _this.saveToCache("bg", id, _this.selectedGame());
+        }
+      });
+    };
+
+    ViewModel.prototype.getGamesDetails = function(gameids, str) {
+      var counter, data, i, result, url,
+        _this = this;
+      data = this.loadFromCache("searched_bgs", str);
+      if (data) {
+        console.log("using cached search games");
+        this.loading(null);
+        this.searchedGames((function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            result = data[_i];
+            _results.push(new BoardGameResult(result));
+          }
+          return _results;
+        })());
+        this.sortByBRating(-1);
+        return;
+      }
+      counter = 0;
+      i = 0;
+      while (i < gameids.length) {
+        url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + gameids[i] + "&stats=1";
+        $.getJSON(this.getYQLurl(url), function(data) {
+          counter += 1;
+          if (data.query.results) {
+            _this.searchedGames.push(new BoardGameResult(data.query.results.items["item"]));
+          }
+          if (counter === gameids.length) {
+            _this.loading(null);
+            _this.saveToCache("searched_bgs", str, _this.searchedGames());
+            _this.sortByBRating(-1);
+          }
+        });
+        i++;
+      }
+    };
+
+    ViewModel.prototype.saveToCache = function(type, key, data) {
+      if (Modernizr.sessionstorage) {
+        sessionStorage["" + type + "_" + key] = ko.toJSON(data);
+      }
+    };
+
+    ViewModel.prototype.loadFromCache = function(type, key) {
+      var data;
+      if (Modernizr.sessionstorage) {
+        data = sessionStorage["" + type + "_" + key];
+        if (data) {
+          data = JSON.parse(data);
+        }
+        return data;
+      }
+    };
+
+    return ViewModel;
+
+  })();
+
+}).call(this);
+
+/*
+//@ sourceMappingURL=script.js.map
+*/
