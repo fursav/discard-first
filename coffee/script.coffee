@@ -153,7 +153,7 @@ class BoardGameResult
           break
       i++
     # Add a button to show the hidden part of the description
-    htmlDescription += "</div><button class='link' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></button>"  if contenthid
+    htmlDescription += "</div><button class='link link-wide' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></button>"  if contenthid
     regex = new RegExp(@getName(), "g")
     htmlDescription = htmlDescription.replace(regex, "<b>" + @getName() + "</b>")
     return htmlDescription

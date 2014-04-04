@@ -104,7 +104,7 @@
         i++;
       }
       if (contenthid) {
-        htmlDescription += "</div><button class='link' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></button>";
+        htmlDescription += "</div><button class='link link-wide' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></button>";
       }
       regex = new RegExp(this.getName(), "g");
       htmlDescription = htmlDescription.replace(regex, "<b>" + this.getName() + "</b>");
