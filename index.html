@@ -42,6 +42,32 @@
 
     <div class="text-center" data-bind="if: loading"><i class="icon ion-loading-c icon-large"></i></div>
 
+
+
+    <!-- top 100 games -->
+    <div class="row" data-bind="if: currentPage() === 'topGames'">
+      <div class="small-12 columns" >
+          <table id="top-table" data-bind="if: topGames().length>0">
+            <thead>
+              <tr>
+                <th width="200"></th>
+                <th>Title</th>
+                <th>Rank</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: topGames">
+              <tr>
+                <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
+                <td>
+                  <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
+                </td>
+                <td data-bind="text:getTopRank()"></td>
+              </tr>
+            </tbody>
+          </table>
+      </div>
+    </div>
+
     <div class="row" data-bind="if: currentPage() === 'hotGames' ">
       <div class="large-12 columns" >
           <table id="hot-table" data-bind="if: hotGames().length>0">
@@ -64,7 +90,6 @@
           </table>
       </div>
     </div>
-
 
     <div class="row" data-bind="if: currentPage() === 'searchGames' ">
       <div id="results" class="large-12 columns" >

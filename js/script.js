@@ -34,6 +34,19 @@
       return this.statistics.ratings.ranks.rank;
     };
 
+    BoardGameResult.prototype.getTopRank = function() {
+      var rank, _i, _len, _ref, _results;
+      _ref = this.getRanks();
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        rank = _ref[_i];
+        if (rank.name === "boardgame") {
+          _results.push(rank.value);
+        }
+      }
+      return _results;
+    };
+
     BoardGameResult.prototype.getAverageRating = function() {
       return this.statistics.ratings.average.value;
     };
@@ -219,10 +232,13 @@
             return 'Game Overview';
           case "hotGames":
             return 'Hot Games';
+          case "topGames":
+            return 'Top Games';
         }
       });
       this.searchedGames = ko.observableArray([]);
       this.hotGames = ko.observableArray([]);
+      this.topGames = ko.observableArray([]);
       this.selectedGame = ko.observable();
       this.loading = ko.observable(null);
       this.sortDirection = -1;
@@ -241,6 +257,12 @@
           self.searchedGames.removeAll();
           self.getGameDetails(this.params.splat[0]);
           self.currentPage("gameOverview");
+        });
+        this.get("#topgames", function() {
+          self.selectedGame(null);
+          self.searchedGames.removeAll();
+          self.getTopGames();
+          self.currentPage("topGames");
         });
         this.get("", function() {
           this.title = "Hello";
@@ -385,6 +407,48 @@
       q = "select * from xml where url=";
       url = "'" + str + "'";
       return "http://query.yahooapis.com/v1/public/yql?q=" + (encodeURIComponent(q + url)) + "&format=json&callback=?";
+    };
+
+    ViewModel.prototype.getTopGames = function() {
+      var data, items, result,
+        _this = this;
+      this.loading(true);
+      data = this.loadFromCache("top", "games");
+      items = [];
+      if (data) {
+        this.topGames((function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = data.length; _i < _len; _i++) {
+            result = data[_i];
+            _results.push(new BoardGameResult(result));
+          }
+          return _results;
+        })());
+        this.loading(null);
+        return;
+      }
+      $.getJSON('json/top100.json', function(data) {
+        var counter, i, url, _results;
+        items = data.data;
+        counter = 0;
+        i = 0;
+        _results = [];
+        while (i < items.length) {
+          url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + items[i].id + "&stats=1";
+          $.getJSON(_this.getYQLurl(url), function(data) {
+            counter += 1;
+            if (data.query.results) {
+              _this.topGames.push(new BoardGameResult(data.query.results.items["item"]));
+            }
+            if (counter === items.length) {
+              _this.loading(null);
+            }
+          });
+          _results.push(i++);
+        }
+        return _results;
+      });
     };
 
     ViewModel.prototype.getHotItems = function() {

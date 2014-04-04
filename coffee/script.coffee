@@ -86,6 +86,9 @@ class BoardGameResult
   getRanks: ->
     @statistics.ratings.ranks.rank
 
+  getTopRank: ->
+    rank.value for rank in @getRanks() when rank.name is "boardgame"
+
   # Returns average rating of a boardgame
   getAverageRating: ->
     @statistics.ratings.average.value
@@ -235,12 +238,15 @@ class ViewModel
         when "gameComments" then  'Game Comments'
         when "gameOverview" then 'Game Overview'
         when "hotGames" then 'Hot Games'
+        when "topGames" then 'Top Games'
       )
 
     # [Array]
     @searchedGames = ko.observableArray([])
     # [Array]
     @hotGames = ko.observableArray([])
+
+    @topGames = ko.observableArray([])
     # [BoardGame]
     @selectedGame = ko.observable()
     # Indicates that information is currently loading
@@ -266,6 +272,13 @@ class ViewModel
         self.searchedGames.removeAll()
         self.getGameDetails @params.splat[0]
         self.currentPage "gameOverview"
+        return
+
+      @get "#topgames", ->
+        self.selectedGame null
+        self.searchedGames.removeAll()
+        self.getTopGames()
+        self.currentPage "topGames"
         return
 
       @get "", ->
@@ -413,6 +426,34 @@ class ViewModel
     q = "select * from xml where url="
     url = "'#{str}'"
     return "http://query.yahooapis.com/v1/public/yql?q=#{encodeURIComponent(q + url)}&format=json&callback=?"
+
+  getTopGames: ->
+    @loading(true)
+    data = @loadFromCache("top", "games")
+    items = []
+    if data
+      @topGames((new BoardGameResult(result) for result in data))
+      @loading(null)
+      return
+    $.getJSON 'json/top100.json', (data) =>
+      items = data.data
+      counter = 0
+      i = 0
+
+      while i < items.length
+        url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + items[i].id + "&stats=1"
+        $.getJSON @getYQLurl(url), (data) =>
+          counter += 1
+          if data.query.results
+            @topGames.push(new BoardGameResult(data.query.results.items["item"]))
+          if counter is items.length
+            @loading null
+            # @saveToCache("searched_bgs", str, @searchedGames()) 
+            # @sortByBRating(-1)
+          return
+
+        i++        
+    return
 
   getHotItems: ->
     @loading(true)
