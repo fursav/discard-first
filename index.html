@@ -97,7 +97,7 @@
             <thead>
               <tr>
                 <th width="200"></th>
-                <th data-bind="click: handleSort.bind($data,'name')">Title</th>
+                <th data-bind="click: function(d,e) {handleSort('name',d,e)}">Title</th>
                 <th data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
               </tr>
             </thead>

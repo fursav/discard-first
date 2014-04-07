@@ -41,7 +41,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         rank = _ref[_i];
         if (rank.name === "boardgame") {
-          _results.push(rank.value);
+          _results.push(parseInt(rank.value));
         }
       }
       return _results;
@@ -296,6 +296,25 @@
       }, "slow");
     };
 
+    ViewModel.prototype.sortList = function(list, type) {
+      var _this = this;
+      return list.sort(function(a, b) {
+        var a_prop, b_prop;
+        switch (type) {
+          case "bggrank":
+            a_prop = parseInt(a.getTopRank());
+            b_prop = parseInt(b.getTopRank());
+        }
+        if (a_prop > b_prop) {
+          return 1;
+        }
+        if (a_prop < b_prop) {
+          return -1;
+        }
+        return 0;
+      });
+    };
+
     ViewModel.prototype.sortByName = function(direction) {
       var _this = this;
       if (direction != null) {
@@ -329,6 +348,7 @@
     };
 
     ViewModel.prototype.handleSort = function(type, vm, event) {
+      console.log([type, vm, event]);
       this.sortDirection = type === this.currentSort ? -this.sortDirection : -1;
       this.currentSort = type;
       this.updateTableHeaders(type, event);
@@ -410,41 +430,38 @@
     };
 
     ViewModel.prototype.getTopGames = function() {
-      var data, items, result,
-        _this = this;
+      var _this = this;
       this.loading(true);
-      data = this.loadFromCache("top", "games");
-      items = [];
-      if (data) {
-        this.topGames((function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = data.length; _i < _len; _i++) {
-            result = data[_i];
-            _results.push(new BoardGameResult(result));
-          }
-          return _results;
-        })());
-        this.loading(null);
-        return;
-      }
       $.getJSON('json/top100.json', function(data) {
-        var counter, i, url, _results;
+        var bgdata, counter, i, items, url, _results;
         items = data.data;
         counter = 0;
         i = 0;
         _results = [];
         while (i < items.length) {
-          url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + items[i].id + "&stats=1";
-          $.getJSON(_this.getYQLurl(url), function(data) {
+          bgdata = _this.loadFromCache("bgr", items[i].id);
+          if (bgdata) {
             counter += 1;
-            if (data.query.results) {
-              _this.topGames.push(new BoardGameResult(data.query.results.items["item"]));
-            }
+            _this.topGames.push(new BoardGameResult(bgdata));
             if (counter === items.length) {
               _this.loading(null);
             }
-          });
+          } else {
+            url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + items[i].id + "&stats=1";
+            $.getJSON(_this.getYQLurl(url), function(data) {
+              var bgr;
+              counter += 1;
+              if (data.query.results) {
+                bgr = new BoardGameResult(data.query.results.items["item"]);
+                _this.topGames.push(bgr);
+                _this.saveToCache("bgr", bgr.id, bgr);
+              }
+              if (counter === items.length) {
+                _this.sortList(_this.topGames, "bggrank");
+                _this.loading(null);
+              }
+            });
+          }
           _results.push(i++);
         }
         return _results;

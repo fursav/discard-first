@@ -87,7 +87,7 @@ class BoardGameResult
     @statistics.ratings.ranks.rank
 
   getTopRank: ->
-    rank.value for rank in @getRanks() when rank.name is "boardgame"
+    parseInt(rank.value) for rank in @getRanks() when rank.name is "boardgame"
 
   # Returns average rating of a boardgame
   getAverageRating: ->
@@ -313,6 +313,16 @@ class ViewModel
         , "slow"
     return
 
+  sortList: (list,type) ->
+    list.sort (a, b) =>
+      switch type
+        when "bggrank"
+          a_prop = parseInt(a.getTopRank())
+          b_prop = parseInt(b.getTopRank())
+      return 1  if a_prop > b_prop
+      return -1  if a_prop < b_prop
+      0
+
   # Sorting of search results by name/title
   # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
   sortByName: (direction) ->
@@ -343,6 +353,7 @@ class ViewModel
   # @param vm [ViewModel]
   # @param event [jQueryEvent]
   handleSort: (type,vm,event) ->
+    console.log [type,vm,event]
     #default to descending sort
     #unless already sorted by the same type
     @sortDirection = if type is @currentSort then -(@sortDirection) else -1
@@ -429,28 +440,32 @@ class ViewModel
 
   getTopGames: ->
     @loading(true)
-    data = @loadFromCache("top", "games")
-    items = []
-    if data
-      @topGames((new BoardGameResult(result) for result in data))
-      @loading(null)
-      return
     $.getJSON 'json/top100.json', (data) =>
       items = data.data
       counter = 0
       i = 0
 
       while i < items.length
-        url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + items[i].id + "&stats=1"
-        $.getJSON @getYQLurl(url), (data) =>
+        bgdata = @loadFromCache("bgr", items[i].id)
+        if bgdata
           counter += 1
-          if data.query.results
-            @topGames.push(new BoardGameResult(data.query.results.items["item"]))
+          @topGames.push(new BoardGameResult(bgdata))
           if counter is items.length
             @loading null
-            # @saveToCache("searched_bgs", str, @searchedGames()) 
-            # @sortByBRating(-1)
-          return
+        else
+          url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + items[i].id + "&stats=1"
+          $.getJSON @getYQLurl(url), (data) =>
+            counter += 1
+            if data.query.results
+              bgr = new BoardGameResult(data.query.results.items["item"])
+              @topGames.push(bgr)
+              @saveToCache("bgr",bgr.id, bgr)
+            if counter is items.length
+              @sortList(@topGames, "bggrank")
+              @loading null
+              # @saveToCache("searched_bgs", str, @searchedGames()) 
+              # @sortByBRating(-1)
+            return
 
         i++        
     return
