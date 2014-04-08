@@ -18,7 +18,12 @@
         <ul class="inline-list" style="margin:0 auto;width:35em">
           <li>
             <div class="row" style="height:2em;margin:0.3em 0">
-              <a style="color:white" href="#"><i class="icon ion-home icon-large"></i></a>              
+              <a href="#" title="Home"><i class="icon ion-home icon-large"></i></a>              
+            </div>
+          </li>
+          <li>
+            <div class="row" style="height:2em;margin:0.3em 0">
+              <a href="#topgames" title="Top Games"><i class="icon ion-stats-bars icon-large"></i></a>              
             </div>
           </li>
           <li style="min-width:13em">
@@ -46,6 +51,7 @@
 
     <!-- top 100 games -->
     <div class="row" data-bind="if: currentPage() === 'topGames'">
+      <h2 class="text-center"><span>Top 100 BGG Games</span> <small data-bind="text: dataTimeStamp"></small></h2>
       <div class="small-12 columns" >
           <table id="top-table" data-bind="if: topGames().length>0">
             <thead>

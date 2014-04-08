@@ -175,6 +175,7 @@ class BoardGame extends BoardGameResult
         @commentsData.page
       write: (value) =>
         vtw = parseInt(value)
+        console.log vtw
         if 0 < vtw < @getCommentsTotalPages()+1
           @commentsData.page = vtw
           $ =>
@@ -247,6 +248,9 @@ class ViewModel
     @hotGames = ko.observableArray([])
 
     @topGames = ko.observableArray([])
+    @dataTimeStamp = ko.observable()
+    $.getJSON 'json/top100.json', (data) =>
+      @dataTimeStamp data.date
     # [BoardGame]
     @selectedGame = ko.observable()
     # Indicates that information is currently loading
@@ -262,16 +266,17 @@ class ViewModel
         self.currentPage "searchGames"
         return
 
-      @get "#game/:oid/comments/page/:num", ->
-        self.getGameDetails(@params.oid, @params.num)
-        self.currentPage "gameComments"
-        #elf.getGameComments(@params.oid, @params.num)
+      @get /#game\/(\w*)$/, ->
+        self.currentPage "gameOverview"
+        self.searchedGames.removeAll()
+        console.log "Here"
+        self.getGameDetails @params.splat[0]
         return
 
-      @get /#game\/(.*)(#.+)?/, ->
-        self.searchedGames.removeAll()
-        self.getGameDetails @params.splat[0]
-        self.currentPage "gameOverview"
+      @get /#game\/(\w*)\/comments\/page\/(\w*)/, ->
+        self.getGameDetails(@params.splat[0], @params.splat[1])
+        self.currentPage "gameComments"
+        #elf.getGameComments(@params.oid, @params.num)
         return
 
       @get "#topgames", ->
@@ -306,7 +311,9 @@ class ViewModel
     return
     
   # @param object [Object] boardgame object
-  goToGame: (object) ->
+  goToGame: (object) =>
+    console.log object
+    #@currentPage ""
     location.hash = "game/" + object.id
     $("html, body").animate
           scrollTop: 0

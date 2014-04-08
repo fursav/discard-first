@@ -2,7 +2,9 @@ p,a,button,input{font:17px "Gen Light"}
 h1,h2,h3,h4,h5{font-family:"Hans Kendrick"}
 .top-nav{background-color:#0b5da1;box-shadow:-.05em .3em .3em -.3em #000;text-align:center;}
 .top-nav li{text-align:center}
-.top-nav a{outline:none}
+.top-nav a{color:white}
+.top-nav a:hover{color:#f3535a}
+.top-nav a:focus{outline:none}
 .icon-large{font-size:2em}
 .icon-huge{font-size:10em}
 .icon-inline{vertical-align:bottom}
