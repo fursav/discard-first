@@ -230,6 +230,12 @@ class BoardGame extends BoardGameResult
 class ViewModel
   constructor: ->
     self = this
+    
+    # Indicates that information is currently loading
+    @loading = ko.observable(null)
+    # 1 is ascending, -1 is descending
+    @sortDirection = -1
+    @currentSort = 'brating'
 
     # Page
     @currentPage = ko.observable()
@@ -246,18 +252,46 @@ class ViewModel
     @searchedGames = ko.observableArray([])
     # [Array]
     @hotGames = ko.observableArray([])
-
-    @topGames = ko.observableArray([])
+    
+    @topGamesType = ko.observable("overall")
+    @topGames = ko.computed(=>
+      @loading(true)
+      topGames = []
+      $.getJSON('json/top100.json', (data) =>
+        console.log data
+        console.log @topGamesType()
+        items = data[@topGamesType()]
+        counter = 0
+        
+        for id in items
+          bgdata = @loadFromCache("bgr", id)
+          if bgdata
+            counter += 1
+            topGames.push(new BoardGameResult(bgdata))
+            if counter is items.length
+              @loading null
+          else
+            url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1"
+            $.getJSON @getYQLurl(url), (data) =>
+              counter += 1
+              if data.query.results
+                bgr = new BoardGameResult(data.query.results.items["item"])
+                topGames.push(bgr)
+                @saveToCache("bgr",bgr.id, bgr)
+              if counter is items.length
+                #@sortList(topGames, "bggrank")
+                @loading null
+              return
+      ).then(=>
+        console.log topGames
+      )
+      return topGames
+    )
     @dataTimeStamp = ko.observable()
     $.getJSON 'json/top100.json', (data) =>
       @dataTimeStamp data.date
     # [BoardGame]
     @selectedGame = ko.observable()
-    # Indicates that information is currently loading
-    @loading = ko.observable(null)
-    # 1 is ascending, -1 is descending
-    @sortDirection = -1
-    @currentSort = 'brating'
     # Client-side routes   
     Sammy(->
       @get "#search/:string", ->
@@ -282,7 +316,7 @@ class ViewModel
       @get "#topgames", ->
         self.selectedGame null
         self.searchedGames.removeAll()
-        self.getTopGames()
+        #self.getTopGames()
         self.currentPage "topGames"
         return
 
@@ -447,34 +481,32 @@ class ViewModel
 
   getTopGames: ->
     @loading(true)
+    topGames = []
     $.getJSON 'json/top100.json', (data) =>
-      items = data.data
+      items = data[@topGamesType()]
       counter = 0
-      i = 0
-
-      while i < items.length
-        bgdata = @loadFromCache("bgr", items[i].id)
+      
+      for id in items
+        bgdata = @loadFromCache("bgr", id)
         if bgdata
           counter += 1
-          @topGames.push(new BoardGameResult(bgdata))
+          topGames.push(new BoardGameResult(bgdata))
           if counter is items.length
             @loading null
         else
-          url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + items[i].id + "&stats=1"
+          url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1"
           $.getJSON @getYQLurl(url), (data) =>
             counter += 1
             if data.query.results
               bgr = new BoardGameResult(data.query.results.items["item"])
-              @topGames.push(bgr)
+              topGames.push(bgr)
               @saveToCache("bgr",bgr.id, bgr)
             if counter is items.length
-              @sortList(@topGames, "bggrank")
+              @sortList(topGames, "bggrank")
               @loading null
               # @saveToCache("searched_bgs", str, @searchedGames()) 
               # @sortByBRating(-1)
             return
-
-        i++        
     return
 
   getHotItems: ->

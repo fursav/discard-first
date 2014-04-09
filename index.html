@@ -53,27 +53,38 @@
     <div class="row" data-bind="if: currentPage() === 'topGames'">
       <h2 class="text-center"><span>Top 100 BGG Games</span> <small data-bind="text: dataTimeStamp"></small></h2>
       <div class="small-12 columns" >
-          <table id="top-table" data-bind="if: topGames().length>0">
-            <thead>
-              <tr>
-                <th width="200"></th>
-                <th>Title</th>
-                <th>Rank</th>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: topGames">
-              <tr>
-                <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
-                <td>
-                  <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
-                </td>
-                <td data-bind="text:getTopRank()"></td>
-              </tr>
-            </tbody>
-          </table>
+        <ul class="button-group radius">
+          <li>
+              <input id="overall" type="radio" checked class="radio-button" name="typeGame" value="overall" data-bind="checked: topGamesType">
+              <label class="button" for="overall">Overall</label>
+          </li>
+          <li>
+              <input id="partygames" type="radio" class="radio-button" name="typeGame" value="partygames" data-bind="checked: topGamesType">
+              <label class="button" for="partygames">Party Games</label>
+          </li>
+        </ul>
+        <table id="top-table" data-bind="if: topGames().length>0">
+          <thead>
+            <tr>
+              <th width="200"></th>
+              <th>Title</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody data-bind="foreach: topGames">
+            <tr>
+              <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
+              <td>
+                <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
+              </td>
+              <td data-bind="text:getTopRank()"></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-
+    
+    <!-- hot games -->
     <div class="row" data-bind="if: currentPage() === 'hotGames' ">
       <div class="large-12 columns" >
           <table id="hot-table" data-bind="if: hotGames().length>0">
@@ -96,7 +107,8 @@
           </table>
       </div>
     </div>
-
+    
+    <!-- Search results -->
     <div class="row" data-bind="if: currentPage() === 'searchGames' ">
       <div id="results" class="large-12 columns" >
           <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">

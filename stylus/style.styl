@@ -24,7 +24,21 @@ h5
     outline none
     :hover
       color #f3535a
+      
+input[type="radio"] + label
+  margin-left 0
+  margin-right 0
+  margin-bottom 1em
 
+.radio-button
+  display none
+  + label
+    margin-left 0
+    margin-right 0
+    margin-bottom 1em
+.radio-button:checked + label
+  color white
+  background-color darken(#0c88b9,15%)
 
 //icons
 .icon-large
