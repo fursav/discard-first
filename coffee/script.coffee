@@ -58,7 +58,6 @@
 #     REVIEW: describe code that should be reviewed to confirm implementation
 
 #---------------------------------------------------------------------------------------------------
-
 $ ->
   $(document).foundation()
   window.vm = new ViewModel()
@@ -85,6 +84,9 @@ class BoardGameResult
   # Returns all the ranks of a boardgame
   getRanks: ->
     @statistics.ratings.ranks.rank
+
+  getRank: (name) ->
+    rank.value for rank in @getRanks() when rank.name is name
 
   getTopRank: ->
     parseInt(rank.value) for rank in @getRanks() when rank.name is "boardgame"
@@ -236,6 +238,11 @@ class ViewModel
     # 1 is ascending, -1 is descending
     @sortDirection = -1
     @currentSort = 'brating'
+    @gameTypes = [{key:'boardgame',name:"Overall"},{key:'partygames',name:'Party'},
+                  {key:'abstracts',name:'Abstract'},{key:'cgs',name:'Customizable'},
+                  {key:'childrensgames',name:"Children"},{key:'familygames',name:'Family'},
+                  {key:'strategygames',name:'Strategy'},{key:'thematic',name:'Thematic'},
+                  {key:'wargames',name:'War'}]
 
     # Page
     @currentPage = ko.observable()
@@ -253,40 +260,8 @@ class ViewModel
     # [Array]
     @hotGames = ko.observableArray([])
     
-    @topGamesType = ko.observable("overall")
-    @topGames = ko.computed(=>
-      @loading(true)
-      topGames = []
-      $.getJSON('json/top100.json', (data) =>
-        console.log data
-        console.log @topGamesType()
-        items = data[@topGamesType()]
-        counter = 0
-        
-        for id in items
-          bgdata = @loadFromCache("bgr", id)
-          if bgdata
-            counter += 1
-            topGames.push(new BoardGameResult(bgdata))
-            if counter is items.length
-              @loading null
-          else
-            url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1"
-            $.getJSON @getYQLurl(url), (data) =>
-              counter += 1
-              if data.query.results
-                bgr = new BoardGameResult(data.query.results.items["item"])
-                topGames.push(bgr)
-                @saveToCache("bgr",bgr.id, bgr)
-              if counter is items.length
-                #@sortList(topGames, "bggrank")
-                @loading null
-              return
-      ).then(=>
-        console.log topGames
-      )
-      return topGames
-    )
+    @topGamesType = ko.observable()
+    @topGames = ko.observableArray([])
     @dataTimeStamp = ko.observable()
     $.getJSON 'json/top100.json', (data) =>
       @dataTimeStamp data.date
@@ -303,7 +278,6 @@ class ViewModel
       @get /#game\/(\w*)$/, ->
         self.currentPage "gameOverview"
         self.searchedGames.removeAll()
-        console.log "Here"
         self.getGameDetails @params.splat[0]
         return
 
@@ -313,10 +287,13 @@ class ViewModel
         #elf.getGameComments(@params.oid, @params.num)
         return
 
-      @get "#topgames", ->
+      @get "#topgames/:gameType", ->
+        self.topGamesType(@params.gameType)
+        console.log self.topGamesType()
         self.selectedGame null
         self.searchedGames.removeAll()
-        #self.getTopGames()
+        self.topGames.removeAll()
+        self.getTopGames(@params.gameType)
         self.currentPage "topGames"
         return
 
@@ -356,10 +333,8 @@ class ViewModel
 
   sortList: (list,type) ->
     list.sort (a, b) =>
-      switch type
-        when "bggrank"
-          a_prop = parseInt(a.getTopRank())
-          b_prop = parseInt(b.getTopRank())
+      a_prop = parseInt(a.getRank(type))
+      b_prop = parseInt(b.getRank(type))
       return 1  if a_prop > b_prop
       return -1  if a_prop < b_prop
       0
@@ -479,19 +454,20 @@ class ViewModel
     url = "'#{str}'"
     return "http://query.yahooapis.com/v1/public/yql?q=#{encodeURIComponent(q + url)}&format=json&callback=?"
 
-  getTopGames: ->
+  getTopGames: (type) ->
     @loading(true)
-    topGames = []
     $.getJSON 'json/top100.json', (data) =>
-      items = data[@topGamesType()]
+      console.log data
+      items = data[type]
       counter = 0
       
       for id in items
         bgdata = @loadFromCache("bgr", id)
         if bgdata
           counter += 1
-          topGames.push(new BoardGameResult(bgdata))
+          @topGames.push(new BoardGameResult(bgdata))
           if counter is items.length
+            console.log @topGames()
             @loading null
         else
           url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1"
@@ -499,10 +475,10 @@ class ViewModel
             counter += 1
             if data.query.results
               bgr = new BoardGameResult(data.query.results.items["item"])
-              topGames.push(bgr)
+              @topGames.push(bgr)
               @saveToCache("bgr",bgr.id, bgr)
             if counter is items.length
-              @sortList(topGames, "bggrank")
+              @sortList(@topGames,@topGamesType())
               @loading null
               # @saveToCache("searched_bgs", str, @searchedGames()) 
               # @sortByBRating(-1)
