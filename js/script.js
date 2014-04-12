@@ -147,8 +147,7 @@
     function BoardGame(data) {
       this.changePageBy = __bind(this.changePageBy, this);
       this.processComments = __bind(this.processComments, this);
-      var comment,
-        _this = this;
+      var comment;
       BoardGame.__super__.constructor.call(this, data);
       this.comments = data.comments;
       this.commentsko = ko.observableArray([]);
@@ -157,22 +156,26 @@
         totalitems: data.comments.totalitems
       };
       this.commentsPage = ko.computed({
-        read: function() {
-          return _this.commentsData.page;
-        },
-        write: function(value) {
-          var vtw;
-          vtw = parseInt(value);
-          console.log(vtw);
-          if ((0 < vtw && vtw < _this.getCommentsTotalPages() + 1)) {
-            _this.commentsData.page = vtw;
-            $(function() {
-              if (window.vm.currentPage() === "gameComments") {
-                location.hash = "#game/" + _this.id + "/comments/page/" + vtw;
-              }
-            });
-          }
-        }
+        read: (function(_this) {
+          return function() {
+            return _this.commentsData.page;
+          };
+        })(this),
+        write: (function(_this) {
+          return function(value) {
+            var vtw;
+            vtw = parseInt(value);
+            console.log(vtw);
+            if ((0 < vtw && vtw < _this.getCommentsTotalPages() + 1)) {
+              _this.commentsData.page = vtw;
+              $(function() {
+                if (window.vm.currentPage() === "gameComments") {
+                  location.hash = "#game/" + _this.id + "/comments/page/" + vtw;
+                }
+              });
+            }
+          };
+        })(this)
       }).extend({
         notify: 'always'
       });
@@ -233,8 +236,7 @@
       this.updateTableHeaders = __bind(this.updateTableHeaders, this);
       this.goToGame = __bind(this.goToGame, this);
       this.goToGameComments = __bind(this.goToGameComments, this);
-      var self,
-        _this = this;
+      var self;
       self = this;
       this.loading = ko.observable(null);
       this.sortDirection = -1;
@@ -270,28 +272,32 @@
         }
       ];
       this.currentPage = ko.observable();
-      this.currentPageTitle = ko.computed(function() {
-        switch (_this.currentPage()) {
-          case "searchGames":
-            return 'Search Results';
-          case "gameComments":
-            return 'Game Comments';
-          case "gameOverview":
-            return 'Game Overview';
-          case "hotGames":
-            return 'Hot Games';
-          case "topGames":
-            return 'Top Games';
-        }
-      });
+      this.currentPageTitle = ko.computed((function(_this) {
+        return function() {
+          switch (_this.currentPage()) {
+            case "searchGames":
+              return 'Search Results';
+            case "gameComments":
+              return 'Game Comments';
+            case "gameOverview":
+              return 'Game Overview';
+            case "hotGames":
+              return 'Hot Games';
+            case "topGames":
+              return 'Top Games';
+          }
+        };
+      })(this));
       this.searchedGames = ko.observableArray([]);
       this.hotGames = ko.observableArray([]);
       this.topGamesType = ko.observable();
       this.topGames = ko.observableArray([]);
       this.dataTimeStamp = ko.observable();
-      $.getJSON('json/top100.json', function(data) {
-        return _this.dataTimeStamp(data.date);
-      });
+      $.getJSON('json/top100.json', (function(_this) {
+        return function(data) {
+          return _this.dataTimeStamp(data.date);
+        };
+      })(this));
       this.selectedGame = ko.observable();
       Sammy(function() {
         this.get("#search/:string", function() {
@@ -351,51 +357,54 @@
     };
 
     ViewModel.prototype.sortList = function(list, type) {
-      var _this = this;
-      return list.sort(function(a, b) {
-        var a_prop, b_prop;
-        a_prop = parseInt(a.getRank(type));
-        b_prop = parseInt(b.getRank(type));
-        if (a_prop > b_prop) {
-          return 1;
-        }
-        if (a_prop < b_prop) {
-          return -1;
-        }
-        return 0;
-      });
+      return list.sort((function(_this) {
+        return function(a, b) {
+          var a_prop, b_prop;
+          a_prop = parseInt(a.getRank(type));
+          b_prop = parseInt(b.getRank(type));
+          if (a_prop > b_prop) {
+            return 1;
+          }
+          if (a_prop < b_prop) {
+            return -1;
+          }
+          return 0;
+        };
+      })(this));
     };
 
     ViewModel.prototype.sortByName = function(direction) {
-      var _this = this;
       if (direction != null) {
         this.sortDirection = direction;
       }
-      this.searchedGames.sort(function(a, b) {
-        if (a.getName() > b.getName()) {
-          return 1 * _this.sortDirection;
-        }
-        if (a.getName() < b.getName()) {
-          return -1 * _this.sortDirection;
-        }
-        return 0;
-      });
+      this.searchedGames.sort((function(_this) {
+        return function(a, b) {
+          if (a.getName() > b.getName()) {
+            return 1 * _this.sortDirection;
+          }
+          if (a.getName() < b.getName()) {
+            return -1 * _this.sortDirection;
+          }
+          return 0;
+        };
+      })(this));
     };
 
     ViewModel.prototype.sortByBRating = function(direction) {
-      var _this = this;
       if (direction != null) {
         this.sortDirection = direction;
       }
-      this.searchedGames.sort(function(a, b) {
-        if (a.getBRating() > b.getBRating()) {
-          return 1 * _this.sortDirection;
-        }
-        if (a.getBRating() < b.getBRating()) {
-          return -1 * _this.sortDirection;
-        }
-        return 0;
-      });
+      this.searchedGames.sort((function(_this) {
+        return function(a, b) {
+          if (a.getBRating() > b.getBRating()) {
+            return 1 * _this.sortDirection;
+          }
+          if (a.getBRating() < b.getBRating()) {
+            return -1 * _this.sortDirection;
+          }
+          return 0;
+        };
+      })(this));
     };
 
     ViewModel.prototype.handleSort = function(type, vm, event) {
@@ -423,8 +432,7 @@
     };
 
     ViewModel.prototype.searchGames = function(str) {
-      var ids, regex, url,
-        _this = this;
+      var ids, regex, url;
       this.searchedGames.removeAll();
       if (str === "") {
         return;
@@ -439,11 +447,13 @@
         return;
       }
       url = "http://www.boardgamegeek.com/xmlapi/search?search=" + str;
-      $.getJSON(this.getYQLurl(url), function(data) {
-        ids = _this.extractIdsFromSearch(data);
-        _this.saveToCache("searched_bgs_ids", str, ids);
-        _this.getGamesDetails(ids, str);
-      });
+      $.getJSON(this.getYQLurl(url), (function(_this) {
+        return function(data) {
+          ids = _this.extractIdsFromSearch(data);
+          _this.saveToCache("searched_bgs_ids", str, ids);
+          _this.getGamesDetails(ids, str);
+        };
+      })(this));
     };
 
     ViewModel.prototype.extractIdsFromSearch = function(data) {
@@ -481,52 +491,51 @@
     };
 
     ViewModel.prototype.getTopGames = function(type) {
-      var _this = this;
       this.loading(true);
-      $.getJSON('json/top100.json', function(data) {
-        var bgdata, counter, id, items, url, _i, _len, _results;
-        console.log(data);
-        items = data[type];
-        counter = 0;
-        _results = [];
-        for (_i = 0, _len = items.length; _i < _len; _i++) {
-          id = items[_i];
-          bgdata = _this.loadFromCache("bgr", id);
-          if (bgdata) {
-            counter += 1;
-            _this.topGames.push(new BoardGameResult(bgdata));
-            if (counter === items.length) {
-              console.log(_this.topGames());
-              _results.push(_this.loading(null));
-            } else {
-              _results.push(void 0);
-            }
-          } else {
-            url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1";
-            _results.push($.getJSON(_this.getYQLurl(url), function(data) {
-              var bgr;
+      $.getJSON('json/top100.json', (function(_this) {
+        return function(data) {
+          var bgdata, counter, id, items, url, _i, _len, _results;
+          console.log(data);
+          items = data[type];
+          counter = 0;
+          _results = [];
+          for (_i = 0, _len = items.length; _i < _len; _i++) {
+            id = items[_i];
+            bgdata = _this.loadFromCache("bgr", id);
+            if (bgdata) {
               counter += 1;
-              if (data.query.results) {
-                bgr = new BoardGameResult(data.query.results.items["item"]);
-                _this.topGames.push(bgr);
-                _this.saveToCache("bgr", bgr.id, bgr);
-              }
+              _this.topGames.push(new BoardGameResult(bgdata));
               if (counter === items.length) {
-                _this.sortList(_this.topGames, _this.topGamesType());
-                _this.loading(null);
+                console.log(_this.topGames());
+                _results.push(_this.loading(null));
+              } else {
+                _results.push(void 0);
               }
-            }));
+            } else {
+              url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1";
+              _results.push($.getJSON(_this.getYQLurl(url), function(data) {
+                var bgr;
+                counter += 1;
+                if (data.query.results) {
+                  bgr = new BoardGameResult(data.query.results.items["item"]);
+                  _this.topGames.push(bgr);
+                  _this.saveToCache("bgr", bgr.id, bgr);
+                }
+                if (counter === items.length) {
+                  _this.sortList(_this.topGames, _this.topGamesType());
+                  _this.loading(null);
+                }
+              }));
+            }
           }
-        }
-        return _results;
-      });
+          return _results;
+        };
+      })(this));
     };
 
     ViewModel.prototype.getHotItems = function() {
-      var data, result, url,
-        _this = this;
+      var result, url;
       this.loading(true);
-      data = this.loadFromCache("hot", "games");
       if (data) {
         console.log(data);
         this.hotGames((function() {
@@ -542,36 +551,39 @@
         return;
       }
       url = "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame";
-      $.getJSON(this.getYQLurl(url), function(data) {
-        if (data.query.results) {
-          _this.hotGames((function() {
-            var _i, _len, _ref, _results;
-            _ref = data.query.results.items.item;
-            _results = [];
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              result = _ref[_i];
-              _results.push(new BoardGameResult(result));
-            }
-            return _results;
-          })());
-          _this.loading(null);
-          _this.saveToCache("hot", "games", _this.hotGames());
-        }
-      });
+      $.getJSON(url, (function(_this) {
+        return function(data) {
+          if (data.query.results) {
+            _this.hotGames((function() {
+              var _i, _len, _ref, _results;
+              _ref = data.query.results.items.item;
+              _results = [];
+              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                result = _ref[_i];
+                _results.push(new BoardGameResult(result));
+              }
+              return _results;
+            })());
+            _this.loading(null);
+            _this.saveToCache("hot", "games", _this.hotGames());
+          }
+        };
+      })(this));
     };
 
     ViewModel.prototype.getGameDetails = function(id, page) {
-      var data, url,
-        _this = this;
+      var data, url;
       this.loading(true);
       if (page) {
         url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
-        $.getJSON(this.getYQLurl(url), function(data) {
-          if (data.query.results) {
-            _this.selectedGame(new BoardGame(data.query.results.items["item"]));
-            _this.loading(null);
-          }
-        });
+        $.getJSON(this.getYQLurl(url), (function(_this) {
+          return function(data) {
+            if (data.query.results) {
+              _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+              _this.loading(null);
+            }
+          };
+        })(this));
         return;
       }
       if (page == null) {
@@ -584,18 +596,19 @@
         return;
       }
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
-      $.getJSON(this.getYQLurl(url), function(data) {
-        if (data.query.results) {
-          _this.selectedGame(new BoardGame(data.query.results.items["item"]));
-          _this.loading(null);
-          _this.saveToCache("bg", id, _this.selectedGame());
-        }
-      });
+      $.getJSON(this.getYQLurl(url), (function(_this) {
+        return function(data) {
+          if (data.query.results) {
+            _this.selectedGame(new BoardGame(data.query.results.items["item"]));
+            _this.loading(null);
+            _this.saveToCache("bg", id, _this.selectedGame());
+          }
+        };
+      })(this));
     };
 
     ViewModel.prototype.getGamesDetails = function(gameids, str) {
-      var counter, data, i, result, url,
-        _this = this;
+      var counter, data, i, result, url;
       data = this.loadFromCache("searched_bgs", str);
       if (data) {
         console.log("using cached search games");
@@ -616,17 +629,19 @@
       i = 0;
       while (i < gameids.length) {
         url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + gameids[i] + "&stats=1";
-        $.getJSON(this.getYQLurl(url), function(data) {
-          counter += 1;
-          if (data.query.results) {
-            _this.searchedGames.push(new BoardGameResult(data.query.results.items["item"]));
-          }
-          if (counter === gameids.length) {
-            _this.loading(null);
-            _this.saveToCache("searched_bgs", str, _this.searchedGames());
-            _this.sortByBRating(-1);
-          }
-        });
+        $.getJSON(this.getYQLurl(url), (function(_this) {
+          return function(data) {
+            counter += 1;
+            if (data.query.results) {
+              _this.searchedGames.push(new BoardGameResult(data.query.results.items["item"]));
+            }
+            if (counter === gameids.length) {
+              _this.loading(null);
+              _this.saveToCache("searched_bgs", str, _this.searchedGames());
+              _this.sortByBRating(-1);
+            }
+          };
+        })(this));
         i++;
       }
     };
@@ -654,6 +669,4 @@
 
 }).call(this);
 
-/*
-//@ sourceMappingURL=script.js.map
-*/
+//# sourceMappingURL=script.js.map

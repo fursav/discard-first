@@ -66,8 +66,8 @@ $ ->
 
 class BoardGameResult
   constructor: (data) ->
-    @id = data.id
-    @image = data.image
+    @id = data.id 
+    @image = data.image or ""
     @description = data.description
     @thumbnail = if $.type(data.thumbnail) is "object" then data.thumbnail.value else data.thumbnail
     @link = data.link
@@ -77,7 +77,7 @@ class BoardGameResult
     @name = data.name
     @playingtime = data.playingtime
     @statistics = data.statistics
-    @yearpublished = data.yearpublished
+    @yearpublished = data.yearpublished or ""
     @thumbnail ?= ""
     @hotRank = data.rank or data.hotRank
 
@@ -269,9 +269,9 @@ class ViewModel
     @selectedGame = ko.observable()
     # Client-side routes   
     Sammy(->
-      @get "#search/:string", ->
+      @get /#search\/(\w*)/, ->
         self.selectedGame null
-        self.searchGames @params.string
+        self.searchGames @params.splat[0]
         self.currentPage "searchGames"
         return
 
@@ -298,11 +298,16 @@ class ViewModel
         return
 
       @get "", ->
+        console.log "as"
         this.title = "Hello"
         self.selectedGame null
         self.searchedGames.removeAll()
         self.getHotItems()
         self.currentPage "hotGames"
+        return
+
+      @get "/", ->
+        console.log "dead"
         return
 
       return
@@ -407,13 +412,14 @@ class ViewModel
 
     # Check if results are already cached
     ids = @loadFromCache("searched_bgs_ids", str)
+    console.log "ids"
     if ids
       @loading null
       @getGamesDetails(ids, str)
       return
 
     url = "http://www.boardgamegeek.com/xmlapi/search?search=#{str}"
-    $.getJSON @getYQLurl(url), (data) =>
+    $.getJSON "/search/#{str}", (data) =>
       # [Array]
       ids = @extractIdsFromSearch(data)
       @saveToCache("searched_bgs_ids", str, ids)
@@ -426,9 +432,9 @@ class ViewModel
   # @param data [Object]
   extractIdsFromSearch: (data) ->
     console.log data
-    if data.query.results
+    if data
       # [Array] or Object
-      jdata = data.query.results.boardgames["boardgame"]
+      jdata = data.boardgames["boardgame"]
       # [Array]
       ids = []
       if Array.isArray(jdata)
@@ -437,15 +443,6 @@ class ViewModel
       else
         ids.push(jdata["objectid"])
       return ids
-
-  getSomething: ->
-    console.log "here"
-    url = "http://www.boardgamegeek.com/boardgame/125618/libertalia"
-    $.getJSON "http://query.yahooapis.com/v1/public/yql?" + "q=select%20*%20from%20html%20where%20url%3D%22" + encodeURIComponent(url) + "%22&format=xml'&callback=?", (data) ->
-      console.log data
-      return
-
-    return
 
   # Returns the YQL query
   # @param str [String]
@@ -471,10 +468,10 @@ class ViewModel
             @loading null
         else
           url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1"
-          $.getJSON @getYQLurl(url), (data) =>
+          $.getJSON "/bgr/#{id}", (data) =>
             counter += 1
-            if data.query.results
-              bgr = new BoardGameResult(data.query.results.items["item"])
+            if data
+              bgr = new BoardGameResult(data.items["item"])
               @topGames.push(bgr)
               @saveToCache("bgr",bgr.id, bgr)
             if counter is items.length
@@ -486,6 +483,7 @@ class ViewModel
     return
 
   getHotItems: ->
+    console.log "hot"
     @loading(true)
     data = @loadFromCache("hot", "games")
     if data
@@ -494,10 +492,13 @@ class ViewModel
       @loading(null)
       return
     url = "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame"
-    $.getJSON @getYQLurl(url), (data) =>
-      if data.query.results
+    console.log "hot"
+    $.getJSON 'data',url, (data) =>
+      console.log "got it"
+      console.log data
+      if data
         #console.log (new BoardGameResult(result) for result in data.query.results.items.item)
-        @hotGames((new BoardGameResult(result) for result in data.query.results.items.item))
+        @hotGames((new BoardGameResult(result) for result in data.items.item))
         @loading(null)
         @saveToCache("hot", "games", @hotGames())        
       return
@@ -509,9 +510,9 @@ class ViewModel
     @loading(true)
     if page
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
-      $.getJSON @getYQLurl(url), (data) =>
+      $.getJSON "bg/#{id}/#{page}", (data) =>
         if data.query.results
-          @selectedGame(new BoardGame(data.query.results.items["item"]))
+          @selectedGame(new BoardGame(data.items["item"]))
           @loading(null)
         return
       return
@@ -523,11 +524,11 @@ class ViewModel
       return
 
     url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
-    $.getJSON @getYQLurl(url), (data) =>
-      if data.query.results
-        @selectedGame(new BoardGame(data.query.results.items["item"]))
+    $.getJSON "/bg/#{id}", (data) =>
+      if data
+        @selectedGame(new BoardGame(data.items["item"]))
         @loading(null)
-        @saveToCache("bg", id, @selectedGame())        
+        @saveToCache("bg", {'query':id}, @selectedGame())        
       return
     return
 
@@ -546,10 +547,10 @@ class ViewModel
 
     while i < gameids.length
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + gameids[i] + "&stats=1"
-      $.getJSON @getYQLurl(url), (data) =>
+      $.getJSON "/bgr/#{gameids[i]}", (data) =>
         counter += 1
-        if data.query.results
-          @searchedGames.push(new BoardGameResult(data.query.results.items["item"]))
+        if data
+          @searchedGames.push(new BoardGameResult(data.items["item"]))
         if counter is gameids.length
           @loading null
           @saveToCache("searched_bgs", str, @searchedGames()) 

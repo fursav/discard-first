@@ -3,7 +3,8 @@
 var express = require('express');
 var fs      = require('fs');
 var path = require('path');
-
+var request = require('request')
+var parser = require('xml2json');
 
 /**
  *  Define the sample application.
@@ -101,7 +102,53 @@ var SampleApp = function() {
             res.send("<html><body><img src='" + link + "'></body></html>");
         };
 
+        self.routes['/bg/:id/:page'] = function(req,res) {
+            console.log("here")
+            id = req.params.id
+            page = req.params.page
+            request("http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1&comments=1&pagesize=100&page=" + page, function(err,response,body){
+                res.send(parser.toJson(body))
+            })
+        };
+
+
+        self.routes['/bg/:id'] = function(req,res) {
+            console.log("here")
+            id = req.params.id
+            request("http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1&comments=1&pagesize=100", function(err,response,body){
+                res.send(parser.toJson(body))
+            })
+        };
+
+        self.routes['/bgr/:id'] = function(req,res) {
+            console.log("bgr")
+            id = req.params.id
+            request("http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1", function(err,response,body){
+                res.send(parser.toJson(body))
+            })
+        };
+
+        self.routes['/search/:str'] = function(req,res) {
+            console.log("search")
+            str = req.params.str
+            request("http://www.boardgamegeek.com/xmlapi/search?search="+str, function(err,response,body){
+                res.send(parser.toJson(body))
+            })
+        };
+
+        self.routes['/data'] = function(req,res) {
+            console.log("here")
+            console.log(req.query)
+            request("http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame", function(err,response,body){
+                res.send(parser.toJson(body))
+            })
+
+
+        };
+
         self.routes['/'] = function(req, res) {
+            console.log("there")
+            console.log(req.query)
             res.setHeader('Content-Type', 'text/html');
             res.send(self.cache_get('index.html') );
         };
