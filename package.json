@@ -35,7 +35,8 @@
     "load-grunt-tasks": "0.3.x",
     "grunt-contrib-stylus": "~0.14.0",
     "request": "2.34.x",
-    "xml2json": "0.4.x"
+    "xml2json": "0.4.x",
+    "grunt-autoprefixer": "0.7.x"
   },
   "bundleDependencies": [],
   "private": true,

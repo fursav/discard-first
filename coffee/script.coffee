@@ -59,7 +59,13 @@
 
 #---------------------------------------------------------------------------------------------------
 $ ->
-  $(document).foundation()
+  # $(document).foundation()
+  nav = responsiveNav(".nav-collapse",
+    animate: true
+    transition: 284
+    label: ""
+    )
+  $("#nav").onePageNav({currentClass:"active"})
   window.vm = new ViewModel()
   ko.applyBindings window.vm
   return
@@ -68,6 +74,8 @@ class BoardGameResult
   constructor: (data) ->
     @id = data.id 
     @image = data.image or ""
+    # console.log(data.description)
+    # console.log(unescape(data.description))
     @description = data.description
     @thumbnail = if $.type(data.thumbnail) is "object" then data.thumbnail.value else data.thumbnail
     @link = data.link
@@ -126,10 +134,16 @@ class BoardGameResult
   getHTMLDescription: ->
     paragraphs = 1
     contenthid = false
+    # htmlDescription = $('<div />').html(@description).text();
+    console.log(@description)
+    regex = new RegExp("&amp;&amp;#35;","g")
+    # [String]
+    htmlDescription = @description.replace(regex, "&#")
+    console.log(htmlDescription)
 
     regex = new RegExp("&#10;&#10;&#10;    ", "g")
-    # [String]
-    htmlDescription = @description.replace(regex, "<ul><li>")
+    htmlDescription = htmlDescription.replace(regex, "<ul><li>")
+
 
     regex = new RegExp("&#10;&#10;&#10;", "g")
     htmlDescription = htmlDescription.replace(regex, "</li></ul>")
@@ -137,10 +151,26 @@ class BoardGameResult
     regex = new RegExp("&#10;    ", "g")
     htmlDescription = htmlDescription.replace(regex, "</li><li>")
 
+    # regex = new RegExp("&amp;amp;", "g")
+    # htmlDescription = htmlDescription.replace(regex, " &")
+
+    # htmlDescription = @description
+
     htmlDescription = "<p>" + htmlDescription
  
     regex = new RegExp("&#10;&#10;", "g")
+    # regex = new RegExp("&amp;&amp;#35;10;&amp;&amp;#35;10;", "g")
     htmlDescription = htmlDescription.replace(regex, "</p><p>")
+    # regex = new RegExp("&amp;ndash;", "g")
+    # htmlDescription = htmlDescription.replace(regex," –")
+    # regex = new RegExp("&amp;&#35;40;","g")
+    # htmlDescription = htmlDescription.replace(regex, "(")
+    # regex = new RegExp("&amp;&#35;41;","g")
+    # htmlDescription = htmlDescription.replace(regex, ")")
+    regex = new RegExp("&amp;quot;","g")
+    htmlDescription = htmlDescription.replace(regex, '"')
+    # regex = new RegExp("&amp;&amp;#35;10;", "g")
+    # htmlDescription = htmlDescription.replace(regex, "")
 
     htmlDescription += "</p>"
     i = 0
@@ -167,25 +197,31 @@ class BoardGameResult
 class BoardGame extends BoardGameResult
   constructor: (data) ->
     super(data)
-    @comments = data.comments
+    @comments = {}
     @commentsko = ko.observableArray([])
-    @commentsData = 
-      page:data.comments.page
-      totalitems:data.comments.totalitems
-    @commentsPage = ko.computed({
-      read: =>
-        @commentsData.page
-      write: (value) =>
-        vtw = parseInt(value)
-        console.log vtw
-        if 0 < vtw < @getCommentsTotalPages()+1
-          @commentsData.page = vtw
-          $ =>
-            location.hash = "#game/#{@id}/comments/page/#{vtw}" if window.vm.currentPage() is "gameComments"
-            return
-        return
-      }).extend({ notify: 'always' })
-    @processComments()
+    @commentsData = {}
+    console.log data
+    if data.comments?
+      @comments = data.comments
+      @commentsData = 
+        page:data.comments.page
+        totalitems:data.comments.totalitems
+      @commentsPage = ko.computed({
+        read: =>
+          @commentsData.page
+        write: (value) =>
+          vtw = parseInt(value)
+          console.log vtw
+          if 0 < vtw < @getCommentsTotalPages()+1
+            @commentsData.page = vtw
+            $ =>
+              location.hash = "#game/#{@id}/comments/page/#{vtw}" if window.vm.currentPage() is "gameComments"
+              return
+          return
+        }).extend({ notify: 'always' })
+      @processComments()
+    else
+      @commentsPage = ko.observable()
 
     @goodComments ?= (comment for comment in @commentsko() when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
     @featuredComment = ko.observable()
@@ -407,6 +443,7 @@ class ViewModel
 
     regex = new RegExp(" ", "g")
     str = str.replace(regex, "+")
+    str = encodeURI(str)
 
     @loading(true)
 
@@ -511,9 +548,12 @@ class ViewModel
     if page
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
       $.getJSON "bg/#{id}/#{page}", (data) =>
-        if data.query.results
+        if data
           @selectedGame(new BoardGame(data.items["item"]))
           @loading(null)
+          subnav = $('#sub-nav').onePageNav({
+            currentClass: 'active'
+            })
         return
       return
     page ?= 1
@@ -527,7 +567,10 @@ class ViewModel
     $.getJSON "/bg/#{id}", (data) =>
       if data
         @selectedGame(new BoardGame(data.items["item"]))
-        @loading(null)
+        @loading(null) 
+        subnav = $('#sub-nav').onePageNav({
+          currentClass: 'active'
+          })
         @saveToCache("bg", {'query':id}, @selectedGame())        
       return
     return

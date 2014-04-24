@@ -6,84 +6,46 @@
     <title>Discover Board Games</title>
     <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/hans-kendrick" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/gen-light" rel="stylesheet" type="text/css"/> 
-    <link rel="stylesheet" href="css/normalize.css" /> 
-    <link rel="stylesheet" href="css/foundation.min.css" />
+    <!-- <link rel="stylesheet" href="css/normalize.css" />  -->
+    <!-- <link rel="stylesheet" href="css/foundation.min.css" /> -->
     <link rel="stylesheet" href="css/ionicons.min.css" />
+    <link rel="stylesheet" href="css/responsive-nav.css" />
     <!-- <link rel="stylesheet" href="css/jquery.fs.boxer.css" > -->
     <link rel="stylesheet" href="css/style.css" />
     <script src="js/vendor/modernizr.js"></script>
   </head>
-  <body>
-    <div class=" sticky top-nav" style="height:3em;margin-bottom:1em;" data-options="sticky_on: large">
-      <nav data-topbar >
-        <ul class="inline-list" style="margin:0 auto;width:35em">
-          <li>
-            <div class="row" style="height:2em;margin:0.3em 0">
-              <a href="#" title="Home"><i class="icon ion-home icon-large"></i></a>              
+  <body class="body-style">
+    <nav class="nav-collapse">
+      <ul class="top-nav">
+        <li><a href="#" title="Home"><i class="icon ion-home icon-xlarge"></i></a>  </li>
+        <li><a href="#topgames/boardgame" title="Top Games"><i class="icon ion-stats-bars icon-xlarge"></i></a> </li>
+        <li><span class="title" data-bind="text: currentPageTitle" style="color:white;"></span>  </li>
+        <li><div class="input-addon">
+            <input class="input-addon-field" id="search" type="text" placeholder="Search" data-bind="event: { change: goToSearch }" />
+            <button class="input-addon-item" data-bind="click: goToSearch"><span class="icon ion-search"></span></button>
             </div>
-          </li>
-          <li>
-            <div class="row" style="height:2em;margin:0.3em 0">
-              <a href="#topgames/boardgame" title="Top Games"><i class="icon ion-stats-bars icon-large"></i></a>              
-            </div>
-          </li>
-          <li style="min-width:13em">
-            <div class="row text-center" style="height:2em;margin:0.3em 0">
-              <h3 data-bind="text: currentPageTitle" style="color:white;"></h3>             
-            </div>
-          </li>
-          <li>
-            <div class="row collapse" style="height:2em;margin:0.3em 0">
-              <div class="small-9 columns">
-                <input id="search" type="text" placeholder="Search" data-bind="event: { change: goToSearch }" />
-              </div>
-              <div class="small-3 columns">
-                <a  class=" button postfix"  data-bind="click: goToSearch"><i style="vertical-align: middle" class="icon ion-search"></i></a>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </nav>
-    </div>
+        </li>
+      </ul>
+    </nav>
 
-    <div class="text-center" data-bind="if: loading"><i class="icon ion-loading-c icon-large"></i></div>
-
-
-
-    <!-- top 100 games -->
-    <div class="row" data-bind="if: currentPage() === 'topGames'">
-      <h2 class="text-center"><span>Top 100 BGG Games</span> <small data-bind="text: dataTimeStamp"></small></h2>
-      <div class="small-12 columns" >
-        <div class="text-center" data-bind="foreach: gameTypes">
-            <a class="button radius" data-bind="text: name, 
-                           css: { selected: key == $root.topGamesType() },
-                           attr:{href: '#topgames/' + key }"></a>
-        </div>
-        <table class="small-12" id="top-table" data-bind="if: topGames().length>0">
-          <thead>
-            <tr>
-              <th width="200"></th>
-              <th>Title</th>
-              <th>Rank</th>
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: topGames">
-            <tr>
-              <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
-              <td>
-                <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
-              </td>
-              <td data-bind="text:getRank($root.topGamesType())"></td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="text-center" data-bind="if: loading">
+        <i class="icon ion-loading-c icon-large"></i>
       </div>
-    </div>
-    
-    <!-- hot games -->
-    <div class="row" data-bind="if: currentPage() === 'hotGames' ">
-      <div class="large-12 columns" >
-          <table id="hot-table" data-bind="if: hotGames().length>0">
+
+    <main class="main">
+
+
+
+      <!-- top 100 games -->
+      <div class="row" data-bind="if: currentPage() === 'topGames'">
+        <h2 class="text-center"><span>Top 100 BGG Games</span> <small data-bind="text: dataTimeStamp"></small></h2>
+        <div class="small-12 columns" >
+          <div class="text-center" data-bind="foreach: gameTypes">
+              <a class="button radius" data-bind="text: name, 
+                             css: { selected: key == $root.topGamesType() },
+                             attr:{href: '#topgames/' + key }"></a>
+          </div>
+          <table class="small-12" id="top-table" data-bind="if: topGames().length>0">
             <thead>
               <tr>
                 <th width="200"></th>
@@ -91,243 +53,258 @@
                 <th>Rank</th>
               </tr>
             </thead>
-            <tbody data-bind="foreach: hotGames">
+            <tbody data-bind="foreach: topGames">
               <tr>
                 <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
                 <td>
                   <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
                 </td>
-                <td data-bind="text:hotRank"></td>
+                <td data-bind="text:getRank($root.topGamesType())"></td>
               </tr>
             </tbody>
           </table>
+        </div>
       </div>
-    </div>
-    
-    <!-- Search results -->
-    <div class="row" data-bind="if: currentPage() === 'searchGames' ">
-      <div id="results" class="large-12 columns" >
-          <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">
-            <thead>
-              <tr>
-                <th width="200"></th>
-                <th data-bind="click: function(d,e) {handleSort('name',d,e)}">Title</th>
-                <th data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
-              </tr>
-            </thead>
-            <tbody data-bind="foreach: searchedGames">
-              <tr>
-                <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
-                <td>
-                  <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
-                  <blockquote data-bind="html: getShortDescription()"></blockquote>
-                </td>
-                <td data-bind="text:getBRating()"></td>
-              </tr>
-            </tbody>
-          </table>
-      </div>
-    </div>
-
-    <!-- Selected game -->
-    <div data-bind="visible: currentPage() === 'gameOverview'">
-      <div  data-magellan-expedition data-options="destination_threshold:200;throttle_delay:0;" >
-        <ul class="sub-nav">
-          <li>
-              <h4 data-bind="with: selectedGame"><span data-bind="text: getName()"></span></h4>
-          </li>
-          <li data-magellan-arrival="info">
-            <a href="#info" rel='bookmark'><i class="icon ion-information-circled"></i> Quick Info</a>
-          </li> 
-          <li data-magellan-arrival="description">
-            <a href="#description"><i class="icon ion-clipboard"></i> Description</a>
-          </li> 
-          <li data-magellan-arrival="ranks">
-            <a href="#ranks"><i class="icon ion-arrow-graph-up-right"></i> Ranks</a>
-          </li> 
-          <li data-magellan-arrival="comments">
-            <a href="#comments"><i class="icon ion-chatbox-working"></i> Comments</a>
-          </li> 
-        </ul> 
-      </div>
-      <div data-bind="with: selectedGame">
-        <a name="info"></a>
-        <section class="section section-white">
-        <div class="row" style="padding-bottom:10px;" >
-          <div class="column small-5" >
-            <a data-bind="attr:{href:image}" class="game-image" title="getName()">
-            <img class="radius" style="height:16.563em;" data-bind="attr:{src:$(window).width() > 600 ? image : thumbnail}">
-            </a>
-          </div>
-          <!-- Quick Info -->
-          <div class=" column small-7 spaced-rows" data-magellan-destination="info">
-            <h1 class="text-center"><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h1>
-            <div class="row">
-              <div style="font-weight: bold;" class="column small-6">
-                Designer
-              </div>
-              <div data-bind="text: getDesigner()" class="column small-6">
-                
-              </div>
-            </div>
-            <div class="row">
-              <div style="font-weight: bold;" class="column small-6">
-                Num of players
-              </div>
-              <div class="column small-6">
-                <span data-bind="text: minplayers.value"></span> - <span data-bind="text: maxplayers.value"></span>
-              </div>
-            </div>
-            <div class="row">
-              <div style="font-weight: bold;" class="column small-6">
-                Suggested age
-              </div>
-              <div class="column small-6">
-                <span data-bind="text: minage.value"></span> and up
-              </div>
-            </div>
-            <div class="row">
-              <div style="font-weight: bold;" class="column small-6">
-                Playing Time
-              </div>
-              <div class="column small-6">
-                <span data-bind="text: playingtime.value"></span> minutes</span>
-              </div>
-            </div>
-            <div class="row">
-              <div style="font-weight: bold;" class="column small-6">
-                Categories
-              </div>
-              <div class="column small-6">
-                <ul class="inline-list categories" data-bind="foreach: getCategories()">
-                  <li data-bind="text: $data"></li> 
-                </ul>
-              </div>
-            </div>                 
-          </div>
-        </div>
-        </section>
-        <!-- Description -->        
-        <a name="description"></a>
-        <section class="section section-gray">  
-        <div class="row">          
-          <div data-magellan-destination="description">
-            <div class="column small-3">
-            <h4 class="text-center">Description</h4>
-            <div class="text-center">
-            <i class="icon ion-clipboard icon-huge"></i>
-            </div>
-            </div>
-            <div class="column small-9">
-            <p data-bind="html: getHTMLDescription()"></p>
-            </div>
-          </div>
-        </div>
-        </section>
-        <!-- Ranks and Ratings -->
-        <a name="ranks"></a>
-        <section class="section section-white">  
-        <div class="row" data-magellan-destination="ranks">
-          <div class="column small-3">
-            <h4 class="text-center">Ranks and Ratings</h4>
-            <div class="text-center">
-            <i class="icon ion-arrow-graph-up-right icon-huge"></i>   
-            </div>       
-          </div>
-          <div class="column small-9 spaced-rows">
-            <div class="row" style="padding-top:3em;">
-              <div style="font-weight: bold;" class="column small-6">
-                Average Rating
-              </div>
-              <div class="column small-6">
-                <span data-bind="text:Math.floor(getAverageRating()*100)/100"></span> / 10
-              </div>
-            </div>
-            <!-- ko foreach: getRanks() -->  
-            <div class="row">
-              <div style="font-weight: bold;" class="column small-6">
-                <span data-bind="text:friendlyname"></span>
-              </div>
-              <div class="column small-6">
-                <a data-bind="text:value, attr: {href: $parent.getRankLink(name,id,value)}"></a>
-              </div>
-            </div>
-            <!-- /ko -->
-          </div>
-        </div>
-        </section>
-        <!-- Comments -->
-        <section class="section section-gray"> 
-        <a name="comments"></a>
-        <div class="row" data-bind="with: featuredComment" data-magellan-destination="comments">
-          <div class="column small-3">
-            <h4 class="text-center">Comments</h4>
-            <div class="text-center"><i class="icon ion-chatbox-working icon-huge"></i></div>
-          </div>
-          <div class="column small-9" >
-            <blockquote> 
-            <p data-bind="html: value"></p>
-            <cite data-bind="html: username"></cite>
-            </blockquote>
-            <p>Rating: <span data-bind="text: rating" ></span>
-              <button class="link" data-bind="click: $parent.pickFeaturedComment()" ><i class="icon ion-refresh"></i></button>
-            </p>
-            <a class="link-wide" data-bind="click: $root.goToGameComments">View All</a>
-          </div>
-        </div>
-        </section>
-      </div>
-    </div>
-
-    <!-- Selected Game Comments Page -->
-    <div data-bind="visible: currentPage() === 'gameComments'">
-      <div  data-bind="with: selectedGame">
-        <div class="row">
-            <button class="radius" data-bind="click: $root.goToGame"><i class="icon ion-arrow-left-c"></i>   <span data-bind="text: getName()"></span></button>
-        </div>
-        <div class="row">
-          <div class="column small-12 small-centered">
-             <div class="row">
-              <div class="small-3 column small-centered">
-                <div class="row collapse" style="margin:0.3em 0">
-                  <div class="small-1 columns">
-                    <a data-bind="click: function(d,e) {changePageBy(-1)}"><i class="icon ion-chevron-left icon-large"></i></a>
-                  </div>
-                  <div class="small-3 columns">
-                    <label for="page-num" class="right inline">Page : </label>
-                  </div>
-                  <div class="small-3 columns">
-                    <input type="text" id="page-num" data-bind="value: commentsPage" >
-                  </div>
-                  <div class="small-3 columns">
-                    <span class="postfix" data-bind="text: getCommentsTotalPages()"></span>
-                  </div>
-                  <div class="small-2 columns text-right">
-                    <a data-bind="click: function(d,e) {changePageBy(1)}"><i class="icon ion-chevron-right icon-large"></i></a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <table id="results-table">
+      
+      <!-- hot games -->
+      <div class="row" data-bind="if: currentPage() === 'hotGames' ">
+        <div class="large-12 columns" >
+            <table id="hot-table" data-bind="if: hotGames().length>0">
               <thead>
                 <tr>
-                  <th>User</th>
-                  <th>Rating</th>
-                  <th>Comments</th>
+                  <th width="200"></th>
+                  <th>Title</th>
+                  <th>Rank</th>
                 </tr>
               </thead>
-              <tbody data-bind="foreach: commentsko">
+              <tbody data-bind="foreach: hotGames">
                 <tr>
-                  <td data-bind="text: username"></td>
-                  <td data-bind="text: rating"></td>
-                  <td><p data-bind="html: value"></p></td>
+                  <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
+                  <td>
+                    <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
+                  </td>
+                  <td data-bind="text:hotRank"></td>
                 </tr>
               </tbody>
             </table>
-          </div>
         </div>
       </div>
-    </div>
+      
+      <!-- Search results -->
+      <div class="row" data-bind="if: currentPage() === 'searchGames' ">
+        <div id="results" class="large-12 columns" >
+            <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">
+              <thead>
+                <tr>
+                  <th width="200"></th>
+                  <th data-bind="click: function(d,e) {handleSort('name',d,e)}">Title</th>
+                  <th data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
+                </tr>
+              </thead>
+              <tbody data-bind="foreach: searchedGames">
+                <tr>
+                  <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
+                  <td>
+                    <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
+                    <blockquote data-bind="html: getShortDescription()"></blockquote>
+                  </td>
+                  <td data-bind="text:getBRating()"></td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
+      </div>
+
+      <!-- Selected game -->
+      <div data-bind="visible: currentPage() === 'gameOverview'">
+        <div data-magellan-expedition data-options="destination_threshold:200;throttle_delay:0;" >
+          <ul id="nav" class="sub-nav">
+            <li>
+                <h4 data-bind="with: selectedGame"><span data-bind="text: getName()"></span></h4>
+            </li>
+            <li data-magellan-arrival="info">
+              <a href="#info" rel='bookmark'><i class="icon ion-information-circled"></i> Quick Info</a>
+            </li> 
+            <li data-magellan-arrival="description">
+              <a href="#description"><i class="icon ion-clipboard"></i> Description</a>
+            </li> 
+            <li data-magellan-arrival="ranks">
+              <a href="#ranks"><i class="icon ion-arrow-graph-up-right"></i> Ranks</a>
+            </li> 
+            <li data-magellan-arrival="comments">
+              <a href="#comments"><i class="icon ion-chatbox-working"></i> Comments</a>
+            </li> 
+          </ul> 
+        </div>
+        <div data-bind="with: selectedGame">
+          <a name="info"></a>
+          <section class="section section-white">
+          <div id="info" data-magellan-destination="info" class="media column" >
+            <div class="media-figure text-center" >
+              <a data-bind="attr:{href:image}" class="game-image" title="getName()">
+              <img class="radius" style="max-height:20em;max-width:100%" data-bind="attr:{src:$(window).width() > 600 ? image : thumbnail}">
+              </a>
+            </div>
+            <!-- Quick Info -->
+            <div class="media-body">
+              <h1 class="text-center"><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h1>
+              <dl class="inline">
+                <li>
+                  <dt>
+                    Designer
+                  </dt>
+                  <dd>
+                    <span data-bind="text: getDesigner()"></span>               
+                  </dd>
+                </li>
+                <li>
+                  <dt>
+                    Num of players
+                  </dt>
+                  <dd>
+                    <span data-bind="text: minplayers.value"></span> - <span data-bind="text: maxplayers.value"></span>
+                  </dd>
+                </li>
+                <li>
+                  <dt>
+                    Suggested Age
+                  </dt>
+                  <dd>
+                    <span data-bind="text: minage.value"></span> and up
+                  </dd>  
+                </li>
+                <li>
+                  <dt>
+                    Playing Time
+                  </dt>
+                  <dd>
+                    <span data-bind="text: playingtime.value"></span> minutes</span>
+                  </dd>
+                </li>
+                <li>
+                  <dt>
+                    Categories
+                  </dt>
+                  <dd>
+                    <ul class="inline categories" data-bind="foreach: getCategories()">
+                      <li data-bind="text: $data"></li> 
+                    </ul>
+                  </dd>
+                </li>
+              </dl>          
+            </div>
+          </div>
+          </section>
+          <!-- Description -->        
+          <a name="description"></a>
+          <section class="section section-gray">  
+          <div id="description" data-magellan-destination="description" class="media column">  
+            <div class="media-figure cell20">
+              <h4 class="text-center">Description</h4>
+              <div class="text-center">
+              <i class="icon ion-clipboard icon-huge"></i>
+              </div>
+            </div>
+            <div class="media-body">
+              <p data-bind="html: getHTMLDescription()"></p>
+            </div>
+          </div>
+          </section>
+          <!-- Ranks and Ratings -->
+          <a name="ranks"></a>
+          <section class="section section-white">  
+          <div id="ranks" data-magellan-destination="ranks" class="media column">
+            <div class="media-figure cell20">
+              <h4 class="text-center">Ranks and Ratings</h4>
+              <div class="text-center">
+              <i class="icon ion-arrow-graph-up-right icon-huge"></i>   
+              </div>       
+            </div>
+            <div class="media-body">
+              <dl class="inline">
+                <li>
+                  <dt>
+                    Average Rating
+                  </dt>
+                  <dd>
+                    <span data-bind="text:Math.floor(getAverageRating()*100)/100"></span> / 10               
+                  </dd>
+                </li>
+                <!-- ko foreach: getRanks() -->  
+                <li>
+                  <dt>
+                    <span data-bind="text:friendlyname"></span>
+                  </dt>
+                  <dd>
+                    <a data-bind="text:value, attr: {href: $parent.getRankLink(name,id,value)}"></a>
+                  </dd>
+                </li>
+                <!-- /ko -->
+              </dl>
+            </div>
+          </div>
+          </section>
+          <!-- Comments -->
+          <section class="section section-gray"> 
+          <a name="comments"></a>
+          <div id="comments" data-magellan-destination="comments" class="media column" data-bind="with: featuredComment">
+            <div class="media-figure cell20">
+              <h4 class="text-center">Comments</h4>
+              <div class="text-center"><i class="icon ion-chatbox-working icon-huge"></i></div>
+            </div>
+            <div class="media-body" >
+              <blockquote> 
+              <p data-bind="html: value"></p>
+              <cite data-bind="html: username"></cite>
+              </blockquote>
+              <p>Rating: <span data-bind="text: rating" ></span>
+                <button class="link" data-bind="click: $parent.pickFeaturedComment()" ><i class="icon ion-refresh"></i></button>
+              </p>
+              <button class="link link-wide" data-bind="click: $root.goToGameComments">View All</a>
+            </div>
+          </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Selected Game Comments Page -->
+      <div data-bind="visible: currentPage() === 'gameComments'">
+        <div class="column" data-bind="with: selectedGame">
+          <div>
+              <button class="radius" data-bind="click: $root.goToGame"><i class="icon ion-arrow-left-c"></i>   <span data-bind="text: getName()"></span></button>
+          </div>
+            <div>
+              <div class="inline fcenter">
+                <a data-bind="click: function(d,e) {changePageBy(-1)}"><i class="icon ion-chevron-left icon-large"></i></a>
+                <!-- <label for="page-num" class="">Page : </label> -->
+                <div class="input-addon">
+                  <input type="text" id="page-num" data-bind="value: commentsPage" class="input-addon-field" style="width:3rem">
+                  <span class="input-addon-item" data-bind="text: getCommentsTotalPages()"></span>
+                </div>
+                <a data-bind="click: function(d,e) {changePageBy(1)}"><i class="icon ion-chevron-right icon-large"></i></a>
+              </div>
+              <table id="results-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Rating</th>
+                    <th>Comments</th>
+                  </tr>
+                </thead>
+                <tbody data-bind="foreach: commentsko">
+                  <tr>
+                    <td data-bind="text: username"></td>
+                    <td data-bind="text: rating"></td>
+                    <td><p data-bind="html: value"></p></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+        </div>
+        
+      </div>
+
+    </main>
 
     <footer>
       <ul>
@@ -344,10 +321,13 @@
     end DIST scripts-->
     <!-- start DEV scripts-->
     <script src="js/vendor/jquery.js"></script>
-    <script src="js/foundation/foundation.js"></script>
-    <script src="js/foundation/foundation.magellan.js"></script>
-    <script src="js/foundation/foundation.interchange.js"></script>
+    <!-- <script src="js/foundation.min.js"></script> -->
+    <!-- <script src="js/foundation/foundation.js"></script> -->
+    <!-- <script src="js/foundation/foundation.magellan.js"></script> -->
+    <!-- <script src="js/foundation/foundation.interchange.js"></script> -->
     <!-- <script src="js/jquery.fs.boxer.min.js"></script> -->
+    <script src="js/responsive-nav.min.js"></script>
+    <script src="js/jquery.nav.js"></script>
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
     <script src="js/script.js"></script>

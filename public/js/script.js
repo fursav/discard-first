@@ -5,7 +5,15 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    $(document).foundation();
+    var nav;
+    nav = responsiveNav(".nav-collapse", {
+      animate: true,
+      transition: 284,
+      label: ""
+    });
+    $("#nav").onePageNav({
+      currentClass: "active"
+    });
     window.vm = new ViewModel();
     ko.applyBindings(window.vm);
   });
@@ -107,8 +115,12 @@
       var contenthid, htmlDescription, i, paragraphs, regex;
       paragraphs = 1;
       contenthid = false;
+      console.log(this.description);
+      regex = new RegExp("&amp;&amp;#35;", "g");
+      htmlDescription = this.description.replace(regex, "&#");
+      console.log(htmlDescription);
       regex = new RegExp("&#10;&#10;&#10;    ", "g");
-      htmlDescription = this.description.replace(regex, "<ul><li>");
+      htmlDescription = htmlDescription.replace(regex, "<ul><li>");
       regex = new RegExp("&#10;&#10;&#10;", "g");
       htmlDescription = htmlDescription.replace(regex, "</li></ul>");
       regex = new RegExp("&#10;    ", "g");
@@ -116,6 +128,8 @@
       htmlDescription = "<p>" + htmlDescription;
       regex = new RegExp("&#10;&#10;", "g");
       htmlDescription = htmlDescription.replace(regex, "</p><p>");
+      regex = new RegExp("&amp;quot;", "g");
+      htmlDescription = htmlDescription.replace(regex, '"');
       htmlDescription += "</p>";
       i = 0;
       while (i < htmlDescription.length) {
@@ -149,37 +163,44 @@
       this.processComments = __bind(this.processComments, this);
       var comment;
       BoardGame.__super__.constructor.call(this, data);
-      this.comments = data.comments;
+      this.comments = {};
       this.commentsko = ko.observableArray([]);
-      this.commentsData = {
-        page: data.comments.page,
-        totalitems: data.comments.totalitems
-      };
-      this.commentsPage = ko.computed({
-        read: (function(_this) {
-          return function() {
-            return _this.commentsData.page;
-          };
-        })(this),
-        write: (function(_this) {
-          return function(value) {
-            var vtw;
-            vtw = parseInt(value);
-            console.log(vtw);
-            if ((0 < vtw && vtw < _this.getCommentsTotalPages() + 1)) {
-              _this.commentsData.page = vtw;
-              $(function() {
-                if (window.vm.currentPage() === "gameComments") {
-                  location.hash = "#game/" + _this.id + "/comments/page/" + vtw;
-                }
-              });
-            }
-          };
-        })(this)
-      }).extend({
-        notify: 'always'
-      });
-      this.processComments();
+      this.commentsData = {};
+      console.log(data);
+      if (data.comments != null) {
+        this.comments = data.comments;
+        this.commentsData = {
+          page: data.comments.page,
+          totalitems: data.comments.totalitems
+        };
+        this.commentsPage = ko.computed({
+          read: (function(_this) {
+            return function() {
+              return _this.commentsData.page;
+            };
+          })(this),
+          write: (function(_this) {
+            return function(value) {
+              var vtw;
+              vtw = parseInt(value);
+              console.log(vtw);
+              if ((0 < vtw && vtw < _this.getCommentsTotalPages() + 1)) {
+                _this.commentsData.page = vtw;
+                $(function() {
+                  if (window.vm.currentPage() === "gameComments") {
+                    location.hash = "#game/" + _this.id + "/comments/page/" + vtw;
+                  }
+                });
+              }
+            };
+          })(this)
+        }).extend({
+          notify: 'always'
+        });
+        this.processComments();
+      } else {
+        this.commentsPage = ko.observable();
+      }
       if (this.goodComments == null) {
         this.goodComments = (function() {
           var _i, _len, _ref, _results;
@@ -443,6 +464,7 @@
       }
       regex = new RegExp(" ", "g");
       str = str.replace(regex, "+");
+      str = encodeURI(str);
       this.loading(true);
       ids = this.loadFromCache("searched_bgs_ids", str);
       console.log("ids");
@@ -579,9 +601,13 @@
         url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
         $.getJSON("bg/" + id + "/" + page, (function(_this) {
           return function(data) {
-            if (data.query.results) {
+            var subnav;
+            if (data) {
               _this.selectedGame(new BoardGame(data.items["item"]));
               _this.loading(null);
+              subnav = $('#sub-nav').onePageNav({
+                currentClass: 'active'
+              });
             }
           };
         })(this));
@@ -599,9 +625,13 @@
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
       $.getJSON("/bg/" + id, (function(_this) {
         return function(data) {
+          var subnav;
           if (data) {
             _this.selectedGame(new BoardGame(data.items["item"]));
             _this.loading(null);
+            subnav = $('#sub-nav').onePageNav({
+              currentClass: 'active'
+            });
             _this.saveToCache("bg", {
               'query': id
             }, _this.selectedGame());
