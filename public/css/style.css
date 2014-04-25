@@ -581,6 +581,7 @@ footer ul li:hover {
 .sub-nav dd.active a,
 .sub-nav li.active a {
   border-radius: 3px;
+  display: block;
   font-weight: normal;
   background: #008cba;
   padding: 0.1875rem 1rem;
@@ -613,7 +614,7 @@ footer ul li:hover {
   }
   .sub-nav li {
     display: block;
-    width: auto;
+    width: 100%;
   }
   .sub-nav > li:first-child {
     display: block;
