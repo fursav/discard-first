@@ -4,9 +4,7 @@ var express = require('express');
 var fs      = require('fs');
 var path = require('path');
 var request = require('request')
-var needle = require('needle');
 var parser = require('xml2json');
-var rest = require('restler');
 
 /**
  *  Define the sample application.
