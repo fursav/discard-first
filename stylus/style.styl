@@ -2,22 +2,29 @@
 font = 17px "Gen Light"
 title-font = "Hans Kendrick"
 color-blue = #0B5DA1
-
+darkgray = #222222
+linkblue = #2ba6cb
+linkblue-hover = darken(linkblue,20%)
+sheadinggray = #6f6f6f
+buttonblue = #008cba
+buttonblue-hover = darken(buttonblue,20%)
+footerbg = #333333
 //screen sizes
 
-large-screen = 40rem
+medium-screen = 40rem
+large-screen = 60rem
 
 body
-  background: white;
-  color: #222222;
-  padding: 0;
-  margin: 0;
-  font-family: font, "Helvetica", Helvetica, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  line-height: 1;
-  position: relative;
-  cursor: default;
+  background white
+  color darkgray
+  padding 0
+  margin 0
+  font-family font, sans-serif
+  font-weight normal
+  font-style normal
+  line-height 1
+  position relative
+  cursor default
 
 div,
 dl,
@@ -38,190 +45,209 @@ p,
 blockquote,
 th,
 td
-  margin: 0;
-  padding: 0;
+  margin 0
+  padding 0
 
 /* Default Link Styles */
 a
-  color: #2ba6cb;
-  text-decoration: none;
-  line-height: inherit;
-  cursor: pointer; 
+  color linkblue
+  text-decoration none
+  line-height inherit
+  cursor pointer
 
 a:hover, a:focus 
-  color: #258faf;
+  color linkblue-hover
 a img
-  border: none;
+  border none
 
 /* Default paragraph styles */
 p
-  font-family: inherit;
-  font-weight: normal;
-  font-size: 1rem;
-  line-height: 1.6;
-  margin-bottom: 1.25rem;
-  text-rendering: optimizeLegibility; 
+  font-family inherit
+  font-weight normal
+  font-size 1rem
+  line-height 1.6
+  margin-bottom 1.25rem
+  text-rendering optimizeLegibility 
 
 p.lead
-  font-size: 1.21875rem;
-  line-height: 1.6;
+  font-size 1.21875rem
+  line-height 1.6
 p aside
-  font-size: 0.875rem;
-  line-height: 1.35;
-  font-style: italic;
+  font-size 0.875rem
+  line-height 1.35
+  font-style italic
 
 /* Default header styles */
 h1, h2, h3, h4, h5, h6
-  font-family: title-font, "Helvetica", Helvetica, Arial, sans-serif;
-  font-weight: normal;
-  font-style: normal;
-  color: #222222;
-  text-rendering: optimizeLegibility;
-  margin-top: 0.2rem;
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
+  font-family: title-font, sans-serif
+  font-weight: normal
+  font-style: normal
+  color: darkgray
+  text-rendering: optimizeLegibility
+  margin-top: 0.2rem
+  margin-bottom: 0.5rem
+  line-height: 1.4
 h1 small, h2 small, h3 small, h4 small, h5 small, h6 small
-  font-size: 60%;
-  color: #6f6f6f;
-  line-height: 0;
+  font-size 60%
+  color lighten(darkgray,30%)
+  line-height 0
 
 h1
-  font-size: 2.125rem;
+  font-size 2.125rem
 
 h2
-  font-size: 1.6875rem;
+  font-size 1.6875rem
 
 h3
-  font-size: 1.375rem;
+  font-size 1.375rem
 
 h4
-  font-size: 1.125rem;
+  font-size 1.125rem
 
 h5
-  font-size: 1.125rem;
+  font-size 1.125rem
 
 h6
-  font-size: 1rem;
+  font-size 1rem
+
+
+@media only screen and (min-width: medium-screen) 
+  h1, h2, h3, h4, h5, h6 
+    line-height 1.4
+
+  h1 
+    font-size 2.75rem
+
+  h2 
+    font-size 2.3125rem
+
+  h3 
+    font-size 1.6875rem
+
+  h4 
+    font-size 1.4375rem
+
 
 .subheader 
-  line-height: 1.4;
-  color: #6f6f6f;
-  font-weight: normal;
-  margin-top: 0.2rem;
-  margin-bottom: 0.5rem;
+  line-height: 1.4
+  color: lighten(darkgray,30%)
+  font-weight: normal
+  margin-top: 0.2rem
+  margin-bottom: 0.5rem
 
 hr
-  border: solid #dddddd;
-  border-width: 1px 0 0;
-  clear: both;
-  margin: 1.25rem 0 1.1875rem;
-  height: 0;
+  border solid #dddddd
+  border-width 1px 0 0
+  clear both
+  margin 1.25rem 0 1.1875rem
+  height 0
 
 /* Helpful Typography Defaults */
 em,
 i
-  font-style: italic;
-  line-height: inherit;
+  font-style italic
+  line-height inherit
 
 strong,
 b
-  font-weight: bold;
-  line-height: inherit;
+  font-weight bold
+  line-height inherit
 
 small
-  font-size: 60%;
-  line-height: inherit;
+  font-size: 60%
+  line-height: inherit
 
 code
-  font-family: Consolas, "Liberation Mono", Courier, monospace;
-  font-weight: bold;
-  color: #910b0e;
+  font-family Consolas, "Liberation Mono", Courier, monospace
+  font-weight bold
+  color #910b0e
 
 table
-  background: white;
+  background white
   margin-top 1.25rem
-  margin-bottom: 1.25rem;
-  // border: solid 1px #dddddd;
+  margin-bottom 1.25rem
 table thead,
 table tfoot
-  background: whitesmoke;
+  background whitesmoke
 table thead tr th,
 table thead tr td,
 table tfoot tr th,
 table tfoot tr td
-  padding: 0.5rem 0.625rem 0.625rem;
+  padding 0.5rem 0.625rem 0.625rem
   font-family title-font
-  font-size: 0.9rem;
-  color: #222222;
-  text-align: left;
+  font-size 0.9rem
+  color darkgray
+  text-align left
 table tr th,
 table tr td
-  padding: 0.5625rem 0.625rem;
-  font-size: 0.875rem;
-  color: #222222;
+  padding 0.5625rem 0.625rem
+  font-size 0.875rem
+  color darkgray
 table tr.even, table tr.alt, table tr:nth-of-type(even)
-  background: #f9f9f9;
+  background lighten(whitesmoke,20%)
 table thead tr th,
 table tfoot tr th,
 table tbody tr td,
 table tr td,
 table tfoot tr td
-  display: table-cell;
-  line-height: 1.125rem;
+  display table-cell
+  line-height 1.125rem
 //
 /* Lists */
 ul,
 ol,
 dl
-  font-size: 1rem;
-  line-height: 1.6;
-  margin-bottom: 1.25rem;
-  list-style-position: outside;
-  font-family: inherit;
+  font-size 1rem
+  line-height 1.6
+  margin-bottom 1.25rem
+  list-style-position outside
+  font-family inherit
 
 ul
-  margin-left: 1.1rem;
+  margin-left 1.1rem
 ul.no-bullet
-  margin-left: 0;
+  margin-left 0
 ul.no-bullet li ul,
 ul.no-bullet li ol
-  margin-left: 1.25rem;
-  margin-bottom: 0;
-  list-style: none;
+  margin-left 1.25rem
+  margin-bottom: 0
+  list-style none
 
 /* Unordered Lists */
 ul li ul,
 ul li ol 
-  margin-left: 1.25rem;
-  margin-bottom: 0;
+  margin-left 1.25rem
+  margin-bottom 0
 ul.square li ul, ul.circle li ul, ul.disc li ul
-  list-style: inherit;
+  list-style inherit
 ul.square
-  list-style-type: square;
-  margin-left: 1.1rem;
+  list-style-type:square
+  margin-left 1.1rem
 ul.circle
-  list-style-type: circle;
-  margin-left: 1.1rem;
+  list-style-type: circle
+  margin-left 1.1rem
 ul.disc
-  list-style-type: disc;
-  margin-left: 1.1rem;
+  list-style-type: disc
+  margin-left 1.1rem
 ul.no-bullet
-  list-style: none;
+  list-style none
 
 /* Ordered Lists */
 ol
-  margin-left: 1.4rem;
+  margin-left 1.4rem
 ol li ul,
 ol li ol
-  margin-left: 1.25rem;
-  margin-bottom: 0;
+  margin-left 1.25rem
+  margin-bottom 0
 
 /* Definition Lists */
 dl dt
-  margin-bottom: 0.3rem;
-  font-weight: bold;
+  margin-bottom 0.3rem
+  font-weight bold
 dl dd
-  margin-bottom: 0.75rem;
+  margin-bottom 0.75rem
+
+/* inline flex */
 
 div.inline
   display flex
@@ -239,52 +265,48 @@ dl.inline li
   justify-content space-between
 
 dl.inline li dd
-  width 13em
-  max-width 13em
+  width 13rem
+  max-width 13rem
 
 ul.inline
   margin 0
 
 ul.inline li
   display inline
-  margin-right .5em
+  margin-right .5rem
 
-
-
-// dl.inline dt, dl.inline dd
-//   display inline-block
 
 /* Abbreviations */
 abbr,
 acronym
-  text-transform: uppercase;
-  font-size: 90%;
-  color: #222222;
-  border-bottom: 1px dotted #dddddd;
-  cursor: help;
+  text-transform uppercase
+  font-size 90%
+  color darkgray
+  border-bottom 1px dotted #dddddd
+  cursor help
 
 abbr
-  text-transform: none;
+  text-transform none
 
 /* Blockquotes */
 blockquote
-  margin: 0 0 1.25rem;
-  padding: 0.5625rem 1.25rem 0 1.1875rem;
-  border-left: 1px solid #dddddd;
+  margin 0 0 1.25rem
+  padding 0.5625rem 1.25rem 0 1.1875rem
+  border-left 1px solid #dddddd
 blockquote cite 
-  display: block;
-  font-size: 0.8125rem;
-  color: #555555;
+  display block
+  font-size 0.8125rem
+  color lighten(darkgray,50%)
 blockquote cite:before 
-  content: "\2014 \0020";
+  content "\2014 \0020"
 blockquote cite a,
 blockquote cite a:visited
-  color: #555555;
+  color lighten(darkgray,50%)
 
 blockquote,
 blockquote p
-  line-height: 1.6;
-  color: #6f6f6f;
+  line-height 1.6
+  color lighten(darkgray,30%)
 
 /* Microformats */
 // .vcard {
@@ -308,145 +330,66 @@ blockquote p
 //   border: none;
 //   padding: 0 0.0625rem; }
 
-@media only screen and (min-width: 40.063em) {
-  h1, h2, h3, h4, h5, h6 {
-    line-height: 1.4; }
-
-  h1 {
-    font-size: 2.75rem; }
-
-  h2 {
-    font-size: 2.3125rem; }
-
-  h3 {
-    font-size: 1.6875rem; }
-
-  h4 {
-    font-size: 1.4375rem; }
-}
-
-// p
-// a
-// button
-// input
-//   font font
-// h1
-// h2
-// h3
-// h4
-// h5
-//   font-family title-font
 .title
   font-family title-font
-  font-size 2em
+  font-size 2rem
+  color white
 
-/* Small screens */
-@media all and (max-width: large-screen) {
-  .top-nav {
-    /* On small screens, we are no longer using row direction but column */
-    flex-direction: column !important
-  }
-}
+@media all and (max-width: large-screen)
+  .title
+    font-size 1.5rem
 
-i:focus
-  outline none
-button:focus
+i:focus, button:focus
   outline none
 
 .top-nav 
-  list-style: none;
-  margin: 0 0; 
+  list-style none
+  margin 0 0
   padding 0 0
-  background: color-blue;
+  background color-blue
   // height 4em
   box-shadow -.05em .3em .3em -.3em black
-  display: flex;
+  display flex
   
   flex-flow row
-  justify-content: center;
+  justify-content center
   align-items center
   color white
   li    
-    text-align: center;
-    text-decoration: none;
-    padding .1em 
+    text-align center
+    text-decoration none
+    padding .1rem 
   a
-    display: block;
+    display block
     outline none
     color white
-
 
 .top-nav a:hover {
   background: darken(color-blue, 10%);
 }
 
-// @media all and (max-width: 800px) {
-//   .navigation {
-//     justify-content: space-around;
-//   }
-// }
-
-// @media all and (max-width: 600px) {
-//   .navigation {
-//     -webkit-flex-flow: column wrap;
-//     padding: 0;
-//   }
+/* Small screens */
+@media all and (max-width: medium-screen)
+  .top-nav
+    /* On small screens, we are no longer using row direction but column */
+    flex-direction column !important
   
-//   .navigation a { 
-//     text-align: center; 
-//     padding: 10px;
-//     border-top: 1px solid rgba(255,255,255,0.3); 
-//     border-bottom: 1px solid rgba(0,0,0,0.1); 
-//   }
-
-  
-//   .navigation li:last-of-type a {
-//     border-bottom: none;
-//   }
-// }
-
-// .top-nav  
-//   background-color color-blue
-//   box-shadow -.05em .3em .3em -.3em black
-//   margin 0
-//   padding 0
-//   text-align center
-//   display flex
-//   flex-flow row nowrap
-//   ul
-//     flex 1
-//     list-style none
-//     margin 0
-//     padding 0
-//     align-items: flex-start
-//     li
-//       text-align center
-//       height: 100%
-//       min-height 100%
-//       padding 0 0.75em
-//       // padding 0.75em 0
-//       :hover
-//         background-color darken(color-blue,20%)
-//     a
-//       color white
-//       outline none
-//       :hover
-//         color #f3535a
 
 .selected
-  background-color darken(#0c88b9,20%) !important
+  background-color buttonblue-hover !important
+  box-shadow inset 0 0 1rem darken(buttonblue,50%)
 
 //icons
 .icon-large
-    font-size 2em
+    font-size 2rem
 
 .icon-xlarge
-    font-size 3em
+    font-size 3rem
 
 .icon-huge
-    font-size 10em
+    font-size 10rem
 
-@media (max-width: large-screen)
+@media (max-width: medium-screen)
   .icon-huge
     display none
 
@@ -463,40 +406,35 @@ button:focus
     content "\f104"
     float right
 
-.spaced-rows .row
-    margin-bottom 1em
-
 img.radius
     border-radius 5px
 
 .link
-  background: none;
-  border: none;
-  display: inline;
-  font: inherit;
-  margin: 0;
-  padding: 0;
-  outline: none;
-  outline-offset: 0;
+  background none
+  border none
+  display inline
+  font: inherit
+  margin 0
+  padding 0
+  outline none
+  outline-offset 0
   /* Additional styles to look like a link */
-  color: rgb(0, 140, 186);
-  cursor: pointer;
+  color linkblue
+  cursor pointer
   // text-decoration: underline;
   &:hover,
   &:active,
   &:focus
-    background: none;
-    border: none;
-    display: inline;
-    font: inherit;
-    margin: 0;
-    padding: 0;
-    outline: none;
-    outline-offset: 0;
-    /* Additional styles to look like a link */
-    color: rgb(0, 120, 160);
-    cursor: pointer;
-    text-decoration: underline;
+    background none
+    border none
+    display inline
+    font inherit
+    margin 0
+    padding 0
+    outline none
+    outline-offset 0
+    color linkblue-hover
+    cursor pointer
 
 .link-wide
   display block
@@ -508,18 +446,27 @@ hr
   background-image -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) 
   background-image -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0))
 
+/* sections */
 
 .section
     margin-bottom .2em
     padding 1rem 0
     box-shadow 0 .3em .3em -.3em black
 
-@media (min-width: large-screen)
+@media (min-width: medium-screen)
   .section
     padding 4.5rem 0
 
+.section-white    
+  background-image linear-gradient(to bottom, #F5F3EB 0%, #FFFFFF 0%)
+
+.section-gray 
+  background-image linear-gradient(to bottom, #F5F3EB 0%, #E8E8E8 100%)
+
+// footer
+
 footer 
-  background #333333
+  background footerbg
   padding 1.7em 0
   margin-top -.5em
   ul
@@ -533,22 +480,14 @@ footer
       font-size 1rem
       text-align center
       a
-        color: white;
-        padding: 0 .5em
+        color white
+        padding 0 .5em
       i
         vertical-align bottom
         color white
     
       &:hover
-        color: #777777;
-
-.section-white    
-  background-color: #a1dafa;
-  background-image: linear-gradient(to bottom, #F5F3EB 0%, #FFFFFF 0%);
-
-
-.section-gray 
-  background-image: linear-gradient(to bottom, #F5F3EB 0%, #E8E8E8 100%);
+        color linkblue-hover
 
 
 .categories
@@ -557,69 +496,70 @@ footer
     list-style circle
 
 .sub-nav
-    list-style-type: none;
-    margin auto
-    width 100%
-    dt 
-      text-transform: uppercase;
-    dt,
-    dd,
-    li
-      margin-left: 1em
-      margin-bottom: 0.625em
-      font-weight: normal
-      width 45%
-      display inline-block
-      // font-size: .3em
-      color: #999999
-    dt a,
-    dd a,
-    li a 
-      text-decoration: none;
-      outline none
-      color: #999999;
-      padding: 0.1875rem 1rem; 
-    dt a:hover,
-    dd a:hover,
-    li a:hover
-      color: #737373; 
-    dt.active a,
-    dd.active a,
-    li.active a
-      border-radius: 3px;
-      display block
-      font-weight: normal;
-      background: #008cba;
-      padding: 0.1875rem 1rem;
-      cursor: default;
-      color: white;
-    dt.active a:hover,
-    dd.active a:hover,
-    li.active a:hover 
-      background: #0078a0;
+  list-style-type none
+  margin auto
+  width 100%
+  dt 
+    text-transform uppercase
+  dt,
+  dd,
+  li
+    margin-left 1em
+    margin-bottom 0.625em
+    font-weight normal
+    width 45%
+    display inline-block
+    color #999999
+  dt a,
+  dd a,
+  li a 
+    text-decoration none
+    outline none
+    color #999999
+    padding 0.1875rem 1rem
+  dt a:hover,
+  dd a:hover,
+  li a:hover
+    color #737373 
+  dt.active a,
+  dd.active a,
+  li.active a
+    border-radius 3px
+    display block
+    font-weight normal
+    background buttonblue
+    padding 0.1875rem 1rem
+    cursor default
+    color white
+  dt.active a:hover,
+  dd.active a:hover,
+  li.active a:hover 
+    background buttonblue
+    box-shadow inset 0 0 1rem darken(buttonblue,50%)
 
+//hide the name of the game on smaller screens
 .sub-nav > li:first-child
   display none
 
-@media only screen and (min-width: 64.063em)
-    .sub-nav
-      background-color: white;
-      box-shadow: 5px 6px 6px -6px black; 
-      display: block;
-      position fixed
-      overflow: hidden;
-      width: 10em;
-      margin: -0.25rem 0 1.125rem;
-      padding 1em 0
-      margin-top: 2em;
-      margin-right: 0em;
-      margin-left: -0.6rem;
-      z-index 999
-    .sub-nav li
-      display block 
-      width 100%  
-    .sub-nav > li:first-child
-      display block
+@media only screen and (min-width: medium-screen)
+  .sub-nav
+    background-color white
+    box-shadow 0px 0px 5px -3px black; 
+    display block
+    position fixed
+    overflow hidden
+    width 10em
+    margin -0.25rem 0 1.125rem
+    padding 1em 0
+    margin-top 2em
+    margin-right 0em
+    margin-left -0.6rem
+    z-index 999
+  .sub-nav li
+    display block 
+    width 100%  
+  .sub-nav > li:first-child
+    display block
 
 .text-center
   text-align center !important
@@ -628,8 +568,6 @@ footer
   display flex
   min-height 100vh
   flex-direction column
-  // justify-content center
-  // align-items center
 }
 
 .main {
@@ -643,66 +581,60 @@ footer
 }
 
 .input-addon 
-  display: flex;
+  display:flex
   margin 0 .7em
-  // margin-bottom 1em
 
 .input-addon-field 
   flex 1
   margin-right -0.15em
   &:not(:first-child)
-    border-left: 0;
+    border-left 0
   &:not(:last-child)
-    border-right: 0;
+    border-right 0
 
 
 .input-addon-item
-  font-weight: 400
+  font-weight 400
   // background-color: hsla(31, 15%, 50%, 0.1);
   // color: hsl(0, 0%, 40%);
 
 
 .input-addon-field, .input-addon-item {
-  border: 1px solid hsla(31, 15%, 50%, 0.25);
-  padding: 0.5em 0.75em !important
+  border 1px solid hsla(31, 15%, 50%, 0.25)
+  padding 0.5em 0.75em !important
   margin 0
   &:first-child {
-    border-radius: 2px 0 0 2px;
+    border-radius 2px 0 0 2px
   }
   &:last-child {
-    border-radius: 0 2px 2px 0;
+    border-radius 0 2px 2px 0
   }
 }
 
 button, .button
-  border-style: solid;
-  border-width: 0px;
-  cursor: pointer;
-  // font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
-  font-weight: normal;
-  line-height: normal;
-  margin: 0 0 1.25rem;
-  position: relative;
-  text-decoration: none;
-  text-align: center;
-  -webkit-appearance: none;
-  -webkit-border-radius: 0;
-  display: inline-block;
+  border-style solid
+  border-width 0px
+  cursor pointer
+  font-weight normal
+  line-height normal
+  margin 0 0 1.25rem
+  position relative
+  text-decoration none
+  text-align center
+  -webkit-appearance none
+  -webkit-border-radius 0
+  display inline-block
   padding .8rem
-  // padding-top: 1rem;
-  // padding-right: 2rem;
-  // padding-bottom: 1.0625rem;
-  // padding-left: 2rem;
-  font-size: 1rem;
-  background-color: #008cba;
-  border-color: #007095;
-  color: white;
-  transition: background-color 300ms ease-out;
+  font-size 1rem
+  background-color buttonblue
+  border-color #007095
+  color white
+  transition background-color 300ms ease-out
 
 button:hover, button:focus, .button:hover, .button:focus
-  background-color: #007095;
+  background-color buttonblue-hover
 button:hover, button:focus, .button:hover, .button:focus
-  color: white;
+  color white
 // button.secondary, .button.secondary {
 //   background-color: #e7e7e7;
 //   border-color: #b9b9b9;
@@ -756,7 +688,7 @@ button:hover, button:focus, .button:hover, .button:focus
 //   text-align: right;
 //   padding-right: 0.75rem; }
 button.radius, .button.radius 
-  border-radius: 3px;
+  border-radius 3px
 // button.round, .button.round {
 //   border-radius: 1000px; }
 // button.disabled, button[disabled], .button.disabled, .button[disabled] {
@@ -831,20 +763,16 @@ input[type="tel"],
 input[type="time"],
 input[type="url"],
 textarea
-  -webkit-appearance: none;
-  background-color: white;
-  font-family: font;
-  border: 1px solid #cccccc;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
-  color: rgba(0, 0, 0, 0.75);
-  display: block;
-  font-size: 0.875rem;
-  // margin: 0 0 1rem 0;
-  // padding: 0.5rem;
-  // height: 2.3125rem;
-  // width: 100%;
-  box-sizing: border-box;
-  transition: box-shadow 0.45s, border-color 0.45s ease-in-out;
+  -webkit-appearance none
+  background-color white
+  font-family font
+  border 1px solid #cccccc
+  box-shadow inset 0 1px 2px rgba(0, 0, 0, 0.1)
+  color rgba(0, 0, 0, 0.75)
+  display block
+  font-size 0.875rem
+  box-sizing border-box;
+  transition box-shadow 0.45s, border-color 0.45s ease-in-out
   input[type="text"]:focus,
   input[type="password"]:focus,
   input[type="date"]:focus,
@@ -859,8 +787,8 @@ textarea
   input[type="time"]:focus,
   input[type="url"]:focus,
   textarea:focus 
-    box-shadow: 0 0 5px #999999;
-    border-color: #999999;
+    box-shadow 0 0 5px #999999
+    border-color #999999
   input[type="text"]:focus,
   input[type="password"]:focus,
   input[type="date"]:focus,
@@ -875,9 +803,9 @@ textarea
   input[type="time"]:focus,
   input[type="url"]:focus,
   textarea:focus
-    background: #fafafa;
-    border-color: #999999;
-    outline: none;
+    background #fafafa
+    border-color #999999
+    outline none
   input[type="text"][disabled], fieldset[disabled] input[type="text"],
   input[type="password"][disabled], fieldset[disabled]
   input[type="password"],
@@ -905,7 +833,7 @@ textarea
   input[type="url"],
   textarea[disabled], fieldset[disabled]
   textarea 
-    background-color: #dddddd;
+    background-color #dddddd
   input[type="text"].radius,
   input[type="password"].radius,
   input[type="date"].radius,
@@ -920,24 +848,18 @@ textarea
   input[type="time"].radius,
   input[type="url"].radius,
   textarea.radius
-    border-radius: 3px;
+    border-radius 3px
 
 input[type="submit"]
-  -webkit-appearance: none;
+  -webkit-appearance none
 
 /* Respect enforced amount of rows for textarea */
 textarea[rows]
-  height: auto;
-
-
-.cell40
-  // flex: 0 0 auto !important;
-  width 40% 
+  height auto
 
 .grid {
   display: flex;
   flex-direction column
-  // flex-flow column wrap
 }
 
 /* Small to medium screens */
@@ -1049,8 +971,6 @@ textarea[rows]
 @media (min-width: large-screen)
   .media
     flex-direction row
-  .column  
-    padding 0 12rem
 
 
 .media-figure {
@@ -1067,9 +987,12 @@ textarea[rows]
 .column  
     padding 0 1rem
 
-@media (min-width: large-screen)
+@media (min-width: medium-screen)
   .column  
     padding 0 12rem
 
 .nav-anchor
   visibility hidden
+
+#page-num
+  width 3rem
