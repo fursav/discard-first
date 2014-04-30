@@ -5,7 +5,7 @@
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   $(function() {
-    var nav;
+    var alert, nav;
     nav = responsiveNav(".nav-collapse", {
       animate: true,
       transition: 284,
@@ -16,6 +16,10 @@
     });
     window.vm = new ViewModel();
     ko.applyBindings(window.vm);
+    if (!(Modernizr.flexbox || Modernizr.flexboxlegacy)) {
+      alert = "<h4 class='alert-title'>Unsupported Browser</h4> You are using an unsupported browser!" + " Majority of the site features will be broken. It is recommended that you upgrade your browser." + "<p><strong>Supported Browsers:</strong></p>Opera 12.1+, Firefox 22+, Chrome 21+, Safari 6.1+.";
+      vex.dialog.alert(alert);
+    }
   });
 
   BoardGameResult = (function() {
