@@ -16,7 +16,7 @@
     });
     window.vm = new ViewModel();
     ko.applyBindings(window.vm);
-    if (!(Modernizr.flexbox || Modernizr.flexboxlegacy)) {
+    if (!Modernizr.flexbox) {
       alert = "<h4 class='alert-title'>Unsupported Browser</h4> You are using an unsupported browser!" + " Majority of the site features will be broken. It is recommended that you upgrade your browser." + "<p><strong>Supported Browsers:</strong></p>Opera 12.1+, Firefox 22+, Chrome 21+, Safari 6.1+.";
       vex.dialog.alert(alert);
     }
