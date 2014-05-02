@@ -105,11 +105,32 @@
       }
     };
 
+    BoardGameResult.prototype.getNumPlayers = function() {
+      if (this.maxplayers.value === this.minplayers.value) {
+        return this.maxplayers.value;
+      } else {
+        return "" + this.minplayers.value + " - " + this.maxplayers.value;
+      }
+    };
+
     BoardGameResult.prototype.getName = function() {
       if ($.type(this.name) === "array") {
         return this.name[0].value;
       }
       return this.name.value;
+    };
+
+    BoardGameResult.prototype.getShortName = function() {
+      var list;
+      list = this.getName().split('(')[0].split('–')[0].split(' ');
+      console.log(list);
+      if (list.length > 3) {
+        list = list.slice(0, 3);
+        list.push('...');
+        console.log(list);
+        return list.join(' ');
+      }
+      return list.join(' ');
     };
 
     BoardGameResult.prototype.getShortDescription = function() {
@@ -120,11 +141,8 @@
       var contenthid, htmlDescription, i, paragraphs, regex;
       paragraphs = 1;
       contenthid = false;
-      console.log(this.description);
-      regex = new RegExp("&amp;&amp;#35;", "g");
-      htmlDescription = this.description.replace(regex, "&#");
-      console.log(htmlDescription);
-      regex = new RegExp("&#10;&#10;&#10;    ", "g");
+      htmlDescription = this.description;
+      regex = new RegExp("&#10;&#10;    ", "g");
       htmlDescription = htmlDescription.replace(regex, "<ul><li>");
       regex = new RegExp("&#10;&#10;&#10;", "g");
       htmlDescription = htmlDescription.replace(regex, "</li></ul>");
@@ -133,8 +151,6 @@
       htmlDescription = "<p>" + htmlDescription;
       regex = new RegExp("&#10;&#10;", "g");
       htmlDescription = htmlDescription.replace(regex, "</p><p>");
-      regex = new RegExp("&amp;quot;", "g");
-      htmlDescription = htmlDescription.replace(regex, '"');
       htmlDescription += "</p>";
       i = 0;
       while (i < htmlDescription.length) {
@@ -243,7 +259,6 @@
 
     BoardGame.prototype.pickFeaturedComment = function() {
       this.featuredComment(this.goodComments[Math.floor(Math.random() * this.goodComments.length)]);
-      return false;
     };
 
     BoardGame.prototype.getRankLink = function(name, id, value) {

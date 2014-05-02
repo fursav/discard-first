@@ -127,10 +127,26 @@ class BoardGameResult
       return link["value"]  if link["type"] is "boardgamedesigner"
     return
 
+  getNumPlayers: ->
+    if @maxplayers.value is @minplayers.value
+      return @maxplayers.value
+    else
+      return "#{@minplayers.value} - #{@maxplayers.value}"
+
   # Returns the primary name of a boardgame
   getName: ->
     return @name[0].value  if $.type(@name) is "array"
     @name.value
+
+  getShortName: ->
+    list = @getName().split('(')[0].split('–')[0].split(' ')
+    console.log list
+    if list.length > 3
+      list = list[0..2]
+      list.push('...')
+      console.log list
+      return list.join(' ')
+    return list.join(' ')
 
   # Returns shorted description of a boardgame
   getShortDescription: ->
@@ -140,14 +156,12 @@ class BoardGameResult
   getHTMLDescription: ->
     paragraphs = 1
     contenthid = false
-    # htmlDescription = $('<div />').html(@description).text();
-    console.log(@description)
-    regex = new RegExp("&amp;&amp;#35;","g")
+    # console.log(@description)
     # [String]
-    htmlDescription = @description.replace(regex, "&#")
-    console.log(htmlDescription)
+    htmlDescription = @description
+    # console.log htmlDescription
 
-    regex = new RegExp("&#10;&#10;&#10;    ", "g")
+    regex = new RegExp("&#10;&#10;    ", "g")
     htmlDescription = htmlDescription.replace(regex, "<ul><li>")
 
 
@@ -157,28 +171,13 @@ class BoardGameResult
     regex = new RegExp("&#10;    ", "g")
     htmlDescription = htmlDescription.replace(regex, "</li><li>")
 
-    # regex = new RegExp("&amp;amp;", "g")
-    # htmlDescription = htmlDescription.replace(regex, " &")
-
-    # htmlDescription = @description
-
     htmlDescription = "<p>" + htmlDescription
  
     regex = new RegExp("&#10;&#10;", "g")
-    # regex = new RegExp("&amp;&amp;#35;10;&amp;&amp;#35;10;", "g")
     htmlDescription = htmlDescription.replace(regex, "</p><p>")
-    # regex = new RegExp("&amp;ndash;", "g")
-    # htmlDescription = htmlDescription.replace(regex," –")
-    # regex = new RegExp("&amp;&#35;40;","g")
-    # htmlDescription = htmlDescription.replace(regex, "(")
-    # regex = new RegExp("&amp;&#35;41;","g")
-    # htmlDescription = htmlDescription.replace(regex, ")")
-    regex = new RegExp("&amp;quot;","g")
-    htmlDescription = htmlDescription.replace(regex, '"')
-    # regex = new RegExp("&amp;&amp;#35;10;", "g")
-    # htmlDescription = htmlDescription.replace(regex, "")
 
     htmlDescription += "</p>"
+    # console.log htmlDescription
     i = 0
 
     while i < htmlDescription.length
@@ -260,7 +259,7 @@ class BoardGame extends BoardGameResult
 
   pickFeaturedComment: ->
       @featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
-      return false
+      return
 
   # Returns link to bgg rank page for given rank
   # @param name [String] type of rank/game

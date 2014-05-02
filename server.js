@@ -115,16 +115,32 @@ var SampleApp = function() {
         self.routes['/bg/:id'] = function(req,res) {
             // console.log("here")
             id = req.params.id
-            request("http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1&comments=1&pagesize=100", function(err,response,body){
-                res.send(parser.toJson(body))
+            options = {uri:"http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1&comments=1"}
+            request(options, function(err,response,body){
+                var options = {
+                    object: false,
+                    reversible: false,
+                    coerce: true,
+                    sanitize: false,
+                    trim: false,
+                    arrayNotation: false
+                };
+                res.send(parser.toJson(body,options))
             })
         };
-
         self.routes['/bgr/:id'] = function(req,res) {
             // console.log("bgr")
             id = req.params.id
             request("http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1", function(err,response,body){
-                res.send(parser.toJson(body))
+                var options = {
+                    object: false,
+                    reversible: false,
+                    coerce: true,
+                    sanitize: false,
+                    trim: false,
+                    arrayNotation: false
+                };
+                res.send(parser.toJson(body,options))
             })
         };
 

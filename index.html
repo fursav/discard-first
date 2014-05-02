@@ -111,7 +111,7 @@
       <div data-bind="visible: currentPage() === 'gameOverview' && !loading()">
         <ul id="nav" class="sub-nav">
           <li>
-              <h4 data-bind="with: selectedGame"><span data-bind="text: getName()"></span></h4>
+              <h4 data-bind="with: selectedGame"><span data-bind="text: getShortName()"></span></h4>
           </li>
           <li class="active" data-magellan-arrival="info">
             <a href="#info"><i class="icon ion-information-circled"></i> Quick Info</a>
@@ -130,7 +130,7 @@
         <div data-bind="with: selectedGame">
           <section id="info" class="section section-white">
           <div class="media column" >
-            <div class="media-figure text-center" >
+            <div class="media-figure cell40 text-center" >
               <a data-bind="attr:{href:image}" class="game-image" title="getName()">
               <img class="radius" style="max-height:20em;max-width:100%" data-bind="attr:{src:$(window).width() > 600 ? image : thumbnail}">
               </a>
@@ -152,7 +152,7 @@
                     Num of players
                   </dt>
                   <dd>
-                    <span data-bind="text: minplayers.value"></span> - <span data-bind="text: maxplayers.value"></span>
+                    <span data-bind="text: getNumPlayers()"</span>
                   </dd>
                 </li>
                 <li>
@@ -302,6 +302,7 @@
     <script src="js/vendor/jquery.js"></script>
     <script src="js/vex.combined.min.js"></script>
     <script>vex.defaultOptions.className = 'vex-theme-default';</script>
+    <script src="js/humanize.min.js"></script>
     <script src="js/responsive-nav.min.js"></script>
     <script src="js/jquery.nav.js"></script>
     <script src="js/sammy-latest.min.js"></script>

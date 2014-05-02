@@ -618,7 +618,7 @@ footer ul li:hover {
   }
   .sub-nav li {
     display: block;
-    width: 100%;
+    width: auto;
   }
   .sub-nav > li:first-child {
     display: block;
@@ -1980,6 +1980,9 @@ textarea[rows] {
 }
 .cell20 {
   width: 20%;
+}
+.cell40 {
+  width: 40%;
 }
 .column {
   padding: 0 1rem;
