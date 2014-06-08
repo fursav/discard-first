@@ -255,9 +255,10 @@ var SampleApp = function() {
         };
 
         self.routes['/search/:str'] = function(req,res) {
-            // console.log("search")
+            console.log("search")
             str = req.params.str
             request("http://www.boardgamegeek.com/xmlapi/search?search="+str, function(err,response,body){
+                console.log("response")
                 res.send(parser.toJson(body))
             })
         };
