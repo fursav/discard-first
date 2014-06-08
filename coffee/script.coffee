@@ -68,7 +68,6 @@ $ ->
   $("#nav").onePageNav({currentClass:"active"})
   window.vm = new ViewModel()
   ko.applyBindings window.vm
-  console.log Modernizr
   if not ((Modernizr.flexbox or Modernizr.flexboxlegacy) and Modernizr.mq('only all'))
     alert = "<h4 class='alert-title'>Unsupported Browser</h4> You are using an unsupported browser!" +
       " Majority of the site features will be broken. It is recommended that you upgrade your browser." +
@@ -140,11 +139,9 @@ class BoardGameResult
 
   getShortName: ->
     list = @getName().split('(')[0].split('–')[0].split(' ')
-    console.log list
     if list.length > 3
       list = list[0..2]
       list.push('...')
-      console.log list
       return list.join(' ')
     return list.join(' ')
 
@@ -193,7 +190,7 @@ class BoardGameResult
           break
       i++
     # Add a button to show the hidden part of the description
-    htmlDescription += "</div><button class='link link-wide' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down'></i></button>"  if contenthid
+    htmlDescription += "</div><button class='link link-wide' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down icon-large'></i></button>"  if contenthid
     regex = new RegExp(@getName(), "g")
     htmlDescription = htmlDescription.replace(regex, "<b>" + @getName() + "</b>")
     return htmlDescription
@@ -203,9 +200,18 @@ class BoardGame extends BoardGameResult
   constructor: (data) ->
     super(data)
     @comments = {}
+    #[Array]
     @commentsko = ko.observableArray([])
     @commentsData = {}
-    console.log data
+    #[Array]
+    @videos = ko.observableArray([])
+    #[Array]
+    @forums = ko.observableArray([])
+    @selectedForum = ko.observable(null)
+    @selectedThread = ko.observable()
+
+    #comments
+
     if data.comments?
       @comments = data.comments
       @commentsData = 
@@ -216,7 +222,6 @@ class BoardGame extends BoardGameResult
           @commentsData.page
         write: (value) =>
           vtw = parseInt(value)
-          console.log vtw
           if 0 < vtw < @getCommentsTotalPages()+1
             @commentsData.page = vtw
             $ =>
@@ -231,25 +236,24 @@ class BoardGame extends BoardGameResult
     @goodComments ?= (comment for comment in @commentsko() when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
     @featuredComment = ko.observable()
     @pickFeaturedComment()
-    # @commentsPage = ko.observable(@commentsData.page)
-    # @commentsPage = ko.computed({
-    #   read: =>
-    #     @commentsData.page
-    #   write: (value) =>
-    #     console.log value
-    #     #window.vm.getGameComments(@id, value)
-    #     locaton.hash = "#game/#{@id}/comments/page/#{value}"
-    #     return
-    #   })
+
+    #videos
+
+    if data.videos? and data.videos.total > 0
+      for vid in data.videos.video
+        vid.link = "http://www.youtube.com/embed/" + vid.link.split("?v=")[1]
+        @videos.push(vid)
+      # @videos(data.videos.video)
+
+    if data.forums?
+      @forums(data.forums)
 
   processComments: =>
     data = @comments
     @commentsko(data.comment)
     @commentsPage(data.page)
-    console.log @commentsPage()
   changePageBy: (num) =>
     @commentsPage(@commentsData.page + parseInt(num))
-    console.log @commentsData
 
   # getComments: ->
   #   console.log "here"
@@ -268,6 +272,47 @@ class BoardGame extends BoardGameResult
   getRankLink: (name, id, value) ->
     return "http://boardgamegeek.com/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"  if name is "boardgame"
     return "http://boardgamegeek.com/#{name}/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"
+
+  selectForum: (forum) =>
+    @selectedForum forum
+    return
+
+  deselectForum: =>
+    @selectedForum null
+    return
+  selectThread: (thread) =>
+    $.getJSON "thread/#{thread.id}", (data) =>
+      @selectedThread(data)
+      # window.onload(->
+      #   )
+      $(document).ready(->
+        $('.thread-title').waypoint('sticky')
+        $('.thread-title').css("width", $('.thread-title').outerWidth())
+        $('html, body').animate({
+          scrollTop: $('#forums').offset().top
+        }, 300)
+        return
+        )
+      return
+    return
+
+  getThreadPost: (articles) =>
+    return if articles[0]? then articles[0].body else articles.body
+
+  deselectThread: =>
+    @selectedThread null
+    $('html, body').animate({
+      scrollTop: $('#forums').offset().top
+    }, 300)
+    return
+
+  getForumVisible: =>
+    # console.log @selectForum()
+    # console.log @selectThread()
+    if @selectedForum() and not @selectedThread()
+      return true
+    return false
+
 
   
 class ViewModel
@@ -330,7 +375,6 @@ class ViewModel
 
       @get "#topgames/:gameType", ->
         self.topGamesType(@params.gameType)
-        console.log self.topGamesType()
         self.selectedGame null
         self.searchedGames.removeAll()
         self.topGames.removeAll()
@@ -339,7 +383,6 @@ class ViewModel
         return
 
       @get "", ->
-        console.log "as"
         this.title = "Hello"
         self.selectedGame null
         self.searchedGames.removeAll()
@@ -369,13 +412,79 @@ class ViewModel
     
   # @param object [Object] boardgame object
   goToGame: (object) =>
-    console.log object
     #@currentPage ""
     location.hash = "game/" + object.id
     $("html, body").animate
           scrollTop: 0
         , "slow"
     return
+
+  sortColumn: (object,event) =>
+    # console.log event
+    th = $(event.target)
+    $table = th.closest("table")
+    thIndex = th.index()
+    trs = $table.children("tbody").children("tr")
+    column = []
+    # if current sort is descending
+    # then change it to ascending
+    # descending -1 is the default sort
+    sortDir = if th.hasClass("sorting-desc") then 1 else -1
+    type = th.data("sort")
+    trs.each((index,tr) ->
+      $e = $(tr).children().eq(thIndex)
+      sort_val = $e.data("sort-value")
+      order_by = if typeof(sort_val) is not "undefined" then sort_val else $e.text()
+      column.push([order_by, tr])
+      return
+    )
+    # Sort by the data-order-by value
+    column.sort((a, b) =>
+      switch type
+        when "int"
+          sortDir * (parseInt(a[0], 10) - parseInt(b[0], 10))
+        when "date"
+          date1 = if a[0] is "0" then 0 else @getIntFromDate(a[0])
+          date2 = if b[0] is "0" then 0 else @getIntFromDate(b[0])
+          sortDir * (date1 - date2)
+        else
+          if a[0] < b[0]
+            return sortDir * -1
+          if a[0] > b[0]
+            return sortDir
+          return 0
+      )
+    trs = $.map(column, (kv) ->
+      kv[1]
+      )
+    $table.children("tbody").append(trs)
+    th.siblings().removeClass("sorting-desc sorting-asc")
+    th.removeClass("sorting-desc sorting-asc")
+    if sortDir is 1
+      th.addClass("sorting-asc")
+    else
+      th.addClass('sorting-desc')
+    return
+
+  getIntFromDate: (date) =>
+    parseInt(date.slice(-4) + @getNumFromMonth(date.slice(8,-5)) + date.slice(5,7),10)
+
+  getNumFromMonth: (month) ->
+    switch month.toLowerCase()
+      when "jan" then "00"
+      when "feb" then "01"
+      when "mar" then "02"
+      when "apr" then "03"
+      when "may" then "04"
+      when "jun" then "05"
+      when "jul" then "06"
+      when "aug" then "07"
+      when "sep" then "08"
+      when "oct" then "09"
+      when "nov" then "10"
+      when "dec" then "11"
+      
+    
 
   sortList: (list,type) ->
     list.sort (a, b) =>
@@ -415,7 +524,6 @@ class ViewModel
   # @param vm [ViewModel]
   # @param event [jQueryEvent]
   handleSort: (type,vm,event) ->
-    console.log [type,vm,event]
     #default to descending sort
     #unless already sorted by the same type
     @sortDirection = if type is @currentSort then -(@sortDirection) else -1
@@ -430,12 +538,12 @@ class ViewModel
   # @param type [String] (name,brating)
   # @param event [jQueryEvent]
   updateTableHeaders: (type,event) =>
-    $("#results-table thead tr th").removeClass "headerSortUp"
-    $("#results-table thead tr th").removeClass "headerSortDown"
+    $("#results-table thead tr th").removeClass "sorting-asc"
+    $("#results-table thead tr th").removeClass "sorting-desc"
     if @sortDirection is -1
-      $(event.toElement).addClass "headerSortDown"
+      $(event.toElement).addClass "sorting-desc"
     else
-      $(event.toElement).addClass "headerSortUp"
+      $(event.toElement).addClass "sorting-asc"
     return  
 
   # Searches games that match input string
@@ -454,7 +562,6 @@ class ViewModel
 
     # Check if results are already cached
     ids = @loadFromCache("searched_bgs_ids", str)
-    console.log "ids"
     if ids
       @loading null
       @getGamesDetails(ids, str)
@@ -473,7 +580,6 @@ class ViewModel
   # Returns the list of ids of the boardgames that match the search string
   # @param data [Object]
   extractIdsFromSearch: (data) ->
-    console.log data
     if data
       # [Array] or Object
       jdata = data.boardgames["boardgame"]
@@ -496,7 +602,6 @@ class ViewModel
   getTopGames: (type) ->
     @loading(true)
     $.getJSON 'json/top100.json', (data) =>
-      console.log data
       items = data[type]
       counter = 0
       
@@ -506,7 +611,6 @@ class ViewModel
           counter += 1
           @topGames.push(new BoardGameResult(bgdata))
           if counter is items.length
-            console.log @topGames()
             @loading null
         else
           url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1"
@@ -525,19 +629,14 @@ class ViewModel
     return
 
   getHotItems: ->
-    console.log "hot"
     @loading(true)
     data = @loadFromCache("hot", "games")
     if data
-      console.log data
       @hotGames((new BoardGameResult(result) for result in data))
       @loading(null)
       return
     url = "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame"
-    console.log "hot"
     $.getJSON 'data',url, (data) =>
-      console.log "got it"
-      console.log data
       if data
         #console.log (new BoardGameResult(result) for result in data.query.results.items.item)
         @hotGames((new BoardGameResult(result) for result in data.items.item))
@@ -584,7 +683,6 @@ class ViewModel
 
     data = @loadFromCache("searched_bgs", str)
     if data
-      console.log "using cached search games"
       @loading null
       @searchedGames((new BoardGameResult(result) for result in data))
       @sortByBRating(-1)

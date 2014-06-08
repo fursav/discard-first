@@ -5,12 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Discover Board Games</title>
     <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/hans-kendrick" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/gen-light" rel="stylesheet" type="text/css"/> 
+    <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/sorts-mill-goudy" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" href="//brick.a.ssl.fastly.net/PT+Sans:400,400i,700,700i/Libre+Baskerville:400,400i,700,700i/Lato:300,400,400i,700,700i/Raleway:300,400,500,400i,700,700i">
     <!-- <link rel="stylesheet" href="css/normalize.css" />  -->
     <link rel="stylesheet" href="css/ionicons.min.css" />
     <link rel="stylesheet" href="css/responsive-nav.css" />
     <link rel="stylesheet" href="css/vex.css" />
     <link rel="stylesheet" href="css/vex-theme-default.css" />
+    <link rel="stylesheet" href="css/sortable-theme-minimal.css" />
     <link rel="stylesheet" href="css/style.css" />
     <script src="js/vendor/modernizr.js"></script>
   </head>
@@ -86,12 +88,12 @@
       
       <!-- Search results -->
       <div id="results" data-bind="if: currentPage() === 'searchGames' ">
-        <table id="results-table" data-bind="if: searchedGames().length>0" class="tablesorter">
+        <table id="results-table" data-bind="if: searchedGames().length>0">
           <thead>
             <tr>
               <th width="200"></th>
-              <th data-bind="click: function(d,e) {handleSort('name',d,e)}">Title</th>
-              <th data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
+              <th class="clickable" data-bind="click: function(d,e) {handleSort('name',d,e)}">Title</th>
+              <th class="clickable" data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>
             </tr>
           </thead>
           <tbody data-bind="foreach: searchedGames">
@@ -113,25 +115,31 @@
           <li>
               <h4 data-bind="with: selectedGame"><span data-bind="text: getShortName()"></span></h4>
           </li>
-          <li class="active" data-magellan-arrival="info">
+          <li class="active">
             <a href="#info"><i class="icon ion-information-circled"></i> Quick Info</a>
           </li> 
-          <li data-magellan-arrival="description">
+          <li>
             <a href="#description"><i class="icon ion-clipboard"></i> Description</a>
           </li> 
-          <li data-magellan-arrival="ranks">
+          <li>
             <a href="#ranks"><i class="icon ion-arrow-graph-up-right"></i> Ranks</a>
           </li> 
-          <li data-magellan-arrival="comments">
+          <li>
             <a href="#comments"><i class="icon ion-chatbox-working"></i> Comments</a>
           </li> 
+          <!-- <li>
+            <a href="#videos"><i class="icon ion-social-youtube"></i> Videos</a>
+          </li>  -->
+          <li>
+            <a href="#forums"><i class="icon ion-chatboxes"></i> Forums</a>
+          </li>
         </ul> 
 
         <div data-bind="with: selectedGame">
           <section id="info" class="section section-white">
           <div class="media column" >
             <div class="media-figure cell40 text-center" >
-              <a data-bind="attr:{href:image}" class="game-image" title="getName()">
+              <a data-bind="attr:{href:image, title:getName()}" class="game-image">
               <img class="radius" style="max-height:20em;max-width:100%" data-bind="attr:{src:$(window).width() > 600 ? image : thumbnail}">
               </a>
             </div>
@@ -189,11 +197,11 @@
           <section id="description" class="section section-gray">  
           <div class="media column">  
             <div class="media-figure cell20 text-center">
-              <h4>Description</h4>
+              <h4 class="heavy-font">Description</h4>
               <i class="icon ion-clipboard icon-huge"></i>
             </div>
             <div class="media-body">
-              <p data-bind="html: getHTMLDescription()"></p>
+              <p class="textblock" data-bind="html: getHTMLDescription()"></p>
             </div>
           </div>
           </section>
@@ -201,7 +209,7 @@
           <section id="ranks" class="section section-white">  
           <div class="media column">
             <div class="media-figure cell20 text-center">
-              <h4>Ranks and Ratings</h4>
+              <h4 class="heavy-font">Ranks and Ratings</h4>
               <i class="icon ion-arrow-graph-up-right icon-huge"></i> 
             </div>
             <div class="media-body">
@@ -232,18 +240,97 @@
           <section id="comments" class="section section-gray"> 
           <div class="media column" data-bind="with: featuredComment">
             <div class="media-figure cell20 text-center">
-              <h4>Comments</h4>
+              <h4 class="heavy-font">Comments</h4>
               <i class="icon ion-chatbox-working icon-huge"></i>
             </div>
             <div class="media-body" >
               <blockquote> 
-              <p data-bind="html: value"></p>
+              <p class="commentblock" data-bind="html: value"></p>
               <cite data-bind="html: username"></cite>
               </blockquote>
               <p>Rating: <span data-bind="text: rating" ></span>
-                <button class="link" data-bind="click: $parent.pickFeaturedComment()" ><i class="icon ion-refresh"></i></button>
+                <button class="link" data-bind="click: $parent.pickFeaturedComment()" ><i class="icon ion-refresh icon-large"></i></button>
               </p>
               <button class="link link-wide" data-bind="click: $root.goToGameComments">View All</a>
+            </div>
+          </div>
+          </section>
+          <!-- Videos -->
+          <!-- <section id="videos" class="section section-white">
+            <div class="media column" data-bind="with: videos">
+              <div class="media-figure cell20 text-center">
+                <h4>Videos</h4>
+                <i class="icon ion-social-youtube icon-huge"></i>
+              </div>
+              <div class="media-body" >
+                <div>
+                  <iframe width="420" height="270" data-bind="attr:{src:$data[0].link}" frameborder="0" allowfullscreen></iframe>
+                </div>
+              </div>
+            </div>
+          </section> -->
+          <!-- Forums -->
+          <section id="forums" class="section section-gray"> 
+          <div class="media column" data-bind="if: forums">
+            <div class="media-figure cell20 text-center">
+              <h4 class="heavy-font">Forums</h4>
+              <i class="icon ion-chatboxes icon-huge"></i>
+            </div>
+            <div class="media-body" >
+              <div class="forum-nav" data-bind="if:selectedForum() == null">
+
+                <table class="thread-table">
+                  <thead>
+                    <tr>
+                      <th class="clickable" data-bind="click: $root.sortColumn">Title</th>
+                      <th class="clickable" data-sort="int" data-bind="click: $root.sortColumn">Num Threads</th>
+                      <th class="clickable" data-sort="date" data-bind="click: $root.sortColumn">Last Post Date</th>
+                    </tr>
+                  </thead>
+                  <tbody data-bind="foreach: forums">
+                    <tr>
+                      <td><span class="link" data-bind="click: $parent.selectForum, text: title"></span></td>
+                      <td><span data-bind="text: numthreads"></span></td>
+                      <td><span data-bind="text: String(lastpostdate).slice(0,16)"></span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div data-bind="visible:getForumVisible(),with: selectedForum">
+                <div class="forum-title text-center" style="padding:5px">
+                  <span class="link" data-bind="click: $parent.deselectForum"><icon class="icon ion-chevron-left icon-large"></icon></span>
+                  <h3 class="inline" data-bind="text: title"></h3>                  
+                </div>
+                <!-- <hr> -->
+                <div  class="forum-nav">
+                  <table id="thread-table" class="thread-table" data-bind="if: threads">
+                    <thead>
+                      <tr>
+                        <th class="clickable" data-bind="click: $root.sortColumn">Subject</th>
+                        <th class="clickable" data-sort="int" data-bind="click: $root.sortColumn">Num of Posts</th>
+                        <th class="clickable" data-sort="date" data-bind="click: $root.sortColumn">Last Post Date</th>
+                        <th class="clickable" data-bind="click: $root.sortColumn">Author</th>
+                      </tr>
+                    </thead>
+                    <tbody data-bind="foreach: threads">
+                      <tr>
+                        <td><span class="link" data-bind="text: subject, click: $parents[1].selectThread"></span></td>
+                        <td><span data-bind="text: numarticles"></span></td>
+                        <td><span data-bind="text: lastpostdate.slice(0,16)"></span></td>
+                        <td><span data-bind="text: author"></span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>            
+              </div>
+
+              <div data-bind="with: selectedThread">
+                <div class="thread-title text-center" style="padding:5px">
+                  <span class="link" data-bind="click: $parent.deselectThread"><icon class="icon ion-chevron-left icon-large"></icon></span>
+                  <h3 class="inline" data-bind="text: subject"></h3>                  
+                </div>
+                <p data-bind="html: $parent.getThreadPost(articles)"></p>
+              </div> 
             </div>
           </div>
           </section>
@@ -291,10 +378,10 @@
 
     <footer>
       <ul>
-        <li><i class="icon ion-log-out icon-large"></i>
-            <a href="http://boardgamegeek.com/">Board Game Geek</a></li>
-        <li><i class="icon ion-social-github icon-large"></i>
-            <a href="https://github.com/fursav/elated-lion">Github</a></li>
+        <li>
+            <a href="http://boardgamegeek.com/"><i class="icon ion-log-out icon-large"></i> Board Game Geek</a></li>
+        <li>
+            <a href="https://github.com/fursav/elated-lion"><i class="icon ion-social-github icon-large"></i> Github</a></li>
         <li></li>
      </ul>
     </footer>
@@ -305,6 +392,10 @@
     <script src="js/humanize.min.js"></script>
     <script src="js/responsive-nav.min.js"></script>
     <script src="js/jquery.nav.js"></script>
+    <script src="js/waypoints.min.js"></script>
+    <script src="js/waypoints-sticky.min.js"></script>
+    <script src="js/sortable.min.js"></script>
+    <script src="js/stupidtable.min.js"></script>
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
     <script src="js/script.js"></script>

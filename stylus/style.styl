@@ -1,6 +1,8 @@
 //fonts
-font = 17px "Gen Light"
-title-font = "Hans Kendrick"
+font = "PT Sans"
+serif-font = "Libre Baskerville"
+fontsize = 18px
+title-font = "Raleway"
 color-blue = #0B5DA1
 darkgray = #222222
 linkblue = #2ba6cb
@@ -14,15 +16,19 @@ footerbg = #333333
 medium-screen = 40rem
 large-screen = 60rem
 
+html
+  font-family font, sans-serif
+  font-size fontsize
+  font-weight normal
+  font-style normal
+  line-height 20px
+
+
 body
   background white
   color darkgray
   padding 0
   margin 0
-  font-family font, sans-serif
-  font-weight normal
-  font-style normal
-  line-height 1
   position relative
   cursor default
 
@@ -60,14 +66,30 @@ a:hover, a:focus
 a img
   border none
 
+
 /* Default paragraph styles */
 p
   font-family inherit
   font-weight normal
   font-size 1rem
   line-height 1.6
-  margin-bottom 1.25rem
+  margin-bottom 1.1rem
   text-rendering optimizeLegibility 
+
+p.textblock
+  font-family font
+  font-size 1.1rem
+  line-height 1.6
+  // text-indent 2.5rem
+  p,ul
+    font-family font
+    font-size 1.1rem
+    line-height 1.6
+
+p.commentblock
+  font-family serif-font
+  font-size 1.15rem
+  line-height 1.8
 
 p.lead
   font-size 1.21875rem
@@ -84,31 +106,34 @@ h1, h2, h3, h4, h5, h6
   font-style: normal
   color: darkgray
   text-rendering: optimizeLegibility
-  margin-top: 0.2rem
-  margin-bottom: 0.5rem
+  margin-top: 0.1rem
+  margin-bottom: 0.3rem
   line-height: 1.4
 h1 small, h2 small, h3 small, h4 small, h5 small, h6 small
   font-size 60%
   color lighten(darkgray,30%)
   line-height 0
 
+h1.inline, h2.inline, h3.inline, h4.inline, h5.inline, h6.inline
+    display inline
+
 h1
-  font-size 2.125rem
+  font-size (16/fontsize)*2.125 rem
 
 h2
-  font-size 1.6875rem
+  font-size (16/fontsize)*1.6875 rem
 
 h3
-  font-size 1.375rem
+  font-size (16/fontsize)*1.375 rem
 
 h4
-  font-size 1.125rem
+  font-size (16/fontsize)*1.125 rem
 
 h5
-  font-size 1.125rem
+  font-size (16/fontsize)*1.125 rem
 
 h6
-  font-size 1rem
+  font-size (16/fontsize)*1 rem
 
 
 @media only screen and (min-width: medium-screen) 
@@ -116,30 +141,30 @@ h6
     line-height 1.4
 
   h1 
-    font-size 2.75rem
+    font-size (16/fontsize)*2.75 rem
 
   h2 
-    font-size 2.3125rem
+    font-size (16/fontsize)*2.3125 rem
 
   h3 
-    font-size 1.6875rem
+    font-size (16/fontsize)*1.6875 rem
 
   h4 
-    font-size 1.4375rem
+    font-size (16/fontsize)*1.4375 rem
 
 
 .subheader 
   line-height: 1.4
   color: lighten(darkgray,30%)
   font-weight: normal
-  margin-top: 0.2rem
-  margin-bottom: 0.5rem
+  margin-top: 0.1rem
+  margin-bottom: 0.3rem
 
 hr
   border solid #dddddd
   border-width 1px 0 0
   clear both
-  margin 1.25rem 0 1.1875rem
+  margin 1rem 0 1rem
   height 0
 
 /* Helpful Typography Defaults */
@@ -164,8 +189,8 @@ code
 
 table
   background white
-  margin-top 1.25rem
-  margin-bottom 1.25rem
+  margin-top 1rem
+  margin-bottom 1rem
 table thead,
 table tfoot
   background whitesmoke
@@ -175,13 +200,13 @@ table tfoot tr th,
 table tfoot tr td
   padding 0.5rem 0.625rem 0.625rem
   font-family title-font
-  font-size 0.9rem
+  // font-size 0.9rem
   color darkgray
   text-align left
 table tr th,
 table tr td
   padding 0.5625rem 0.625rem
-  font-size 0.875rem
+  // font-size 0.875rem
   color darkgray
 table tr.even, table tr.alt, table tr:nth-of-type(even)
   background lighten(whitesmoke,20%)
@@ -222,13 +247,13 @@ ul.square li ul, ul.circle li ul, ul.disc li ul
   list-style inherit
 ul.square
   list-style-type:square
-  margin-left 1.1rem
+  margin-left 1rem
 ul.circle
   list-style-type: circle
-  margin-left 1.1rem
+  margin-left 1rem
 ul.disc
   list-style-type: disc
-  margin-left 1.1rem
+  margin-left 1rem
 ul.no-bullet
   list-style none
 
@@ -332,12 +357,12 @@ blockquote p
 
 .title
   font-family title-font
-  font-size 2rem
+  font-size (16/fontsize)*2 rem
   color white
 
 @media all and (max-width: large-screen)
   .title
-    font-size 1.5rem
+    font-size (16/fontsize)*1.5 rem
 
 i:focus, button:focus
   outline none
@@ -376,18 +401,18 @@ i:focus, button:focus
   
 
 .selected
-  background-color buttonblue-hover !important
-  box-shadow inset 0 0 1rem darken(buttonblue,50%)
+  background-color darken(buttonblue-hover,29%) !important
+  box-shadow inset 0 0 1rem darken(buttonblue,70%)
 
 //icons
 .icon-large
-    font-size 2rem
+    font-size (16/fontsize)*2 rem
 
 .icon-xlarge
-    font-size 3rem
+    font-size (16/fontsize)*3 rem
 
 .icon-huge
-    font-size 10rem
+    font-size (16/fontsize)*10 rem
 
 @media (max-width: medium-screen)
   .icon-huge
@@ -396,12 +421,12 @@ i:focus, button:focus
 .icon-inline
     vertical-align bottom
 
-.headerSortUp:after 
+.sorting-asc:after 
     font-family "Ionicons"
     content "\f10d"
     float right
 
-.headerSortDown:after 
+.sorting-desc:after 
     font-family "Ionicons"
     content "\f104"
     float right
@@ -440,11 +465,11 @@ img.radius
   display block
   width 100%
   text-align center
-hr 
-  border 0 
-  height .02em 
-  background-image -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) 
-  background-image -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0))
+// hr 
+//   border 0 
+//   height .02em 
+//   background-image -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) 
+//   background-image -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0))
 
 /* sections */
 
@@ -455,7 +480,7 @@ hr
 
 @media (min-width: medium-screen)
   .section
-    padding 4.5rem 0
+    padding 4rem 0
 
 .section-white    
   background-image linear-gradient(to bottom, #F5F3EB 0%, #FFFFFF 0%)
@@ -485,9 +510,9 @@ footer
       i
         vertical-align bottom
         color white
+    li:hover a, li:hover i
+      color linkblue-hover
     
-      &:hover
-        color linkblue-hover
 
 
 .categories
@@ -544,7 +569,8 @@ footer
 @media only screen and (min-width: medium-screen)
   .sub-nav
     background-color white
-    box-shadow 0px 0px 5px -3px black; 
+    box-shadow 0px 0px 5px 0px #ccc
+    border-radius 10px
     display block
     position fixed
     overflow hidden
@@ -582,7 +608,7 @@ footer
 
 .input-addon 
   display:flex
-  margin 0 .7em
+  margin 0 1rem
 
 .input-addon-field 
   flex 1
@@ -601,7 +627,7 @@ footer
 
 .input-addon-field, .input-addon-item {
   border 1px solid hsla(31, 15%, 50%, 0.25)
-  padding 0.5em 0.75em !important
+  padding 0.2rem 0.5rem !important
   margin 0
   &:first-child {
     border-radius 2px 0 0 2px
@@ -626,6 +652,7 @@ button, .button
   display inline-block
   padding .8rem
   font-size 1rem
+  font-family font
   background-color buttonblue
   border-color #007095
   color white
@@ -765,12 +792,12 @@ input[type="url"],
 textarea
   -webkit-appearance none
   background-color white
-  font-family font
   border 1px solid #cccccc
   box-shadow inset 0 1px 2px rgba(0, 0, 0, 0.1)
+  font-family font
   color rgba(0, 0, 0, 0.75)
   display block
-  font-size 0.875rem
+  font-size (16/fontsize)*0.875 rem
   box-sizing border-box;
   transition box-shadow 0.45s, border-color 0.45s ease-in-out
   input[type="text"]:focus,
@@ -870,10 +897,10 @@ textarea[rows]
 
 /* With gutters */
 .grid-gutters {
-  margin-left: -1em;
+  margin-left: -1rem;
 }
 .grid-gutters > .grid-cell {
-  padding-left: 1em;
+  padding-left: 1rem;
 }
 
 /* Alignment per row */
@@ -974,7 +1001,7 @@ textarea[rows]
 
 
 .media-figure {
-  margin-right: 3em;
+  margin-right: (16/fontsize)*3 rem;
 }
 
 .media-body {
@@ -992,13 +1019,17 @@ textarea[rows]
 
 @media (min-width: medium-screen)
   .column  
+    padding-left 12rem
+
+@media (min-width: large-screen)
+  .column  
     padding 0 12rem
 
 .nav-anchor
   visibility hidden
 
 #page-num
-  width 3rem
+  width (16/fontsize)*3 rem
 
 .alert-title
   text-align center
@@ -1006,3 +1037,77 @@ textarea[rows]
 
 .vex-content
   margin-top -5.5em !important
+
+.forum-nav
+  list-style-type none
+  max-height 25.7rem
+  overflow auto
+  li
+    margin-left 1em
+    margin-bottom 0.625em
+    font-weight normal
+    display block
+    color #999999
+  dt a,
+  dd a,
+  li a 
+    text-decoration none
+    outline none
+    color #999999
+    padding 0.1875rem 1rem
+  dt a:hover,
+  dd a:hover,
+  li a:hover
+    color #737373 
+  dt.active a,
+  dd.active a,
+  li.active a
+    border-radius 3px
+    display block
+    font-weight normal
+    background buttonblue
+    padding 0.1875rem 1rem
+    cursor default
+    color white
+  dt.active a:hover,
+  dd.active a:hover,
+  li.active a:hover 
+    background buttonblue
+    box-shadow inset 0 0 1rem darken(buttonblue,50%)
+
+.thread-table
+  background rgba(0,0,0,0)
+  width 100%
+  thead,
+  tfoot
+    background rgba(0,0,0,0)
+  tr.even, tr.alt, tr:nth-of-type(even)
+    background rgba(0,0,0,0)
+
+.heavy-font
+  font-weight 500
+
+.thread-title, .forum-title
+  position relative
+
+.thread-title .link, .forum-title .link
+  // position absolute
+  // left 1em
+  float left
+  padding 5px
+
+.thread-title.stuck
+  // box-shadow 0 3px 3px #eee
+  background rgb(85, 85, 85)
+  // color #fff
+
+.thread-title.stuck > *
+  color #fff
+
+.stuck 
+  position fixed !important
+  top 0px
+  box-shadow 0px 2px 4px rgba(0, 0, 0, 0.3)
+
+.clickable
+  cursor pointer
