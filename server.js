@@ -259,6 +259,8 @@ var SampleApp = function() {
             str = req.params.str
             request("http://www.boardgamegeek.com/xmlapi/search?search="+str, function(err,response,body){
                 console.log("response")
+                console.log(err)
+                console.log(response)
                 console.log(body)
                 res.send(parser.toJson(body))
             })
