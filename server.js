@@ -259,7 +259,9 @@ var SampleApp = function() {
             str = req.params.str
             request("http://www.boardgamegeek.com/xmlapi/search?search="+str, function(err,response,body){
                 console.log("response")
-                res.send(parser.toJson(body))
+                console.log(body)
+                // res.send(parser.toJson(body))
+                res.send({})
             })
         };
 
