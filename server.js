@@ -260,8 +260,7 @@ var SampleApp = function() {
             request("http://www.boardgamegeek.com/xmlapi/search?search="+str, function(err,response,body){
                 console.log("response")
                 console.log(body)
-                // res.send(parser.toJson(body))
-                res.send({})
+                res.send(parser.toJson(body))
             })
         };
 
