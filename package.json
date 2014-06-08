@@ -19,14 +19,13 @@
     "url": "https://github.com/openshift/origin-server"
   },
   "engines": {
-    "node": ">= 0.6.0",
+    "node": ">= 0.10.0",
     "npm": ">= 1.0.0"
   },
   "dependencies": {
     "express": "~3.4.4"
   },
   "devDependencies": {
-    "path": "~0.4",
     "grunt": "0.4.x",
     "stylus": "~0.43.1",
     "grunt-contrib-watch": "~0.6.1",
