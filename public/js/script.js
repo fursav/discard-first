@@ -283,6 +283,7 @@
     };
 
     BoardGame.prototype.selectForum = function(forum) {
+      console.log("select forum");
       this.selectedForum(forum);
     };
 
@@ -291,8 +292,10 @@
     };
 
     BoardGame.prototype.selectThread = function(thread) {
+      console.log("select thread");
       $.getJSON("thread/" + thread.id, (function(_this) {
         return function(data) {
+          console.log(data);
           _this.selectedThread(data);
           $(document).ready(function() {
             $('.thread-title').waypoint('sticky');

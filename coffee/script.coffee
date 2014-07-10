@@ -77,7 +77,7 @@ $ ->
 
 class BoardGameResult
   constructor: (data) ->
-    @id = data.id 
+    @id = data.id
     @image = data.image or ""
     # console.log(data.description)
     # console.log(unescape(data.description))
@@ -169,7 +169,7 @@ class BoardGameResult
     htmlDescription = htmlDescription.replace(regex, "</li><li>")
 
     htmlDescription = "<p>" + htmlDescription
- 
+
     regex = new RegExp("&#10;&#10;", "g")
     htmlDescription = htmlDescription.replace(regex, "</p><p>")
 
@@ -214,7 +214,7 @@ class BoardGame extends BoardGameResult
 
     if data.comments?
       @comments = data.comments
-      @commentsData = 
+      @commentsData =
         page:data.comments.page
         totalitems:data.comments.totalitems
       @commentsPage = ko.computed({
@@ -274,6 +274,7 @@ class BoardGame extends BoardGameResult
     return "http://boardgamegeek.com/#{name}/browse/boardgame?sort=rank&rankobjecttype=subtype&rankobjectid=#{id}&rank=#{value}##{value}"
 
   selectForum: (forum) =>
+    console.log "select forum"
     @selectedForum forum
     return
 
@@ -281,7 +282,9 @@ class BoardGame extends BoardGameResult
     @selectedForum null
     return
   selectThread: (thread) =>
+    console.log "select thread"
     $.getJSON "thread/#{thread.id}", (data) =>
+      console.log data
       @selectedThread(data)
       # window.onload(->
       #   )
@@ -314,11 +317,11 @@ class BoardGame extends BoardGameResult
     return false
 
 
-  
+
 class ViewModel
   constructor: ->
     self = this
-    
+
     # Indicates that information is currently loading
     @loading = ko.observable(null)
     # 1 is ascending, -1 is descending
@@ -345,7 +348,7 @@ class ViewModel
     @searchedGames = ko.observableArray([])
     # [Array]
     @hotGames = ko.observableArray([])
-    
+
     @topGamesType = ko.observable()
     @topGames = ko.observableArray([])
     @dataTimeStamp = ko.observable()
@@ -353,7 +356,7 @@ class ViewModel
       @dataTimeStamp data.date
     # [BoardGame]
     @selectedGame = ko.observable()
-    # Client-side routes   
+    # Client-side routes
     Sammy(->
       @get /#search\/(\w*)/, ->
         self.selectedGame null
@@ -399,17 +402,25 @@ class ViewModel
 
   goToGameComments: =>
     x = @selectedGame().commentsPage()
-    location.hash = "game/#{@selectedGame().id}/comments/page/#{x}" 
+    location.hash = "game/#{@selectedGame().id}/comments/page/#{x}"
     $("html, body").animate
           scrollTop: 0
         , "slow"
     return
 
+  # goToGameForums: =>
+  #   x = @selectedGame().selectedThread().
+  #   location.hash = "game/#{@selectedGame().id}/comments/page/#{x}"
+  #   $("html, body").animate
+  #         scrollTop: 0
+  #       , "slow"
+  #   return
+
   goToSearch: ->
     str = encodeURIComponent($("#search").val())
     location.hash = "search/" + str
     return
-    
+
   # @param object [Object] boardgame object
   goToGame: (object) =>
     #@currentPage ""
@@ -483,8 +494,8 @@ class ViewModel
       when "oct" then "09"
       when "nov" then "10"
       when "dec" then "11"
-      
-    
+
+
 
   sortList: (list,type) ->
     list.sort (a, b) =>
@@ -518,7 +529,7 @@ class ViewModel
 
     return
   # Invoked when user clicks on a table header of search results
-  # Calls appropriate sort method 
+  # Calls appropriate sort method
   # Calls method to update icons representing sort direction
   # @param type [String] (name,brating)
   # @param vm [ViewModel]
@@ -544,7 +555,7 @@ class ViewModel
       $(event.toElement).addClass "sorting-desc"
     else
       $(event.toElement).addClass "sorting-asc"
-    return  
+    return
 
   # Searches games that match input string
   # @param str [String]
@@ -604,7 +615,7 @@ class ViewModel
     $.getJSON 'json/top100.json', (data) =>
       items = data[type]
       counter = 0
-      
+
       for id in items
         bgdata = @loadFromCache("bgr", id)
         if bgdata
@@ -623,7 +634,7 @@ class ViewModel
             if counter is items.length
               @sortList(@topGames,@topGamesType())
               @loading null
-              # @saveToCache("searched_bgs", str, @searchedGames()) 
+              # @saveToCache("searched_bgs", str, @searchedGames())
               # @sortByBRating(-1)
             return
     return
@@ -641,7 +652,7 @@ class ViewModel
         #console.log (new BoardGameResult(result) for result in data.query.results.items.item)
         @hotGames((new BoardGameResult(result) for result in data.items.item))
         @loading(null)
-        @saveToCache("hot", "games", @hotGames())        
+        @saveToCache("hot", "games", @hotGames())
       return
     return
 
@@ -671,11 +682,11 @@ class ViewModel
     $.getJSON "/bg/#{id}", (data) =>
       if data
         @selectedGame(new BoardGame(data.items["item"]))
-        @loading(null) 
+        @loading(null)
         subnav = $('#sub-nav').onePageNav({
           currentClass: 'active'
           })
-        @saveToCache("bg", {'query':id}, @selectedGame())        
+        @saveToCache("bg", {'query':id}, @selectedGame())
       return
     return
 
@@ -699,7 +710,7 @@ class ViewModel
           @searchedGames.push(new BoardGameResult(data.items["item"]))
         if counter is gameids.length
           @loading null
-          @saveToCache("searched_bgs", str, @searchedGames()) 
+          @saveToCache("searched_bgs", str, @searchedGames())
           @sortByBRating(-1)
         return
 

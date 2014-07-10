@@ -525,7 +525,7 @@ img.radius {
   }
 }
 .section-white {
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f3eb), to(#fff));
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f3eb), color-stop(0%, #fff));
   background-image: -webkit-linear-gradient(top, #f5f3eb 0%, #fff 0%);
   background-image: linear-gradient(to bottom, #f5f3eb 0%, #fff 0%);
 }
