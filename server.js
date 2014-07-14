@@ -208,7 +208,7 @@ var SampleApp = function() {
                 }
             ], function (err, result) {
                 // console.log(result.items.item.forums[0].threads)
-                res.send(result)   
+                res.send(result)
             });
             // var uri = "http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1&comments=1&videos=1&pagesize=100"
             // request(uri, function(err,response,body){
@@ -293,7 +293,8 @@ var SampleApp = function() {
         self.createRoutes();
         self.app = express();
         self.app.configure(function () {
-            self.app.use(express.static(path.join(__dirname, 'public')));
+            // self.app.use(express.static(path.join(__dirname, 'dist')));
+            self.app.use(express.static(path.join(__dirname, '')));
         });
 
         //  Add handlers for the app (from the routes).

@@ -42,51 +42,7 @@
   }
 }
 
-@-moz-keyframes vex-flyin {
-  /* line 25, ../sass/_keyframes.sass */
-  0% {
-    opacity: 0;
-    transform: translateY(-40px);
-    -webkit-transform: translateY(-40px);
-    -moz-transform: translateY(-40px);
-    -ms-transform: translateY(-40px);
-    -o-transform: translateY(-40px);
-  }
-
-  /* line 28, ../sass/_keyframes.sass */
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    -webkit-transform: translateY(0);
-    -moz-transform: translateY(0);
-    -ms-transform: translateY(0);
-    -o-transform: translateY(0);
-  }
-}
-
 @-ms-keyframes vex-flyin {
-  /* line 25, ../sass/_keyframes.sass */
-  0% {
-    opacity: 0;
-    transform: translateY(-40px);
-    -webkit-transform: translateY(-40px);
-    -moz-transform: translateY(-40px);
-    -ms-transform: translateY(-40px);
-    -o-transform: translateY(-40px);
-  }
-
-  /* line 28, ../sass/_keyframes.sass */
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-    -webkit-transform: translateY(0);
-    -moz-transform: translateY(0);
-    -ms-transform: translateY(0);
-    -o-transform: translateY(0);
-  }
-}
-
-@-o-keyframes vex-flyin {
   /* line 25, ../sass/_keyframes.sass */
   0% {
     opacity: 0;
@@ -152,51 +108,7 @@
   }
 }
 
-@-moz-keyframes vex-flyout {
-  /* line 34, ../sass/_keyframes.sass */
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-    -webkit-transform: translateY(0);
-    -moz-transform: translateY(0);
-    -ms-transform: translateY(0);
-    -o-transform: translateY(0);
-  }
-
-  /* line 37, ../sass/_keyframes.sass */
-  100% {
-    opacity: 0;
-    transform: translateY(-40px);
-    -webkit-transform: translateY(-40px);
-    -moz-transform: translateY(-40px);
-    -ms-transform: translateY(-40px);
-    -o-transform: translateY(-40px);
-  }
-}
-
 @-ms-keyframes vex-flyout {
-  /* line 34, ../sass/_keyframes.sass */
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-    -webkit-transform: translateY(0);
-    -moz-transform: translateY(0);
-    -ms-transform: translateY(0);
-    -o-transform: translateY(0);
-  }
-
-  /* line 37, ../sass/_keyframes.sass */
-  100% {
-    opacity: 0;
-    transform: translateY(-40px);
-    -webkit-transform: translateY(-40px);
-    -moz-transform: translateY(-40px);
-    -ms-transform: translateY(-40px);
-    -o-transform: translateY(-40px);
-  }
-}
-
-@-o-keyframes vex-flyout {
   /* line 34, ../sass/_keyframes.sass */
   0% {
     opacity: 1;
@@ -221,22 +133,16 @@
 @keyframes vex-pulse {
   /* line 104, ../sass/_keyframes.sass */
   0% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
     box-shadow: inset 0 0 0 300px transparent;
   }
 
   /* line 106, ../sass/_keyframes.sass */
   70% {
-    -webkit-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-    -moz-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
     box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
   }
 
   /* line 108, ../sass/_keyframes.sass */
   100% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
     box-shadow: inset 0 0 0 300px transparent;
   }
 }
@@ -244,45 +150,16 @@
 @-webkit-keyframes vex-pulse {
   /* line 104, ../sass/_keyframes.sass */
   0% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
     box-shadow: inset 0 0 0 300px transparent;
   }
 
   /* line 106, ../sass/_keyframes.sass */
   70% {
-    -webkit-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-    -moz-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
     box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
   }
 
   /* line 108, ../sass/_keyframes.sass */
   100% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
-    box-shadow: inset 0 0 0 300px transparent;
-  }
-}
-
-@-moz-keyframes vex-pulse {
-  /* line 104, ../sass/_keyframes.sass */
-  0% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
-    box-shadow: inset 0 0 0 300px transparent;
-  }
-
-  /* line 106, ../sass/_keyframes.sass */
-  70% {
-    -webkit-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-    -moz-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-    box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-  }
-
-  /* line 108, ../sass/_keyframes.sass */
-  100% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
     box-shadow: inset 0 0 0 300px transparent;
   }
 }
@@ -290,45 +167,16 @@
 @-ms-keyframes vex-pulse {
   /* line 104, ../sass/_keyframes.sass */
   0% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
     box-shadow: inset 0 0 0 300px transparent;
   }
 
   /* line 106, ../sass/_keyframes.sass */
   70% {
-    -webkit-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-    -moz-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
     box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
   }
 
   /* line 108, ../sass/_keyframes.sass */
   100% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
-    box-shadow: inset 0 0 0 300px transparent;
-  }
-}
-
-@-o-keyframes vex-pulse {
-  /* line 104, ../sass/_keyframes.sass */
-  0% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
-    box-shadow: inset 0 0 0 300px transparent;
-  }
-
-  /* line 106, ../sass/_keyframes.sass */
-  70% {
-    -webkit-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-    -moz-box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-    box-shadow: inset 0 0 0 300px rgba(255, 255, 255, 0.25);
-  }
-
-  /* line 108, ../sass/_keyframes.sass */
-  100% {
-    -webkit-box-shadow: inset 0 0 0 300px transparent;
-    -moz-box-shadow: inset 0 0 0 300px transparent;
     box-shadow: inset 0 0 0 300px transparent;
   }
 }
@@ -358,9 +206,6 @@
 }
 /* line 23, ../sass/vex-theme-default.sass */
 .vex.vex-theme-default .vex-content {
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -ms-border-radius: 5px;
   -o-border-radius: 5px;
   border-radius: 5px;
   font-family: "Helvetica Neue", sans-serif;
@@ -380,9 +225,6 @@
 }
 /* line 39, ../sass/vex-theme-default.sass */
 .vex.vex-theme-default .vex-close {
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  -ms-border-radius: 5px;
   -o-border-radius: 5px;
   border-radius: 5px;
   position: absolute;
@@ -392,9 +234,6 @@
 }
 /* line 46, ../sass/vex-theme-default.sass */
 .vex.vex-theme-default .vex-close:before {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
   position: absolute;
@@ -425,9 +264,6 @@
 }
 /* line 73, ../sass/vex-theme-default.sass */
 .vex.vex-theme-default .vex-dialog-form .vex-dialog-input textarea, .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="text"], .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="password"], .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="email"], .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="url"] {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
   background: white;
@@ -442,8 +278,6 @@
 }
 /* line 85, ../sass/vex-theme-default.sass */
 .vex.vex-theme-default .vex-dialog-form .vex-dialog-input textarea:focus, .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="text"]:focus, .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="password"]:focus, .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="email"]:focus, .vex.vex-theme-default .vex-dialog-form .vex-dialog-input input[type="url"]:focus {
-  -webkit-box-shadow: inset 0 0 0 2px #8dbdf1;
-  -moz-box-shadow: inset 0 0 0 2px #8dbdf1;
   box-shadow: inset 0 0 0 2px #8dbdf1;
   outline: none;
 }
@@ -459,9 +293,6 @@
 }
 /* line 92, ../sass/vex-theme-default.sass */
 .vex.vex-theme-default .vex-dialog-button {
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
   border: 0;
@@ -512,12 +343,7 @@
 
 /* line 124, ../sass/vex-theme-default.sass */
 .vex-loading-spinner.vex-theme-default {
-  -webkit-box-shadow: 0 0 0 0.5em #f0f0f0, 0 0 1px 0.5em rgba(0, 0, 0, 0.3);
-  -moz-box-shadow: 0 0 0 0.5em #f0f0f0, 0 0 1px 0.5em rgba(0, 0, 0, 0.3);
   box-shadow: 0 0 0 0.5em #f0f0f0, 0 0 1px 0.5em rgba(0, 0, 0, 0.3);
-  -webkit-border-radius: 100%;
-  -moz-border-radius: 100%;
-  -ms-border-radius: 100%;
   -o-border-radius: 100%;
   border-radius: 100%;
   background: #f0f0f0;

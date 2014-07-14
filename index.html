@@ -8,12 +8,14 @@
     <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/sorts-mill-goudy" rel="stylesheet" type="text/css"/>
     <link rel="stylesheet" href="//brick.a.ssl.fastly.net/PT+Sans:400,400i,700,700i/Libre+Baskerville:400,400i,700,700i/Lato:300,400,400i,700,700i/Raleway:300,400,500,400i,700,700i">
     <!-- <link rel="stylesheet" href="css/normalize.css" />  -->
+
+    <!-- build:css css/style.css -->
     <link rel="stylesheet" href="css/ionicons.min.css" />
     <link rel="stylesheet" href="css/responsive-nav.css" />
     <link rel="stylesheet" href="css/vex.css" />
     <link rel="stylesheet" href="css/vex-theme-default.css" />
     <link rel="stylesheet" href="css/style.css" />
-    <script src="js/vendor/modernizr.js"></script>
+    <!-- endbuild -->
   </head>
   <body class="body-style">
     <nav class="nav-collapse">
@@ -208,7 +210,7 @@
           <dl class="inline">
             <li>
               <dt>
-              Average Rating
+              <!-- Average Rating -->
               </dt>
               <dd>
               <span data-bind="text:Math.floor(getAverageRating()*100)/100"></span> / 10
@@ -387,9 +389,10 @@
         <li></li>
       </ul>
     </footer>
+    <!-- build:js js/script.js -->
+    <script src="js/vendor/modernizr.js"></script>
     <script src="js/vendor/jquery.js"></script>
     <script src="js/vex.combined.min.js"></script>
-    <script>vex.defaultOptions.className = 'vex-theme-default';</script>
     <script src="js/humanize.min.js"></script>
     <script src="js/responsive-nav.min.js"></script>
     <script src="js/jquery.nav.js"></script>
@@ -398,5 +401,7 @@
     <script src="js/sammy-latest.min.js"></script>
     <script src="js/knockout-3.1.0.js"></script>
     <script src="js/script.js"></script>
+    <!-- endbuild -->
+    <script>vex.defaultOptions.className = 'vex-theme-default';</script>
   </body>
 </html>

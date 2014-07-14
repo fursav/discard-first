@@ -4,13 +4,13 @@
   margin: 0;
   padding: 0;
   width: 100%;
-  display: block;
+  /*display: block;*/
   list-style: none;
 }
 
 .nav-collapse li {
   width: 100%;
-  display: block;
+  /*display: block;*/
 }
 
 .js .nav-collapse {
@@ -18,7 +18,7 @@
   max-height: 0;
   position: absolute;
   display: block;
-  overflow: hidden;
+  /*overflow: hidden;*/
   zoom: 1;
 }
 
@@ -38,6 +38,14 @@
   -ms-user-select: none;
   -o-user-select: none;
   user-select: none;
+  margin-left: 1em;
+  color:#484848;
+}
+
+.nav-toggle:before{
+  font-family: "Ionicons";
+  font-size: 3em;
+  content:"\f20d" 
 }
 
 @media screen and (min-width: 40em) {
@@ -45,7 +53,7 @@
     position: relative;
   }
   .js .nav-collapse.closed {
-    max-height: none;
+    max-height: 3.8rem;
   }
   .nav-toggle {
     display: none;
