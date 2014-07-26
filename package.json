@@ -50,5 +50,6 @@
   },
   "bundleDependencies": [],
   "private": true,
-  "main": "server.js"
+  "main": "server.coffee",
+  "scripts":{"start":"coffee server.coffee"} 
 }

@@ -25,7 +25,7 @@ var SampleApp = function() {
      */
     self.setupVariables = function() {
         //  Set the environment variables we need.
-        self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
+        self.ipaddress = process.env.OPENSHIFT_NODEJS_IP || process.env.IP;
         self.port      = process.env.OPENSHIFT_NODEJS_PORT || 8080;
 
         if (typeof self.ipaddress === "undefined") {
@@ -96,6 +96,14 @@ var SampleApp = function() {
      *  Create the routing table entries + handlers for the application.
      */
     self.createRoutes = function() {
+        self.jsonOptions = {
+                    object: true,
+                    reversible: false,
+                    coerce: true,
+                    sanitize: false,
+                    trim: false,
+                    arrayNotation: false
+                };
         self.routes = { };
 
         self.routes['/asciimo'] = function(req, res) {
@@ -116,26 +124,18 @@ var SampleApp = function() {
         self.routes['/bg/:id'] = function(req,res) {
             // console.log("here")
             var id = req.params.id
-            var options = {
-                object: true,
-                reversible: false,
-                coerce: true,
-                sanitize: false,
-                trim: false,
-                arrayNotation: false
-            };
             var uris = ["http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1&comments=1&videos=1&pagesize=100",
             "http://boardgamegeek.com/xmlapi2/forumlist?id="+id+"&type=thing"]
             async.waterfall([
                 function(callback){
                     request(uris[0], function(err,response,body){
-                        var x = parser.toJson(body,options)
+                        var x = parser.toJson(body,self.jsonOptions)
                         callback(null, x);
                     })
                 },
                 function(arg, callback){
                     request("http://boardgamegeek.com/xmlapi2/forumlist?id="+id+"&type=thing",function(err,response,body){
-                        arg.items.item.forums = parser.toJson(body,options).forums.forum;
+                        arg.items.item.forums = parser.toJson(body,self.jsonOptions).forums.forum;
                         callback(null, arg);
                     })
                 },
@@ -147,7 +147,7 @@ var SampleApp = function() {
                     arg.items.item.forums = []
                     async.each(list, function(forum,callback){
                         request("http://boardgamegeek.com/xmlapi2/forum?id="+forum.id,function(err,response,body){
-                            forum.threads = parser.toJson(body,options).forum.threads.thread || []
+                            forum.threads = parser.toJson(body,self.jsonOptions).forum.threads.thread || []
                             // var list2 = parser.toJson(body,options).forum.threads.thread;
                             // if (list2 == null || list2 == undefined) {
                             //     list2 = [];
@@ -225,29 +225,33 @@ var SampleApp = function() {
             // console.log("bgr")
             id = req.params.id
             request("http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1", function(err,response,body){
-                var options = {
-                    object: false,
-                    reversible: false,
-                    coerce: true,
-                    sanitize: false,
-                    trim: false,
-                    arrayNotation: false
-                };
-                res.send(parser.toJson(body,options))
+
+                res.send(parser.toJson(body,self.jsonOptions))
             })
+        };
+        
+        self.routes['/bgs/:ids'] = function(req,res) {
+          console.log("bgs");
+          var ids = req.params.ids.split(",");
+          async.map(ids,function (id, callback) {
+            request("http://www.boardgamegeek.com/xmlapi2/thing?id="+id+"&stats=1", function(err,response,body){
+              var result = parser.toJson(body,self.jsonOptions);
+              result.items = result.items.item;
+              callback(null,result);
+            });
+          }, function(err,results) {
+            var endResult  = [];
+            for(var i = 0; i<results.length;i++) {
+              endResult = endResult.concat(results[i].items);
+            }
+            res.send({"boardgames":endResult});
+          });
         };
 
         self.routes['/thread/:id'] = function(req,res) {
             request("http://boardgamegeek.com/xmlapi2/thread?id=" + req.params.id,function(err,response,body){
-                var options = {
-                    object: true,
-                    reversible: false,
-                    coerce: true,
-                    sanitize: false,
-                    trim: false,
-                    arrayNotation: false
-                };
-                thread = parser.toJson(body,options).thread
+
+                thread = parser.toJson(body,self.jsonOptions).thread
                 thread.articles = thread.articles.article
                 // console.log(thread)
                 res.send(thread)
@@ -255,23 +259,24 @@ var SampleApp = function() {
         };
 
         self.routes['/search/:str'] = function(req,res) {
-            console.log("search")
-            str = req.params.str
+            console.log("search");
+            var str = req.params.str;
             request("http://www.boardgamegeek.com/xmlapi/search?search="+str, function(err,response,body){
-                console.log("response")
-                console.log(err)
-                console.log(response)
-                console.log(body)
-                res.send(parser.toJson(body))
-            })
+                var result = parser.toJson(body,self.jsonOptions);
+                result.boardgames = result.boardgames.boardgame;
+                res.send(result);
+            });
         };
 
         self.routes['/data'] = function(req,res) {
             // console.log("here")
             // console.log(req.query)
             request("http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame", function(err,response,body){
-                res.send(parser.toJson(body))
-            })
+                // res.send(parser.toJson(body))
+                var result = parser.toJson(body,self.jsonOptions);
+                result.items = result.items.item;
+                res.send(result);
+            });
 
 
         };

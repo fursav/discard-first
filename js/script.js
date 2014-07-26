@@ -1,8 +1,6 @@
 (function() {
-  var BoardGame, BoardGameResult, ViewModel,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  var BoardGame, ViewModel, loadFromCache, saveToCache,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   $(function() {
     var alert, nav;
@@ -22,44 +20,133 @@
     }
   });
 
-  BoardGameResult = (function() {
-    function BoardGameResult(data) {
-      this.id = data.id;
-      this.image = data.image || "";
-      this.description = data.description;
-      this.thumbnail = $.type(data.thumbnail) === "object" ? data.thumbnail.value : data.thumbnail;
-      this.link = data.link;
-      this.maxplayers = data.maxplayers;
-      this.minage = data.minage;
-      this.minplayers = data.minplayers;
-      this.name = data.name;
-      this.playingtime = data.playingtime;
-      this.statistics = data.statistics;
-      this.yearpublished = data.yearpublished || "";
-      if (this.thumbnail == null) {
-        this.thumbnail = "";
+  saveToCache = function(type, key, data) {
+    if (Modernizr.sessionstorage) {
+      sessionStorage["" + type + "_" + key] = ko.toJSON(data);
+    }
+  };
+
+  loadFromCache = function(type, key) {
+    var data;
+    if (Modernizr.sessionstorage) {
+      data = sessionStorage["" + type + "_" + key];
+      if (data) {
+        data = JSON.parse(data);
       }
-      this.hotRank = data.rank || data.hotRank;
+      return data;
+    }
+  };
+
+  BoardGame = (function() {
+    function BoardGame(data) {
+      this.getForumVisible = __bind(this.getForumVisible, this);
+      this.deselectThread = __bind(this.deselectThread, this);
+      this.getThreadPost = __bind(this.getThreadPost, this);
+      this.selectThread = __bind(this.selectThread, this);
+      this.deselectForum = __bind(this.deselectForum, this);
+      this.selectForum = __bind(this.selectForum, this);
+      this.id = "";
+      this.image = ko.observable();
+      this.description = ko.observable();
+      this.thumbnail = ko.observable();
+      this.link = ko.observable();
+      this.maxplayers = ko.observable();
+      this.minage = ko.observable();
+      this.minplayers = ko.observable();
+      this.name = ko.observable();
+      this.playingtime = ko.observable();
+      this.statistics = ko.observable();
+      this.yearpublished = ko.observable();
+      this.rank = ko.observable();
+      this.dataInfo = {};
+      this.comments = [];
+      this.commentsData = {};
+      this.forums = [];
+      this.selectedForum = ko.observable();
+      this.selectedThread = ko.observable();
+      this.featuredComment = ko.observable();
+      this.updated = ko.observable();
+      this.updateData(data);
     }
 
-    BoardGameResult.prototype.getRanks = function() {
-      return this.statistics.ratings.ranks.rank;
+    BoardGame.prototype.updateData = function(data) {
+      var k, updateProp, v, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+      updateProp = function(prop, propData) {
+        if (propData) {
+          prop(propData);
+        }
+      };
+      this.id = (_ref = data.id) != null ? _ref : this.id;
+      updateProp(this.image, data.image);
+      updateProp(this.description, data.description);
+      this.thumbnail((_ref1 = ($.type(data.thumbnail) === "object" ? data.thumbnail.value : data.thumbnail)) != null ? _ref1 : this.thumbnail);
+      updateProp(this.link, data.link);
+      updateProp(this.maxplayers, data.maxplayers);
+      updateProp(this.minage, data.minage);
+      updateProp(this.minplayers, data.minplayers);
+      updateProp(this.name, data.name);
+      updateProp(this.playingtime, data.playingtime);
+      updateProp(this.statistics, data.statistics);
+      updateProp(this.yearpublished, data.yearpublished);
+      updateProp(this.rank, data.rank);
+      this.comments = (_ref2 = data.comments) != null ? _ref2 : this.comments;
+      this.commentsData = (_ref3 = data.commentsData) != null ? _ref3 : this.commentsData;
+      this.forums = (_ref4 = data.forums) != null ? _ref4 : this.forums;
+      _ref5 = data.dataInfo;
+      for (k in _ref5) {
+        v = _ref5[k];
+        this.dataInfo[k] = v;
+      }
+      this.updated(Date.now());
+      return this.cacheData();
     };
 
-    BoardGameResult.prototype.getRank = function(name) {
+    BoardGame.prototype.getData = function() {
+      return {
+        "id": this.id,
+        "image": this.image(),
+        "description": this.description(),
+        "thumbnail": this.thumbnail(),
+        "link": this.link(),
+        "maxplayers": this.maxplayers(),
+        "minage": this.minage(),
+        "minplayers": this.minplayers(),
+        "name": this.name(),
+        "playingtime": this.playingtime(),
+        "statistics": this.statistics(),
+        "yearpublished": this.yearpublished(),
+        "rank": this.rank(),
+        "comments": this.comments,
+        "commentsData": this.commentsData,
+        "forums": this.forums,
+        "dataInfo": this.dataInfo,
+        "updated": this.updated()
+      };
+    };
+
+    BoardGame.prototype.cacheData = function() {
+      return saveToCache("boardgame", this.id, this.getData());
+    };
+
+    BoardGame.prototype.getRanks = function() {
+      return this.statistics().ratings.ranks.rank;
+    };
+
+    BoardGame.prototype.getRank = function(name) {
       var rank, _i, _len, _ref, _results;
+      console.log(name);
       _ref = this.getRanks();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         rank = _ref[_i];
         if (rank.name === name) {
-          _results.push(rank.value);
+          _results.push(parseInt(rank.value));
         }
       }
       return _results;
     };
 
-    BoardGameResult.prototype.getTopRank = function() {
+    BoardGame.prototype.getTopRank = function() {
       var rank, _i, _len, _ref, _results;
       _ref = this.getRanks();
       _results = [];
@@ -72,18 +159,20 @@
       return _results;
     };
 
-    BoardGameResult.prototype.getAverageRating = function() {
-      return this.statistics.ratings.average.value;
+    BoardGame.prototype.getAverageRating = function() {
+      var _ref, _ref1, _ref2;
+      return (_ref = this.statistics()) != null ? (_ref1 = _ref.ratings) != null ? (_ref2 = _ref1.average) != null ? _ref2.value : void 0 : void 0 : void 0;
     };
 
-    BoardGameResult.prototype.getBRating = function() {
-      return this.statistics.ratings.bayesaverage.value;
+    BoardGame.prototype.getBRating = function() {
+      var _ref, _ref1, _ref2;
+      return (_ref = this.statistics()) != null ? (_ref1 = _ref.ratings) != null ? (_ref2 = _ref1.bayesaverage) != null ? _ref2.value : void 0 : void 0 : void 0;
     };
 
-    BoardGameResult.prototype.getCategories = function() {
+    BoardGame.prototype.getCategories = function() {
       var categories, link, _i, _len, _ref;
       categories = [];
-      _ref = this.link;
+      _ref = this.link();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         link = _ref[_i];
         if (link["type"] === "boardgamecategory") {
@@ -93,9 +182,9 @@
       return categories;
     };
 
-    BoardGameResult.prototype.getDesigner = function() {
+    BoardGame.prototype.getDesigner = function() {
       var link, _i, _len, _ref;
-      _ref = this.link;
+      _ref = this.link();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         link = _ref[_i];
         if (link["type"] === "boardgamedesigner") {
@@ -104,22 +193,22 @@
       }
     };
 
-    BoardGameResult.prototype.getNumPlayers = function() {
-      if (this.maxplayers.value === this.minplayers.value) {
-        return this.maxplayers.value;
+    BoardGame.prototype.getNumPlayers = function() {
+      if (this.maxplayers().value === this.minplayers().value) {
+        return this.maxplayers().value;
       } else {
-        return "" + this.minplayers.value + " - " + this.maxplayers.value;
+        return "" + (this.minplayers().value) + " - " + (this.maxplayers().value);
       }
     };
 
-    BoardGameResult.prototype.getName = function() {
-      if ($.type(this.name) === "array") {
-        return this.name[0].value;
+    BoardGame.prototype.getName = function() {
+      if ($.type(this.name()) === "array") {
+        return this.name()[0].value;
       }
-      return this.name.value;
+      return this.name().value;
     };
 
-    BoardGameResult.prototype.getShortName = function() {
+    BoardGame.prototype.getShortName = function() {
       var list;
       list = this.getName().split('(')[0].split('–')[0].split(' ');
       if (list.length > 3) {
@@ -130,15 +219,15 @@
       return list.join(' ');
     };
 
-    BoardGameResult.prototype.getShortDescription = function() {
-      return this.description.slice(0, 100) + "...";
+    BoardGame.prototype.getShortDescription = function() {
+      return this.description().slice(0, 100) + "...";
     };
 
-    BoardGameResult.prototype.getHTMLDescription = function() {
+    BoardGame.prototype.getHTMLDescription = function() {
       var contenthid, htmlDescription, i, paragraphs, regex;
       paragraphs = 1;
       contenthid = false;
-      htmlDescription = this.description;
+      htmlDescription = this.description();
       regex = new RegExp("&#10;&#10;    ", "g");
       htmlDescription = htmlDescription.replace(regex, "<ul><li>");
       regex = new RegExp("&#10;&#10;&#10;", "g");
@@ -167,112 +256,6 @@
       regex = new RegExp(this.getName(), "g");
       htmlDescription = htmlDescription.replace(regex, "<b>" + this.getName() + "</b>");
       return htmlDescription;
-    };
-
-    return BoardGameResult;
-
-  })();
-
-  BoardGame = (function(_super) {
-    __extends(BoardGame, _super);
-
-    function BoardGame(data) {
-      this.getForumVisible = __bind(this.getForumVisible, this);
-      this.deselectThread = __bind(this.deselectThread, this);
-      this.getThreadPost = __bind(this.getThreadPost, this);
-      this.selectThread = __bind(this.selectThread, this);
-      this.deselectForum = __bind(this.deselectForum, this);
-      this.selectForum = __bind(this.selectForum, this);
-      this.changePageBy = __bind(this.changePageBy, this);
-      this.processComments = __bind(this.processComments, this);
-      var comment, vid, _i, _len, _ref;
-      BoardGame.__super__.constructor.call(this, data);
-      this.comments = {};
-      this.commentsko = ko.observableArray([]);
-      this.commentsData = {};
-      this.videos = ko.observableArray([]);
-      this.forums = ko.observableArray([]);
-      this.selectedForum = ko.observable(null);
-      this.selectedThread = ko.observable();
-      if (data.comments != null) {
-        this.comments = data.comments;
-        this.commentsData = {
-          page: data.comments.page,
-          totalitems: data.comments.totalitems
-        };
-        this.commentsPage = ko.computed({
-          read: (function(_this) {
-            return function() {
-              return _this.commentsData.page;
-            };
-          })(this),
-          write: (function(_this) {
-            return function(value) {
-              var vtw;
-              vtw = parseInt(value);
-              if ((0 < vtw && vtw < _this.getCommentsTotalPages() + 1)) {
-                _this.commentsData.page = vtw;
-                $(function() {
-                  if (window.vm.currentPage() === "gameComments") {
-                    location.hash = "#game/" + _this.id + "/comments/page/" + vtw;
-                  }
-                });
-              }
-            };
-          })(this)
-        }).extend({
-          notify: 'always'
-        });
-        this.processComments();
-      } else {
-        this.commentsPage = ko.observable();
-      }
-      if (this.goodComments == null) {
-        this.goodComments = (function() {
-          var _i, _len, _ref, _results;
-          _ref = this.commentsko();
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            comment = _ref[_i];
-            if (comment.value.length > 119 && parseInt(comment.rating) > 0 && comment.value.length < 600) {
-              _results.push(comment);
-            }
-          }
-          return _results;
-        }).call(this);
-      }
-      this.featuredComment = ko.observable();
-      this.pickFeaturedComment();
-      if ((data.videos != null) && data.videos.total > 0) {
-        _ref = data.videos.video;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          vid = _ref[_i];
-          vid.link = "http://www.youtube.com/embed/" + vid.link.split("?v=")[1];
-          this.videos.push(vid);
-        }
-      }
-      if (data.forums != null) {
-        this.forums(data.forums);
-      }
-    }
-
-    BoardGame.prototype.processComments = function() {
-      var data;
-      data = this.comments;
-      this.commentsko(data.comment);
-      return this.commentsPage(data.page);
-    };
-
-    BoardGame.prototype.changePageBy = function(num) {
-      return this.commentsPage(this.commentsData.page + parseInt(num));
-    };
-
-    BoardGame.prototype.getCommentsTotalPages = function() {
-      return Math.ceil(this.commentsData.totalitems / 100);
-    };
-
-    BoardGame.prototype.pickFeaturedComment = function() {
-      this.featuredComment(this.goodComments[Math.floor(Math.random() * this.goodComments.length)]);
     };
 
     BoardGame.prototype.getRankLink = function(name, id, value) {
@@ -332,7 +315,7 @@
 
     return BoardGame;
 
-  })(BoardGameResult);
+  })();
 
   ViewModel = (function() {
     function ViewModel() {
@@ -387,13 +370,41 @@
             case "gameOverview":
               return 'Game Overview';
             case "hotGames":
-              return 'Hot Games';
+              return '';
             case "topGames":
               return 'Top Games';
           }
         };
       })(this));
+      this.boardGames = {
+        "updated": ko.observable()
+      };
       this.searchedGames = ko.observableArray([]);
+      this.searchedGamesList = ko.computed((function(_this) {
+        return function() {
+          var id, list, _i, _len, _ref;
+          _this.boardGames.updated();
+          list = [];
+          _ref = _this.searchedGames();
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            id = _ref[_i];
+            if (_this.boardGames[id] != null) {
+              list.push(_this.boardGames[id]);
+            }
+          }
+          console.log(list);
+          list.sort(function(a, b) {
+            if (a.getBRating() < b.getBRating()) {
+              return 1;
+            }
+            if (a.getBRating() > b.getBRating()) {
+              return -1;
+            }
+            return 0;
+          });
+          return list;
+        };
+      })(this));
       this.hotGames = ko.observableArray([]);
       this.topGamesType = ko.observable();
       this.topGames = ko.observableArray([]);
@@ -405,7 +416,7 @@
       })(this));
       this.selectedGame = ko.observable();
       Sammy(function() {
-        this.get(/#search\/(\w*)/, function() {
+        this.get(/#search\/(.*)/, function() {
           self.selectedGame(null);
           self.searchGames(this.params.splat[0]);
           self.currentPage("searchGames");
@@ -482,6 +493,8 @@
         return function(a, b) {
           var date1, date2;
           switch (type) {
+            case "float":
+              return sortDir * (parseFloat(a[0], 10) - parseFloat(b[0], 10));
             case "int":
               return sortDir * (parseInt(a[0], 10) - parseInt(b[0], 10));
             case "date":
@@ -620,53 +633,52 @@
     };
 
     ViewModel.prototype.searchGames = function(str) {
-      var ids, regex, url;
+      var ids, regex;
       this.searchedGames.removeAll();
       if (str === "") {
-        return;
+        return null;
       }
       regex = new RegExp(" ", "g");
       str = str.replace(regex, "+");
       str = encodeURI(str);
+      console.log(str);
       this.loading(true);
-      ids = this.loadFromCache("searched_bgs_ids", str);
+      ids = loadFromCache("searched_bgs_ids", str);
       if (ids) {
-        this.loading(null);
+        console.log('search from cache');
+        console.log(ids);
         this.getGamesDetails(ids, str);
+        this.searchedGames(ids);
+        this.loading(null);
         return;
       }
-      url = "http://www.boardgamegeek.com/xmlapi/search?search=" + str;
-      $.getJSON("/search/" + str, (function(_this) {
+      $.getJSON("/search?type=boardgame&query=" + str, (function(_this) {
         return function(data) {
           ids = _this.extractIdsFromSearch(data);
-          _this.saveToCache("searched_bgs_ids", str, ids);
+          saveToCache("searched_bgs_ids", str, ids);
           _this.getGamesDetails(ids, str);
+          _this.searchedGames(ids);
         };
       })(this));
     };
 
     ViewModel.prototype.extractIdsFromSearch = function(data) {
-      var ids, jdata, object, _i, _len;
+      var ids, item, items, _i, _len, _ref;
+      console.log(data);
       if (data) {
-        jdata = data.boardgames["boardgame"];
         ids = [];
-        if (Array.isArray(jdata)) {
-          for (_i = 0, _len = jdata.length; _i < _len; _i++) {
-            object = jdata[_i];
-            ids.push(object["objectid"]);
+        items = data.items;
+        if (Array.isArray(items)) {
+          _ref = data.items;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            item = _ref[_i];
+            ids.push(item != null ? item.id : void 0);
           }
         } else {
-          ids.push(jdata["objectid"]);
+          ids.push(items != null ? items.id : void 0);
         }
         return ids;
       }
-    };
-
-    ViewModel.prototype.getYQLurl = function(str) {
-      var q, url;
-      q = "select * from xml where url=";
-      url = "'" + str + "'";
-      return "http://query.yahooapis.com/v1/public/yql?q=" + (encodeURIComponent(q + url)) + "&format=json&callback=?";
     };
 
     ViewModel.prototype.getTopGames = function(type) {
@@ -710,34 +722,55 @@
       })(this));
     };
 
+    ViewModel.prototype.parseData = function(data) {
+      if (data == null) {
+        return;
+      }
+      console.log(data.id);
+      if (this.boardGames[data.id] != null) {
+        this.boardGames[data.id].updateData(data);
+        data = this.boardGames[data.id].getData();
+      }
+      this.boardGames[data.id] = new BoardGame(data);
+      this.boardGames.updated(Date.now());
+    };
+
     ViewModel.prototype.getHotItems = function() {
-      var data, result, url;
+      var data, id, _i, _len;
       this.loading(true);
       data = this.loadFromCache("hot", "games");
       if (data) {
-        this.hotGames((function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = data.length; _i < _len; _i++) {
-            result = data[_i];
-            _results.push(new BoardGameResult(result));
+        this.hotGames(data);
+        console.log(data);
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          id = data[_i];
+          if (this.boardGames[id] == null) {
+            console.log(id);
+            this.boardGames[id] = new BoardGame(this.loadFromCache("boardgame", id));
           }
-          return _results;
-        })());
+        }
         this.loading(null);
         return;
       }
-      url = "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame";
-      $.getJSON('data', url, (function(_this) {
+      $.getJSON('hot', (function(_this) {
         return function(data) {
+          var item, _j, _len1, _ref;
           if (data) {
+            _ref = data.items;
+            for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+              item = _ref[_j];
+              item.dataInfo = {
+                'hot': 1
+              };
+              _this.parseData(item);
+            }
             _this.hotGames((function() {
-              var _i, _len, _ref, _results;
-              _ref = data.items.item;
+              var _k, _len2, _ref1, _results;
+              _ref1 = data.items;
               _results = [];
-              for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                result = _ref[_i];
-                _results.push(new BoardGameResult(result));
+              for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+                item = _ref1[_k];
+                _results.push(item.id);
               }
               return _results;
             })());
@@ -752,7 +785,6 @@
       var data, url;
       this.loading(true);
       if (page) {
-        url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
         $.getJSON("bg/" + id + "/" + page, (function(_this) {
           return function(data) {
             var subnav;
@@ -777,7 +809,7 @@
         return;
       }
       url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
-      $.getJSON("/bg/" + id, (function(_this) {
+      $.getJSON("/thing?id=" + id + "&stats=1", (function(_this) {
         return function(data) {
           var subnav;
           if (data) {
@@ -794,42 +826,74 @@
       })(this));
     };
 
-    ViewModel.prototype.getGamesDetails = function(gameids, str) {
-      var counter, data, i, result, url;
-      data = this.loadFromCache("searched_bgs", str);
-      if (data) {
-        this.loading(null);
-        this.searchedGames((function() {
-          var _i, _len, _results;
-          _results = [];
-          for (_i = 0, _len = data.length; _i < _len; _i++) {
-            result = data[_i];
-            _results.push(new BoardGameResult(result));
-          }
-          return _results;
-        })());
-        this.sortByBRating(-1);
-        return;
+    ViewModel.prototype.getGamesDetails = function(ids) {
+      var cnt, id, k, lookupids, query, url, v, _i, _j, _len, _len1;
+      query = {
+        'stats': 1
+      };
+      this.loading(true);
+      console.log('getGamesDetails');
+      lookupids = [];
+      for (_i = 0, _len = ids.length; _i < _len; _i++) {
+        id = ids[_i];
+        if (this.needToRetrieveData(id, query)) {
+          lookupids.push(id);
+        }
       }
-      counter = 0;
-      i = 0;
-      while (i < gameids.length) {
-        url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + gameids[i] + "&stats=1";
-        $.getJSON("/bgr/" + gameids[i], (function(_this) {
+      cnt = 0;
+      for (_j = 0, _len1 = lookupids.length; _j < _len1; _j++) {
+        id = lookupids[_j];
+        cnt++;
+        url = "/thing?id=" + id;
+        for (k in query) {
+          v = query[k];
+          url += "&" + k + "=" + v;
+        }
+        $.getJSON(url, (function(_this) {
           return function(data) {
-            counter += 1;
+            cnt--;
             if (data) {
-              _this.searchedGames.push(new BoardGameResult(data.items["item"]));
+              data.datainfo = query;
+              _this.parseData(data);
             }
-            if (counter === gameids.length) {
+            if (cnt === 0) {
               _this.loading(null);
-              _this.saveToCache("searched_bgs", str, _this.searchedGames());
-              _this.sortByBRating(-1);
             }
           };
         })(this));
-        i++;
       }
+      if (lookupids.length === 0) {
+        this.loading(null);
+      }
+    };
+
+    ViewModel.prototype.needToRetrieveData = function(id, dataInfo) {
+      var cachedData, di, k, v;
+      if (id == null) {
+        return false;
+      }
+      if (this.boardGames[id] != null) {
+        di = this.boardGames[id].dataInfo;
+        for (k in dataInfo) {
+          v = dataInfo[k];
+          if (di[k] == null) {
+            return true;
+          }
+        }
+        return false;
+      }
+      cachedData = loadFromCache("boardgame", id);
+      if (cachedData == null) {
+        return true;
+      }
+      for (k in dataInfo) {
+        v = dataInfo[k];
+        if (cachedData[k] == null) {
+          return true;
+        }
+      }
+      this.parseData(cachedData);
+      return false;
     };
 
     ViewModel.prototype.saveToCache = function(type, key, data) {

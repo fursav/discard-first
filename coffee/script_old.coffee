@@ -74,165 +74,68 @@ $ ->
       "<p><strong>Supported Browsers:</strong></p>Opera 12.1+, Firefox 22+, Chrome 21+, Safari 6.1+."
     vex.dialog.alert alert
   return
-  
 
-
-saveToCache = (type,key,data) ->
-  if Modernizr.sessionstorage
-    sessionStorage["#{type}_#{key}"] = ko.toJSON(data)
-  return
-loadFromCache = (type,key) ->
-  if Modernizr.sessionstorage
-    data = sessionStorage["#{type}_#{key}"]
-    data = JSON.parse(data) if data
-    return data
-  return
-
-class BoardGame
+class BoardGameResult
   constructor: (data) ->
-    # from search api
-    @id = ""
-    @image = ko.observable()
-    @description = ko.observable()
-    @thumbnail = ko.observable()
-    @link = ko.observable()
-    @maxplayers = ko.observable()
-    @minage = ko.observable()
-    @minplayers = ko.observable()
-    @name = ko.observable()
-    @playingtime = ko.observable()
-    @statistics = ko.observable()
-    @yearpublished = ko.observable()
-    # hot rank
-    @rank  = ko.observable()
-    @dataInfo = {}
-    
-    # from board game api
-    #[Array]
-    @comments = []
-    #[Object]
-    @commentsData = {}
-    #[Array]
-    #@videos = ko.observableArray([])
-    #[Array]
-    @forums = []
-    @selectedForum = ko.observable()
-    @selectedThread = ko.observable()
-    @featuredComment = ko.observable()
-    @updated = ko.observable()
-    @updateData(data)
-      #console.log k
-    #@pickFeaturedComment()
-#
-  #pickFeaturedComment: ->
-      #@featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
-      #return
-      
-  updateData: (data) ->
-    updateProp = (prop,propData) ->
-      prop(propData) if propData
-      return
-    @id = data.id ? @id
-    updateProp(@image,data.image)
-    updateProp(@description,data.description)
-    #@image = data.image ? @image
-    #@description = data.description ? @description
-    @thumbnail((if $.type(data.thumbnail) is "object" then data.thumbnail.value else data.thumbnail) ? @thumbnail)
-    updateProp(@link,data.link)
-    #@link = data.link ? @link
-    updateProp(@maxplayers,data.maxplayers)
-    #@maxplayers = data.maxplayers ? @maxplayers
-    updateProp(@minage,data.minage)
-    #@minage = data.minage ? @minage
-    updateProp(@minplayers,data.minplayers)
-    #@minplayers = data.minplayers ? @minplayers
-    #@name = data.name ? @name
-    updateProp(@name,data.name)
-    updateProp(@playingtime,data.playingtime)
-    #@playingtime = data.playingtime ? @playingtime
-    updateProp(@statistics,data.statistics)
-    #@statistics = data.statistics ? @statistics
-    updateProp(@yearpublished,data.yearpublished)
-    #@yearpublished = data.yearpublished ? @yearpublished
-    updateProp(@rank,data.rank)
-    #@rank  = data.rank ? @rank
-    @comments = data.comments ? @comments
-    @commentsData = data.commentsData ? @commentsData
-    @forums = data.forums ? @forums
-    for k,v of data.dataInfo
-      @dataInfo[k] = v
-      
-    @updated(Date.now())
-    @cacheData()
-    
-  getData: ->
-    "id":@id
-    "image":@image()
-    "description":@description()
-    "thumbnail":@thumbnail()
-    "link":@link()
-    "maxplayers":@maxplayers()
-    "minage":@minage()
-    "minplayers":@minplayers()
-    "name":@name()
-    "playingtime":@playingtime()
-    "statistics":@statistics()
-    "yearpublished":@yearpublished()
-    "rank":@rank()
-    "comments":@comments
-    "commentsData":@commentsData
-    "forums":@forums
-    "dataInfo":@dataInfo
-    "updated":@updated()
-    
-  cacheData: ->
-    saveToCache("boardgame",@id,
-    @getData()
-    )
+    @id = data.id
+    @image = data.image or ""
+    # console.log(data.description)
+    # console.log(unescape(data.description))
+    @description = data.description
+    @thumbnail = if $.type(data.thumbnail) is "object" then data.thumbnail.value else data.thumbnail
+    @link = data.link
+    @maxplayers = data.maxplayers
+    @minage = data.minage
+    @minplayers = data.minplayers
+    @name = data.name
+    @playingtime = data.playingtime
+    @statistics = data.statistics
+    @yearpublished = data.yearpublished or ""
+    @thumbnail ?= ""
+    @hotRank = data.rank or data.hotRank
 
   # Returns all the ranks of a boardgame
   getRanks: ->
-    @statistics().ratings.ranks.rank
+    @statistics.ratings.ranks.rank
 
   getRank: (name) ->
-    console.log name
-    parseInt(rank.value) for rank in @getRanks() when rank.name is name
+    rank.value for rank in @getRanks() when rank.name is name
 
   getTopRank: ->
     parseInt(rank.value) for rank in @getRanks() when rank.name is "boardgame"
 
   # Returns average rating of a boardgame
   getAverageRating: ->
-    @statistics()?.ratings?.average?.value
+    @statistics.ratings.average.value
 
   # Returns Bayes Rating of boardgame
   getBRating: ->
-    @statistics()?.ratings?.bayesaverage?.value
+    @statistics.ratings.bayesaverage.value
 
   # Returns all the categories of a boardgame
   getCategories: ->
     # [Array]
     categories = []
-    for link in @link()
+    for link in @link
       categories.push(link["value"])  if link["type"] is "boardgamecategory"
     return categories
 
   # Returns the designer of a boardgame
   getDesigner: ->
-    for link in @link()
+    for link in @link
       return link["value"]  if link["type"] is "boardgamedesigner"
     return
 
   getNumPlayers: ->
-    if @maxplayers().value is @minplayers().value
-      return @maxplayers().value
+    if @maxplayers.value is @minplayers.value
+      return @maxplayers.value
     else
-      return "#{@minplayers().value} - #{@maxplayers().value}"
+      return "#{@minplayers.value} - #{@maxplayers.value}"
 
   # Returns the primary name of a boardgame
   getName: ->
-    return @name()[0].value if $.type(@name()) is "array"
-    @name().value
+    return @name[0].value  if $.type(@name) is "array"
+    @name.value
 
   getShortName: ->
     list = @getName().split('(')[0].split('–')[0].split(' ')
@@ -244,7 +147,7 @@ class BoardGame
 
   # Returns shorted description of a boardgame
   getShortDescription: ->
-    @description().slice(0, 100) + "..."
+    @description.slice(0, 100) + "..."
 
   # Returns the html of description string
   getHTMLDescription: ->
@@ -252,7 +155,7 @@ class BoardGame
     contenthid = false
     # console.log(@description)
     # [String]
-    htmlDescription = @description()
+    htmlDescription = @description
     # console.log htmlDescription
 
     regex = new RegExp("&#10;&#10;    ", "g")
@@ -292,6 +195,75 @@ class BoardGame
     htmlDescription = htmlDescription.replace(regex, "<b>" + @getName() + "</b>")
     return htmlDescription
 
+
+class BoardGame extends BoardGameResult
+  constructor: (data) ->
+    super(data)
+    @comments = {}
+    #[Array]
+    @commentsko = ko.observableArray([])
+    @commentsData = {}
+    #[Array]
+    @videos = ko.observableArray([])
+    #[Array]
+    @forums = ko.observableArray([])
+    @selectedForum = ko.observable(null)
+    @selectedThread = ko.observable()
+
+    #comments
+
+    if data.comments?
+      @comments = data.comments
+      @commentsData =
+        page:data.comments.page
+        totalitems:data.comments.totalitems
+      @commentsPage = ko.computed({
+        read: =>
+          @commentsData.page
+        write: (value) =>
+          vtw = parseInt(value)
+          if 0 < vtw < @getCommentsTotalPages()+1
+            @commentsData.page = vtw
+            $ =>
+              location.hash = "#game/#{@id}/comments/page/#{vtw}" if window.vm.currentPage() is "gameComments"
+              return
+          return
+        }).extend({ notify: 'always' })
+      @processComments()
+    else
+      @commentsPage = ko.observable()
+
+    @goodComments ?= (comment for comment in @commentsko() when comment.value.length > 119 and parseInt(comment.rating) > 0 and comment.value.length < 600)
+    @featuredComment = ko.observable()
+    @pickFeaturedComment()
+
+    #videos
+
+    if data.videos? and data.videos.total > 0
+      for vid in data.videos.video
+        vid.link = "http://www.youtube.com/embed/" + vid.link.split("?v=")[1]
+        @videos.push(vid)
+      # @videos(data.videos.video)
+
+    if data.forums?
+      @forums(data.forums)
+
+  processComments: =>
+    data = @comments
+    @commentsko(data.comment)
+    @commentsPage(data.page)
+  changePageBy: (num) =>
+    @commentsPage(@commentsData.page + parseInt(num))
+
+  # getComments: ->
+  #   console.log "here"
+  #   @comments.comment
+  getCommentsTotalPages: ->
+    Math.ceil(@commentsData.totalitems/100)
+
+  pickFeaturedComment: ->
+      @featuredComment(@goodComments[Math.floor(Math.random() * @goodComments.length)])
+      return
 
   # Returns link to bgg rank page for given rank
   # @param name [String] type of rank/game
@@ -344,6 +316,8 @@ class BoardGame
       return true
     return false
 
+
+
 class ViewModel
   constructor: ->
     self = this
@@ -366,33 +340,12 @@ class ViewModel
         when "searchGames" then 'Search Results'
         when "gameComments" then  'Game Comments'
         when "gameOverview" then 'Game Overview'
-        when "hotGames" then ''
+        when "hotGames" then 'Hot Games'
         when "topGames" then 'Top Games'
       )
-    
-    @boardGames = {"updated":ko.observable()}
+
     # [Array]
     @searchedGames = ko.observableArray([])
-    @searchedGamesList = ko.computed =>
-      # introduced this to dependency to refresh when finished loading
-      #@loading()
-      @boardGames.updated()
-      list = []
-      for id in @searchedGames()
-        if @boardGames[id]?
-          list.push @boardGames[id]
-      #console.log list.sort().reverse()
-      #list = @sortList(list,"boardgame")
-      console.log list
-      list.sort((a,b) ->
-        return 1 if a.getBRating() < b.getBRating()
-        return -1 if a.getBRating() > b.getBRating()
-        return 0
-        )
-      list
-      #console.log(@boardGames[id] for id in @searchedGames() if @boardGames[id]?)
-      #@boardGames[id] for id in @searchedGames() if @boardGames[id]?
-    #.extend({ notify: 'always' })
     # [Array]
     @hotGames = ko.observableArray([])
 
@@ -405,11 +358,11 @@ class ViewModel
     @selectedGame = ko.observable()
     # Client-side routes
     Sammy(->
-      @get /#search\/(.*)/, ->
-          self.selectedGame null
-          self.searchGames @params.splat[0]
-          self.currentPage "searchGames"
-          return
+      @get /#search\/(\w*)/, ->
+        self.selectedGame null
+        self.searchGames @params.splat[0]
+        self.currentPage "searchGames"
+        return
 
       @get /#game\/(\w*)$/, ->
         self.currentPage "gameOverview"
@@ -499,8 +452,6 @@ class ViewModel
     # Sort by the data-order-by value
     column.sort((a, b) =>
       switch type
-        when "float"
-          sortDir * (parseFloat(a[0], 10) - parseFloat(b[0], 10))
         when "int"
           sortDir * (parseInt(a[0], 10) - parseInt(b[0], 10))
         when "date"
@@ -612,31 +563,27 @@ class ViewModel
     # Clear previous search results
     @searchedGames.removeAll()
     # Do nothing if no characters are entered
-    return null if str is ""
-    
+    return  if str is ""
+
     regex = new RegExp(" ", "g")
     str = str.replace(regex, "+")
     str = encodeURI(str)
-    console.log str
 
     @loading(true)
 
     # Check if results are already cached
-    ids = loadFromCache("searched_bgs_ids", str)
+    ids = @loadFromCache("searched_bgs_ids", str)
     if ids
-      console.log 'search from cache'
-      console.log ids
-      @getGamesDetails(ids, str)
-      @searchedGames(ids)
       @loading null
+      @getGamesDetails(ids, str)
       return
 
-    $.getJSON "/search?type=boardgame&query=#{str}", (data) =>
+    url = "http://www.boardgamegeek.com/xmlapi/search?search=#{str}"
+    $.getJSON "/search/#{str}", (data) =>
       # [Array]
       ids = @extractIdsFromSearch(data)
-      saveToCache("searched_bgs_ids", str, ids)
+      @saveToCache("searched_bgs_ids", str, ids)
       @getGamesDetails(ids, str)
-      @searchedGames(ids)
       return
 
     return
@@ -644,17 +591,24 @@ class ViewModel
   # Returns the list of ids of the boardgames that match the search string
   # @param data [Object]
   extractIdsFromSearch: (data) ->
-    console.log data
     if data
-      #[Array]
+      # [Array] or Object
+      jdata = data.boardgames["boardgame"]
+      # [Array]
       ids = []
-      items = data.items
-      if Array.isArray(items)
-        for item in data.items
-          ids.push(item?.id)
+      if Array.isArray(jdata)
+        for object in jdata
+          ids.push(object["objectid"])
       else
-        ids.push(items?.id)
+        ids.push(jdata["objectid"])
       return ids
+
+  # Returns the YQL query
+  # @param str [String]
+  getYQLurl: (str) ->
+    q = "select * from xml where url="
+    url = "'#{str}'"
+    return "http://query.yahooapis.com/v1/public/yql?q=#{encodeURIComponent(q + url)}&format=json&callback=?"
 
   getTopGames: (type) ->
     @loading(true)
@@ -684,45 +638,19 @@ class ViewModel
               # @sortByBRating(-1)
             return
     return
-    
-  parseData: (data) ->
-    if not data?
-      return
-    console.log data.id
-    if @boardGames[data.id]?
-      #olddata = @boardGames[data.id].getData()
-      #if olddata is not data
-      @boardGames[data.id].updateData(data)
-      data = @boardGames[data.id].getData()
-      #else
-        #return
-      #@boardGames.updated(Date.now())
-      #return
-    @boardGames[data.id] = new BoardGame(data)
-    @boardGames.updated(Date.now())
-    return
 
   getHotItems: ->
     @loading(true)
     data = @loadFromCache("hot", "games")
     if data
-      @hotGames(data)
-      console.log data
-      # assume the actual board game data is still in cache if list of hot games has been cached
-      for id in data
-        if not @boardGames[id]?
-          console.log id
-          @boardGames[id] = new BoardGame(@loadFromCache("boardgame", id))
+      @hotGames((new BoardGameResult(result) for result in data))
       @loading(null)
       return
-    $.getJSON 'hot', (data) =>
+    url = "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame"
+    $.getJSON 'data',url, (data) =>
       if data
         #console.log (new BoardGameResult(result) for result in data.query.results.items.item)
-        for item in data.items
-          item.dataInfo = 
-            'hot':1
-          @parseData(item) 
-        @hotGames((item.id for item in data.items))
+        @hotGames((new BoardGameResult(result) for result in data.items.item))
         @loading(null)
         @saveToCache("hot", "games", @hotGames())
       return
@@ -733,6 +661,7 @@ class ViewModel
   getGameDetails: (id,page) ->
     @loading(true)
     if page
+      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
       $.getJSON "bg/#{id}/#{page}", (data) =>
         if data
           @selectedGame(new BoardGame(data.items["item"]))
@@ -750,7 +679,7 @@ class ViewModel
       return
 
     url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
-    $.getJSON "/thing?id=#{id}&stats=1", (data) =>
+    $.getJSON "/bg/#{id}", (data) =>
       if data
         @selectedGame(new BoardGame(data.items["item"]))
         @loading(null)
@@ -761,93 +690,32 @@ class ViewModel
       return
     return
 
-  getGamesDetails: (ids) ->
-    query = 
-      'stats':1
-      #'comments':1
-      #'pagesize':100
-      #'page':1
-    @loading(true)
-    console.log 'getGamesDetails'
-    lookupids = []
-    for id in ids
-      if @needToRetrieveData(id,query)
-        lookupids.push(id)
-      #if not id?
-        #continue
-      #if @boardGames[id]?
-        #continue
-      #cachedData = loadFromCache "boardgame",id
-      #if cachedData
-        #@parseData cachedData
-      #else
-        #lookupids.push(id)
-    cnt = 0
-    for id in lookupids
-      cnt++
-      #while cnt > 50
-        #continue
-      url = "/thing?id=#{id}"
-      for k,v of query
-        url += "&#{k}=#{v}"
-      $.getJSON url, (data) =>
-        cnt--
-        if data
-          data.datainfo = query
-          @parseData data
-        if cnt is 0
-          @loading null
-        return
-    if lookupids.length is 0
-      @loading null
-    return
-    
-  needToRetrieveData: (id,dataInfo) ->
-    if not id?
-      return false
-    # assume that cache does not have more
-    # information than the object in memory
-    if @boardGames[id]?
-      di = @boardGames[id].dataInfo
-      for k,v of dataInfo
-    # TODO: check for other data types besides boolean
-        if not di[k]?
-          return true
-      return false
-    cachedData = loadFromCache "boardgame",id
-    if not cachedData?
-      return true
-    for k,v of dataInfo
-      if not cachedData[k]?
-        return true
-    @parseData cachedData
-    return false
+  getGamesDetails: (gameids, str) ->
 
-  #getGamesDetails: (ids) ->
-    #@loading(true)
-    #url = "/bgs/"
-    #console.log 'getGamesDetails'
-    #for id in ids
-      #if not id?
-        #continue
-      #if @boardGames[id]?
-        #continue
-      #cachedData = loadFromCache "boardgame",id
-      #if cachedData
-        #@parseData cachedData
-      #else
-        #url += "#{id},"
-    #url = url.slice(0,-1) if url.slice(-1) is ","
-    #if url isnt "/bgs/"
-      #$.getJSON url, (data) =>
-        #if data
-          #for bg in data.boardgames
-            #@parseData bg
-        #@loading null
-        #return
-    #else
-      #@loading null
-    #return
+    data = @loadFromCache("searched_bgs", str)
+    if data
+      @loading null
+      @searchedGames((new BoardGameResult(result) for result in data))
+      @sortByBRating(-1)
+      return
+
+    counter = 0
+    i = 0
+
+    while i < gameids.length
+      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + gameids[i] + "&stats=1"
+      $.getJSON "/bgr/#{gameids[i]}", (data) =>
+        counter += 1
+        if data
+          @searchedGames.push(new BoardGameResult(data.items["item"]))
+        if counter is gameids.length
+          @loading null
+          @saveToCache("searched_bgs", str, @searchedGames())
+          @sortByBRating(-1)
+        return
+
+      i++
+    return
 
   saveToCache: (type,key,data) ->
     if Modernizr.sessionstorage
