@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Discover Board Games</title>
-    <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/hans-kendrick" rel="stylesheet" type="text/css"/>
-    <link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/sorts-mill-goudy" rel="stylesheet" type="text/css"/>
+    <!--<link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/hans-kendrick" rel="stylesheet" type="text/css"/>-->
+    <!--<link rel="stylesheet" media="screen" href="http://openfontlibrary.org/face/sorts-mill-goudy" rel="stylesheet" type="text/css"/>-->
     <link rel="stylesheet" href="//brick.a.ssl.fastly.net/PT+Sans:400,400i,700,700i/Libre+Baskerville:400,400i,700,700i/Lato:300,400,400i,700,700i/Raleway:300,400,500,400i,700,700i">
     <!-- <link rel="stylesheet" href="css/normalize.css" />  -->
 
@@ -22,95 +22,37 @@
       <ul class="top-nav">
         <li><a href="#" title="Home"><i class="icon ion-home icon-xlarge"></i></a>  </li>
         <li><a href="#topgames/boardgame" title="Top Games"><i class="icon ion-stats-bars icon-xlarge"></i></a> </li>
-        <li><span class="title" data-bind="text: currentPageTitle"></span>  </li>
+        <li><h2 class="inline" data-bind="text: currentPageTitle"></h2>  </li>
         <li><div class="input-addon">
           <input class="input-addon-field" id="search" type="text" placeholder="Search" data-bind="event: { change: goToSearch }" />
           <button class="input-addon-item" data-bind="click: goToSearch"><span class="icon ion-search"></span></button>
-        </div>
-      </li>
-    </ul>
-  </nav>
-  <div class="text-center" data-bind="if: loading">
-    <i class="icon ion-loading-c icon-large"></i>
-  </div>
-  <main class="main">
-  <!-- top 100 games -->
-  <div data-bind="if: currentPage() === 'topGames'">
-    <h2 class="text-center"><span>Top 100 BGG Games</span> <small data-bind="text: dataTimeStamp"></small></h2>
-    <div class="text-center" data-bind="foreach: gameTypes">
-      <a class="button radius" data-bind="text: name,
-        css: { selected: key == $root.topGamesType() },
-      attr:{href: '#topgames/' + key }"></a>
+            </div>
+        </li>
+      </ul>
+    </nav>
+    <div class="text-center" data-bind="if: loading">
+      <i class="icon ion-loading-c icon-large"></i>
     </div>
-    <table id="top-table" data-bind="if: topGames().length>0">
-      <thead>
-        <tr>
-          <th width="200"></th>
-          <th>Title</th>
-          <th>Rank</th>
-        </tr>
-      </thead>
-      <tbody data-bind="foreach: topGames">
-        <tr>
-          <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
-          <td>
-            <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
-          </td>
-          <td data-bind="text:getRank($root.topGamesType())"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <!-- hot games -->
-  <div class="row" data-bind="if: currentPage() === 'hotGames' ">
-    <table id="hot-table" data-bind="if: hotGames().length>0">
-      <thead>
-        <tr>
-          <th width="200"></th>
-          <th class="clickable" data-bind="click: $root.sortColumn">Title</th>
-          <th class="clickable" data-sort="int" data-bind="click: $root.sortColumn">Rank</th>
-        </tr>
-      </thead>
-      <tbody data-bind="foreach: hotGames">
-        <!-- ko with:$root.boardGames[$data] -->
-        <tr>
-          <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
-          <td>
-            <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
-          </td>
-          <td data-bind="text:rank"></td>
-        </tr>
-        <!-- /ko -->
-      </tbody>
-    </table>
-  </div>
-  <!-- Search results -->
-  <div id="results" data-bind="if: currentPage() === 'searchGames' ">
-    <span data-bind="if: searchedGames()[0] === undefined && !loading()">No Results</span>
-    <!--<table id="results-table" data-bind="if: searchedGames().length>0 && searchedGames()[0] !== undefined">-->
-    <table id="results-table" data-bind="if: searchedGamesList().length>0">
-      <thead>
-        <tr>
-          <th width="200"></th>
-          <!--<th class="clickable" data-bind="click: function(d,e) {handleSort('name',d,e)}">Title</th>-->
-          <th class="clickable" data-bind="click: $root.sortColumn">Title</th>
-          <!--<th class="clickable" data-bind="click: handleSort.bind($data,'brating')">BGG Rating</th>-->
-          <th class="clickable" data-sort="float" data-bind="click: $root.sortColumn">BGG Rating</th>
-        </tr>
-      </thead>
-      <tbody data-bind="foreach: searchedGamesList">
-        <!--<tr data-bind="if: $data">-->
-        <tr>
-          <td class="paddingless"><img class="radius" data-bind="attr:{src: thumbnail}"></td>
-          <td>
-            <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
-            <blockquote data-bind="html: getShortDescription()"></blockquote>
-          </td>
-          <td data-bind="text:getBRating()"></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <main>
+    <!-- top 100 games -->
+    <div data-bind="if: currentPage() === 'topGames'">
+      <h2 class="text-center"><span>Top 100 BGG Games</span> <small data-bind="text: dataTimeStamp"></small></h2>
+      <div class="text-center" data-bind="foreach: gameTypes">
+        <a class="button radius" data-bind="text: name,
+          css: { selected: key == $root.topGamesType() },
+        attr:{href: '#topgames/' + key }"></a>
+      </div>
+      <div data-bind="template: { name: 'gamesList-template', data: [topGames]}"></div>
+    </div>
+    <!-- hot games -->
+    <div data-bind="if: currentPage() === 'hotGames' ">
+      <div data-bind="template: { name: 'gamesList-template', data: [hotGames]}"></div>
+    </div>
+    <!-- Search results -->
+    <div data-bind="if: currentPage() === 'searchGames' ">
+      <span data-bind="if: searchedGames().length===0 && !loading()">No Results</span>
+      <div data-bind="template: { name: 'gamesList-template', data: [searchedGames]}"></div>
+    </div>
 <!-- Selected game -->
 <div data-bind="visible: currentPage() === 'gameOverview' && !loading()">
   <ul id="nav" class="sub-nav">
@@ -301,6 +243,42 @@
     </div>
   </div>
 </div>
+<script type="text/html" id="gamesList-template">
+  <table class="games-table" data-bind="sortable: $data[0]">
+    <thead>
+      <tr>
+        <th></th>
+        <th data-sort='string'>Title</th>
+        <!-- ko if: $root.currentPage() === 'topGames' || $root.currentPage() === 'hotGames' -->
+        <th data-sort='int'>Rank</th>
+        <!-- /ko -->
+        <!-- ko if: $root.currentPage() === 'searchGames' -->
+        <th data-sort="float">BGG Rating</th>
+        <!-- /ko -->
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: $root.gamesList">
+      <tr>
+        <td><img class="game-image radius" data-bind="attr:{src: thumbnail}"></td>
+        <td>
+          <a href="" data-bind="click: $root.goToGame"><h4><span data-bind="text:getName()"></span> <small data-bind="text:yearpublished['value']"></small></h4></a>
+          <!-- ko if: $root.currentPage() === 'searchGames' -->
+          <blockquote class="hidden-small" data-bind="html: getShortDescription()"></blockquote>
+          <!-- /ko -->
+        </td>
+        <!-- ko if: $root.currentPage() === 'topGames' -->
+        <td class="text-center" data-bind="text:getRank($root.topGamesType())"></td>
+        <!-- /ko -->
+        <!-- ko if: $root.currentPage() === 'hotGames' -->
+        <td class="text-center" data-bind="text:rank"></td>
+        <!-- /ko -->
+        <!-- ko if: $root.currentPage() === 'searchGames' -->
+        <td class="text-center" data-bind="text:getBRating()"></td>
+        <!-- /ko -->
+      </tr>
+    </tbody>
+  </table>
+</script>
 <script type="text/html" id="forums-template">
 <table class="thread-table">
   <thead>
@@ -387,20 +365,22 @@
   </div>
 </div>
 </main>
-<footer>
-  <ul>
-    <li>
-      <a href="http://boardgamegeek.com/"><i class="icon ion-log-out icon-large"></i> Board Game Geek</a></li>
+  <footer>
+    <ul>
       <li>
-        <a href="https://github.com/fursav/elated-lion"><i class="icon ion-social-github icon-large"></i> Github</a></li>
-        <li></li>
-      </ul>
-    </footer>
+        <a href="http://boardgamegeek.com/"><i class="icon ion-log-out icon-large"></i><span> Board Game Geek</span></a>
+      </li>
+      <li>
+        <a href="https://github.com/fursav/elated-lion"><i class="icon ion-social-github icon-large"></i><span></span> Github</a></li>
+      </li>
+    </ul>
+  </footer>
     <!-- build:js js/script.js -->
     <script src="js/vendor/modernizr.js"></script>
     <script src="js/vendor/jquery.js"></script>
     <script src="js/vex.combined.min.js"></script>
     <script src="js/humanize.min.js"></script>
+    <script src="js/rsvp.js"></script>
     <script src="js/responsive-nav.min.js"></script>
     <script src="js/jquery.nav.js"></script>
     <script src="js/waypoints.min.js"></script>

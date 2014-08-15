@@ -1,13 +1,123 @@
 (function() {
-  var BoardGame, ViewModel, loadFromCache, saveToCache,
+  var BoardGame, ViewModel, getIntFromDate, getNumFromMonth, loadFromCache, saveToCache, sortColumn,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  getIntFromDate = (function(_this) {
+    return function(date) {
+      return parseInt(date.slice(-4) + _this.getNumFromMonth(date.slice(8, -5)) + date.slice(5, 7), 10);
+    };
+  })(this);
+
+  getNumFromMonth = function(month) {
+    switch (month.toLowerCase()) {
+      case "jan":
+        return "00";
+      case "feb":
+        return "01";
+      case "mar":
+        return "02";
+      case "apr":
+        return "03";
+      case "may":
+        return "04";
+      case "jun":
+        return "05";
+      case "jul":
+        return "06";
+      case "aug":
+        return "07";
+      case "sep":
+        return "08";
+      case "oct":
+        return "09";
+      case "nov":
+        return "10";
+      case "dec":
+        return "11";
+    }
+  };
+
+  sortColumn = function(list, e, type, sortDir) {
+    var $table, column, temp, th, thIndex, trs;
+    th = $(e);
+    $table = th.closest("table");
+    thIndex = th.index();
+    trs = $table.children("tbody").children("tr");
+    column = [];
+    if (sortDir != null) {
+      sortDir = sortDir === "asc" ? 1 : -1;
+    }
+    if (sortDir == null) {
+      sortDir = th.hasClass("sorting-desc") ? 1 : -1;
+    }
+    trs.each(function(index, tr) {
+      var $e, order_by, sort_val;
+      $e = $(tr).children().eq(thIndex);
+      sort_val = $e.data("sort-value");
+      order_by = typeof sort_val === !"undefined" ? sort_val : $e.text();
+      column.push([order_by, index]);
+    });
+    column.sort((function(_this) {
+      return function(a, b) {
+        var date1, date2;
+        switch (type) {
+          case "float":
+            return sortDir * (parseFloat(a[0], 10) - parseFloat(b[0], 10));
+          case "int":
+            return sortDir * (parseInt(a[0], 10) - parseInt(b[0], 10));
+          case "date":
+            date1 = a[0] === "0" ? 0 : getIntFromDate(a[0]);
+            date2 = b[0] === "0" ? 0 : getIntFromDate(b[0]);
+            return sortDir * (date1 - date2);
+          default:
+            if (a[0] < b[0]) {
+              return sortDir * -1;
+            }
+            if (a[0] > b[0]) {
+              return sortDir;
+            }
+            return 0;
+        }
+      };
+    })(this));
+    temp = $.map(column, function(kv) {
+      return list()[kv[1]];
+    });
+    list(temp);
+    th.siblings().removeClass("sorting-desc sorting-asc");
+    th.removeClass("sorting-desc sorting-asc");
+    if (sortDir === 1) {
+      th.addClass("sorting-asc");
+    } else {
+      th.addClass('sorting-desc');
+    }
+  };
+
+  ko.bindingHandlers.sortable = {
+    init: function(element, valueAccessor) {
+      $("th[data-sort]", element).each(function() {
+        $(this).addClass("clickable");
+      });
+    },
+    update: function(element, valueAccessor) {
+      var value;
+      value = valueAccessor();
+      $("th[data-sort]", element).each(function() {
+        $(this).removeClass("sorting-desc sorting-asc");
+        $(this).click(function() {
+          sortColumn(value, this, $(this).data("sort"));
+        });
+      });
+    }
+  };
 
   $(function() {
     var alert, nav;
     nav = responsiveNav(".nav-collapse", {
       animate: true,
       transition: 284,
-      label: ""
+      label: "",
+      closeOnNavClick: true
     });
     $("#nav").onePageNav({
       currentClass: "active"
@@ -72,7 +182,7 @@
     BoardGame.prototype.updateData = function(data) {
       var k, updateProp, v, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
       updateProp = function(prop, propData) {
-        if (propData) {
+        if (propData != null) {
           prop(propData);
         }
       };
@@ -129,12 +239,21 @@
     };
 
     BoardGame.prototype.getRanks = function() {
-      return this.statistics().ratings.ranks.rank;
+      var _ref, _ref1, _ref2;
+      return (_ref = this.statistics()) != null ? (_ref1 = _ref.ratings) != null ? (_ref2 = _ref1.ranks) != null ? _ref2.rank : void 0 : void 0 : void 0;
     };
 
     BoardGame.prototype.getRank = function(name) {
       var rank, _i, _len, _ref, _results;
-      console.log(name);
+      if (name === "averageRating") {
+        return this.getAverageRating();
+      }
+      if (name === "bayesRating") {
+        return this.getBRating();
+      }
+      if (this.getRanks() == null) {
+        return "";
+      }
       _ref = this.getRanks();
       _results = [];
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -319,16 +438,11 @@
 
   ViewModel = (function() {
     function ViewModel() {
-      this.updateTableHeaders = __bind(this.updateTableHeaders, this);
-      this.getIntFromDate = __bind(this.getIntFromDate, this);
-      this.sortColumn = __bind(this.sortColumn, this);
       this.goToGame = __bind(this.goToGame, this);
       this.goToGameComments = __bind(this.goToGameComments, this);
       var self;
       self = this;
       this.loading = ko.observable(null);
-      this.sortDirection = -1;
-      this.currentSort = 'brating';
       this.gameTypes = [
         {
           key: 'boardgame',
@@ -380,34 +494,35 @@
         "updated": ko.observable()
       };
       this.searchedGames = ko.observableArray([]);
-      this.searchedGamesList = ko.computed((function(_this) {
+      this.hotGames = ko.observableArray([]);
+      this.topGamesType = ko.observable();
+      this.topGames = ko.observableArray([]);
+      this.gamesList = ko.computed((function(_this) {
         return function() {
-          var id, list, _i, _len, _ref;
-          _this.boardGames.updated();
+          var id, ids, list, _i, _len;
           list = [];
-          _ref = _this.searchedGames();
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            id = _ref[_i];
+          ids = (function() {
+            switch (this.currentPage()) {
+              case "topGames":
+                return this.topGames();
+              case "hotGames":
+                return this.hotGames();
+              case "searchGames":
+                return this.searchedGames();
+              default:
+                return [];
+            }
+          }).call(_this);
+          _this.boardGames.updated();
+          for (_i = 0, _len = ids.length; _i < _len; _i++) {
+            id = ids[_i];
             if (_this.boardGames[id] != null) {
               list.push(_this.boardGames[id]);
             }
           }
-          console.log(list);
-          list.sort(function(a, b) {
-            if (a.getBRating() < b.getBRating()) {
-              return 1;
-            }
-            if (a.getBRating() > b.getBRating()) {
-              return -1;
-            }
-            return 0;
-          });
           return list;
         };
       })(this));
-      this.hotGames = ko.observableArray([]);
-      this.topGamesType = ko.observable();
-      this.topGames = ko.observableArray([]);
       this.dataTimeStamp = ko.observable();
       $.getJSON('json/top100.json', (function(_this) {
         return function(data) {
@@ -417,14 +532,12 @@
       this.selectedGame = ko.observable();
       Sammy(function() {
         this.get(/#search\/(.*)/, function() {
-          self.selectedGame(null);
           self.searchGames(this.params.splat[0]);
           self.currentPage("searchGames");
         });
         this.get(/#game\/(\w*)$/, function() {
-          self.currentPage("gameOverview");
-          self.searchedGames.removeAll();
           self.getGameDetails(this.params.splat[0]);
+          self.currentPage("gameOverview");
         });
         this.get(/#game\/(\w*)\/comments\/page\/(\w*)/, function() {
           self.getGameDetails(this.params.splat[0], this.params.splat[1]);
@@ -432,9 +545,6 @@
         });
         this.get("#topgames/:gameType", function() {
           self.topGamesType(this.params.gameType);
-          self.selectedGame(null);
-          self.searchedGames.removeAll();
-          self.topGames.removeAll();
           self.getTopGames(this.params.gameType);
           self.currentPage("topGames");
         });
@@ -444,9 +554,6 @@
           self.searchedGames.removeAll();
           self.getHotItems();
           self.currentPage("hotGames");
-        });
-        this.get("/", function() {
-          console.log("dead");
         });
       }).run();
     }
@@ -473,167 +580,36 @@
       }, "slow");
     };
 
-    ViewModel.prototype.sortColumn = function(object, event) {
-      var $table, column, sortDir, th, thIndex, trs, type;
-      th = $(event.target);
-      $table = th.closest("table");
-      thIndex = th.index();
-      trs = $table.children("tbody").children("tr");
-      column = [];
-      sortDir = th.hasClass("sorting-desc") ? 1 : -1;
-      type = th.data("sort");
-      trs.each(function(index, tr) {
-        var $e, order_by, sort_val;
-        $e = $(tr).children().eq(thIndex);
-        sort_val = $e.data("sort-value");
-        order_by = typeof sort_val === !"undefined" ? sort_val : $e.text();
-        column.push([order_by, tr]);
-      });
-      column.sort((function(_this) {
-        return function(a, b) {
-          var date1, date2;
-          switch (type) {
-            case "float":
-              return sortDir * (parseFloat(a[0], 10) - parseFloat(b[0], 10));
-            case "int":
-              return sortDir * (parseInt(a[0], 10) - parseInt(b[0], 10));
-            case "date":
-              date1 = a[0] === "0" ? 0 : _this.getIntFromDate(a[0]);
-              date2 = b[0] === "0" ? 0 : _this.getIntFromDate(b[0]);
-              return sortDir * (date1 - date2);
-            default:
-              if (a[0] < b[0]) {
-                return sortDir * -1;
-              }
-              if (a[0] > b[0]) {
-                return sortDir;
-              }
-              return 0;
-          }
-        };
-      })(this));
-      trs = $.map(column, function(kv) {
-        return kv[1];
-      });
-      $table.children("tbody").append(trs);
-      th.siblings().removeClass("sorting-desc sorting-asc");
-      th.removeClass("sorting-desc sorting-asc");
-      if (sortDir === 1) {
-        th.addClass("sorting-asc");
-      } else {
-        th.addClass('sorting-desc');
+    ViewModel.prototype.sortList = function(list, type, dir) {
+      if (dir == null) {
+        dir = 1;
       }
-    };
-
-    ViewModel.prototype.getIntFromDate = function(date) {
-      return parseInt(date.slice(-4) + this.getNumFromMonth(date.slice(8, -5)) + date.slice(5, 7), 10);
-    };
-
-    ViewModel.prototype.getNumFromMonth = function(month) {
-      switch (month.toLowerCase()) {
-        case "jan":
-          return "00";
-        case "feb":
-          return "01";
-        case "mar":
-          return "02";
-        case "apr":
-          return "03";
-        case "may":
-          return "04";
-        case "jun":
-          return "05";
-        case "jul":
-          return "06";
-        case "aug":
-          return "07";
-        case "sep":
-          return "08";
-        case "oct":
-          return "09";
-        case "nov":
-          return "10";
-        case "dec":
-          return "11";
-      }
-    };
-
-    ViewModel.prototype.sortList = function(list, type) {
       return list.sort((function(_this) {
         return function(a, b) {
           var a_prop, b_prop;
-          a_prop = parseInt(a.getRank(type));
-          b_prop = parseInt(b.getRank(type));
+          a_prop = parseFloat(_this.boardGames[a].getRank(type));
+          b_prop = parseFloat(_this.boardGames[b].getRank(type));
           if (a_prop > b_prop) {
-            return 1;
+            return -1 * dir;
           }
           if (a_prop < b_prop) {
-            return -1;
+            return dir;
           }
           return 0;
         };
       })(this));
-    };
-
-    ViewModel.prototype.sortByName = function(direction) {
-      if (direction != null) {
-        this.sortDirection = direction;
-      }
-      this.searchedGames.sort((function(_this) {
-        return function(a, b) {
-          if (a.getName() > b.getName()) {
-            return 1 * _this.sortDirection;
-          }
-          if (a.getName() < b.getName()) {
-            return -1 * _this.sortDirection;
-          }
-          return 0;
-        };
-      })(this));
-    };
-
-    ViewModel.prototype.sortByBRating = function(direction) {
-      if (direction != null) {
-        this.sortDirection = direction;
-      }
-      this.searchedGames.sort((function(_this) {
-        return function(a, b) {
-          if (a.getBRating() > b.getBRating()) {
-            return 1 * _this.sortDirection;
-          }
-          if (a.getBRating() < b.getBRating()) {
-            return -1 * _this.sortDirection;
-          }
-          return 0;
-        };
-      })(this));
-    };
-
-    ViewModel.prototype.handleSort = function(type, vm, event) {
-      this.sortDirection = type === this.currentSort ? -this.sortDirection : -1;
-      this.currentSort = type;
-      this.updateTableHeaders(type, event);
-      switch (type) {
-        case "name":
-          this.sortByName();
-          break;
-        case "brating":
-          this.sortByBRating();
-      }
-    };
-
-    ViewModel.prototype.updateTableHeaders = function(type, event) {
-      $("#results-table thead tr th").removeClass("sorting-asc");
-      $("#results-table thead tr th").removeClass("sorting-desc");
-      if (this.sortDirection === -1) {
-        $(event.toElement).addClass("sorting-desc");
-      } else {
-        $(event.toElement).addClass("sorting-asc");
-      }
     };
 
     ViewModel.prototype.searchGames = function(str) {
-      var ids, regex;
+      var ids, processIds, regex;
+      processIds = (function(_this) {
+        return function(ids) {
+          _this.getGamesDetails(ids, function() {
+            _this.sortList(_this.searchedGames, "bayesRating");
+          });
+          _this.searchedGames(ids);
+        };
+      })(this);
       this.searchedGames.removeAll();
       if (str === "") {
         return null;
@@ -641,23 +617,18 @@
       regex = new RegExp(" ", "g");
       str = str.replace(regex, "+");
       str = encodeURI(str);
-      console.log(str);
-      this.loading(true);
       ids = loadFromCache("searched_bgs_ids", str);
       if (ids) {
-        console.log('search from cache');
-        console.log(ids);
-        this.getGamesDetails(ids, str);
-        this.searchedGames(ids);
-        this.loading(null);
+        processIds(ids);
         return;
       }
+      this.loading(true);
       $.getJSON("/search?type=boardgame&query=" + str, (function(_this) {
         return function(data) {
           ids = _this.extractIdsFromSearch(data);
           saveToCache("searched_bgs_ids", str, ids);
-          _this.getGamesDetails(ids, str);
-          _this.searchedGames(ids);
+          processIds(ids);
+          _this.loading(null);
         };
       })(this));
     };
@@ -675,49 +646,39 @@
             ids.push(item != null ? item.id : void 0);
           }
         } else {
-          ids.push(items != null ? items.id : void 0);
+          if ((items != null ? items.id : void 0) != null) {
+            ids.push(items != null ? items.id : void 0);
+          }
         }
         return ids;
       }
     };
 
     ViewModel.prototype.getTopGames = function(type) {
+      var ids, processItems;
+      window.counter = Date.now();
+      console.log(0);
+      processItems = (function(_this) {
+        return function(items) {
+          _this.topGames(items);
+          _this.getGamesDetails(items, function() {
+            _this.sortList(_this.topGames, _this.topGamesType(), -1);
+            console.log(Date.now() - window.counter);
+          });
+        };
+      })(this);
+      this.topGames.removeAll();
+      ids = loadFromCache("topgames", type);
+      if (ids) {
+        processItems(ids);
+        return;
+      }
       this.loading(true);
       $.getJSON('json/top100.json', (function(_this) {
         return function(data) {
-          var bgdata, counter, id, items, url, _i, _len, _results;
-          items = data[type];
-          counter = 0;
-          _results = [];
-          for (_i = 0, _len = items.length; _i < _len; _i++) {
-            id = items[_i];
-            bgdata = _this.loadFromCache("bgr", id);
-            if (bgdata) {
-              counter += 1;
-              _this.topGames.push(new BoardGameResult(bgdata));
-              if (counter === items.length) {
-                _results.push(_this.loading(null));
-              } else {
-                _results.push(void 0);
-              }
-            } else {
-              url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1";
-              _results.push($.getJSON("/bgr/" + id, function(data) {
-                var bgr;
-                counter += 1;
-                if (data) {
-                  bgr = new BoardGameResult(data.items["item"]);
-                  _this.topGames.push(bgr);
-                  _this.saveToCache("bgr", bgr.id, bgr);
-                }
-                if (counter === items.length) {
-                  _this.sortList(_this.topGames, _this.topGamesType());
-                  _this.loading(null);
-                }
-              }));
-            }
-          }
-          return _results;
+          ids = data[type];
+          saveToCache("topgames", type, ids);
+          processItems(ids);
         };
       })(this));
     };
@@ -726,10 +687,10 @@
       if (data == null) {
         return;
       }
-      console.log(data.id);
       if (this.boardGames[data.id] != null) {
         this.boardGames[data.id].updateData(data);
-        data = this.boardGames[data.id].getData();
+        this.boardGames.updated(Date.now());
+        return;
       }
       this.boardGames[data.id] = new BoardGame(data);
       this.boardGames.updated(Date.now());
@@ -737,21 +698,16 @@
 
     ViewModel.prototype.getHotItems = function() {
       var data, id, _i, _len;
-      this.loading(true);
-      data = this.loadFromCache("hot", "games");
+      data = loadFromCache("hot", "games");
       if (data) {
         this.hotGames(data);
-        console.log(data);
         for (_i = 0, _len = data.length; _i < _len; _i++) {
           id = data[_i];
-          if (this.boardGames[id] == null) {
-            console.log(id);
-            this.boardGames[id] = new BoardGame(this.loadFromCache("boardgame", id));
-          }
+          this.needToRetrieveData(id);
         }
-        this.loading(null);
         return;
       }
+      this.loading(true);
       $.getJSON('hot', (function(_this) {
         return function(data) {
           var item, _j, _len1, _ref;
@@ -775,96 +731,68 @@
               return _results;
             })());
             _this.loading(null);
-            _this.saveToCache("hot", "games", _this.hotGames());
+            saveToCache("hot", "games", _this.hotGames());
           }
         };
       })(this));
     };
 
-    ViewModel.prototype.getGameDetails = function(id, page) {
-      var data, url;
-      this.loading(true);
-      if (page) {
-        $.getJSON("bg/" + id + "/" + page, (function(_this) {
-          return function(data) {
-            var subnav;
-            if (data) {
-              _this.selectedGame(new BoardGame(data.items["item"]));
-              _this.loading(null);
-              subnav = $('#sub-nav').onePageNav({
-                currentClass: 'active'
-              });
+    ViewModel.prototype.getGameDetails = function(id, query) {
+      var promise;
+      promise = new RSVP.Promise((function(_this) {
+        return function(resolve, reject) {
+          var k, url, v;
+          if (query == null) {
+            query = {
+              'stats': 1,
+              'comments': 1,
+              'pagesize': 100,
+              'page': page
+            };
+          }
+          console.log('getGameDetails');
+          if (_this.needToRetrieveData(id, query)) {
+            url = "/thing?id=" + id;
+            for (k in query) {
+              v = query[k];
+              url += "&" + k + "=" + v;
             }
-          };
-        })(this));
-        return;
-      }
-      if (page == null) {
-        page = 1;
-      }
-      data = this.loadFromCache("bg", id);
-      if (data) {
-        this.selectedGame(new BoardGame(data));
-        this.loading(null);
-        return;
-      }
-      url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1&comments=1&pagesize=100&page=" + page;
-      $.getJSON("/thing?id=" + id + "&stats=1", (function(_this) {
-        return function(data) {
-          var subnav;
-          if (data) {
-            _this.selectedGame(new BoardGame(data.items["item"]));
-            _this.loading(null);
-            subnav = $('#sub-nav').onePageNav({
-              currentClass: 'active'
+            $.getJSON(url, function(data) {
+              if (data) {
+                data.dataInfo = query;
+                _this.parseData(data);
+              }
+              return resolve(true);
             });
-            _this.saveToCache("bg", {
-              'query': id
-            }, _this.selectedGame());
+          } else {
+            return resolve(true);
           }
         };
       })(this));
+      return promise;
     };
 
-    ViewModel.prototype.getGamesDetails = function(ids) {
-      var cnt, id, k, lookupids, query, url, v, _i, _j, _len, _len1;
+    ViewModel.prototype.getGamesDetails = function(ids, callback) {
+      var promises, query;
       query = {
         'stats': 1
       };
       this.loading(true);
       console.log('getGamesDetails');
-      lookupids = [];
-      for (_i = 0, _len = ids.length; _i < _len; _i++) {
-        id = ids[_i];
-        if (this.needToRetrieveData(id, query)) {
-          lookupids.push(id);
-        }
-      }
-      cnt = 0;
-      for (_j = 0, _len1 = lookupids.length; _j < _len1; _j++) {
-        id = lookupids[_j];
-        cnt++;
-        url = "/thing?id=" + id;
-        for (k in query) {
-          v = query[k];
-          url += "&" + k + "=" + v;
-        }
-        $.getJSON(url, (function(_this) {
-          return function(data) {
-            cnt--;
-            if (data) {
-              data.datainfo = query;
-              _this.parseData(data);
-            }
-            if (cnt === 0) {
-              _this.loading(null);
-            }
-          };
-        })(this));
-      }
-      if (lookupids.length === 0) {
-        this.loading(null);
-      }
+      promises = ids.map((function(_this) {
+        return function(id) {
+          return _this.getGameDetails(id, query);
+        };
+      })(this));
+      RSVP.all(promises).then((function(_this) {
+        return function() {
+          console.log("done");
+          if (callback != null) {
+            callback();
+          }
+          _this.loading(null);
+        };
+      })(this));
     };
 
     ViewModel.prototype.needToRetrieveData = function(id, dataInfo) {
@@ -888,29 +816,12 @@
       }
       for (k in dataInfo) {
         v = dataInfo[k];
-        if (cachedData[k] == null) {
+        if (cachedData.dataInfo[k] == null) {
           return true;
         }
       }
       this.parseData(cachedData);
       return false;
-    };
-
-    ViewModel.prototype.saveToCache = function(type, key, data) {
-      if (Modernizr.sessionstorage) {
-        sessionStorage["" + type + "_" + key] = ko.toJSON(data);
-      }
-    };
-
-    ViewModel.prototype.loadFromCache = function(type, key) {
-      var data;
-      if (Modernizr.sessionstorage) {
-        data = sessionStorage["" + type + "_" + key];
-        if (data) {
-          data = JSON.parse(data);
-        }
-        return data;
-      }
     };
 
     return ViewModel;

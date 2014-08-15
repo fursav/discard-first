@@ -58,12 +58,100 @@
 #     REVIEW: describe code that should be reviewed to confirm implementation
 
 #---------------------------------------------------------------------------------------------------
+
+getIntFromDate =  (date) =>
+  parseInt(date.slice(-4) + @getNumFromMonth(date.slice(8,-5)) + date.slice(5,7),10)
+
+getNumFromMonth = (month) ->
+  switch month.toLowerCase()
+    when "jan" then "00"
+    when "feb" then "01"
+    when "mar" then "02"
+    when "apr" then "03"
+    when "may" then "04"
+    when "jun" then "05"
+    when "jul" then "06"
+    when "aug" then "07"
+    when "sep" then "08"
+    when "oct" then "09"
+    when "nov" then "10"
+    when "dec" then "11"
+
+sortColumn = (list,e,type,sortDir) ->
+  th = $(e)
+  $table = th.closest("table")
+  thIndex = th.index()
+  trs = $table.children("tbody").children("tr")
+  column = []
+  # if current sort is descending
+  # then change it to ascending
+  # descending -1 is the default sort
+  if sortDir?
+    sortDir = if sortDir is "asc" then 1 else -1
+  sortDir ?= if th.hasClass("sorting-desc") then 1 else -1
+  trs.each((index,tr) ->
+    $e = $(tr).children().eq(thIndex)
+    sort_val = $e.data("sort-value")
+    order_by = if typeof(sort_val) is not "undefined" then sort_val else $e.text()
+    column.push([order_by, index])
+    return
+  )
+  # Sort by the data-order-by value
+  column.sort((a, b) =>
+    switch type
+      when "float"
+        sortDir * (parseFloat(a[0], 10) - parseFloat(b[0], 10))
+      when "int"
+        sortDir * (parseInt(a[0], 10) - parseInt(b[0], 10))
+      when "date"
+        date1 = if a[0] is "0" then 0 else getIntFromDate(a[0])
+        date2 = if b[0] is "0" then 0 else getIntFromDate(b[0])
+        sortDir * (date1 - date2)
+      else
+        if a[0] < b[0]
+          return sortDir * -1
+        if a[0] > b[0]
+          return sortDir
+        return 0
+    )
+  temp = $.map(column, (kv) ->
+    list()[kv[1]]
+    )
+  list(temp)
+  #$table.children("tbody").append(trs)
+  th.siblings().removeClass("sorting-desc sorting-asc")
+  th.removeClass("sorting-desc sorting-asc")
+  if sortDir is 1
+    th.addClass("sorting-asc")
+  else
+    th.addClass('sorting-desc')
+  return
+
+
+ko.bindingHandlers.sortable =
+  init: (element, valueAccessor) ->
+    # Change cursor to pointer on hover
+    $("th[data-sort]", element).each ->
+      $(this).addClass("clickable")
+      return
+    return
+
+  update: (element, valueAccessor) ->
+    value = valueAccessor()
+    $("th[data-sort]", element).each ->
+      $(this).removeClass("sorting-desc sorting-asc")
+      $(this).click ->
+        sortColumn(value,this,$(this).data("sort"))
+        return
+      return
+    return
+    
 $ ->
-  # $(document).foundation()
   nav = responsiveNav(".nav-collapse",
     animate: true
     transition: 284
     label: ""
+    closeOnNavClick: true
     )
   $("#nav").onePageNav({currentClass:"active"})
   window.vm = new ViewModel()
@@ -130,7 +218,7 @@ class BoardGame
       
   updateData: (data) ->
     updateProp = (prop,propData) ->
-      prop(propData) if propData
+      prop(propData) if propData?
       return
     @id = data.id ? @id
     updateProp(@image,data.image)
@@ -192,10 +280,12 @@ class BoardGame
 
   # Returns all the ranks of a boardgame
   getRanks: ->
-    @statistics().ratings.ranks.rank
+    @statistics()?.ratings?.ranks?.rank
 
   getRank: (name) ->
-    console.log name
+    return @getAverageRating() if name is "averageRating"
+    return @getBRating() if name is "bayesRating"
+    return "" if not @getRanks()?
     parseInt(rank.value) for rank in @getRanks() when rank.name is name
 
   getTopRank: ->
@@ -350,9 +440,6 @@ class ViewModel
 
     # Indicates that information is currently loading
     @loading = ko.observable(null)
-    # 1 is ascending, -1 is descending
-    @sortDirection = -1
-    @currentSort = 'brating'
     @gameTypes = [{key:'boardgame',name:"Overall"},{key:'partygames',name:'Party'},
                   {key:'abstracts',name:'Abstract'},{key:'cgs',name:'Customizable'},
                   {key:'childrensgames',name:"Children"},{key:'familygames',name:'Family'},
@@ -373,48 +460,40 @@ class ViewModel
     @boardGames = {"updated":ko.observable()}
     # [Array]
     @searchedGames = ko.observableArray([])
-    @searchedGamesList = ko.computed =>
-      # introduced this to dependency to refresh when finished loading
-      #@loading()
-      @boardGames.updated()
-      list = []
-      for id in @searchedGames()
-        if @boardGames[id]?
-          list.push @boardGames[id]
-      #console.log list.sort().reverse()
-      #list = @sortList(list,"boardgame")
-      console.log list
-      list.sort((a,b) ->
-        return 1 if a.getBRating() < b.getBRating()
-        return -1 if a.getBRating() > b.getBRating()
-        return 0
-        )
-      list
-      #console.log(@boardGames[id] for id in @searchedGames() if @boardGames[id]?)
-      #@boardGames[id] for id in @searchedGames() if @boardGames[id]?
-    #.extend({ notify: 'always' })
     # [Array]
     @hotGames = ko.observableArray([])
 
     @topGamesType = ko.observable()
     @topGames = ko.observableArray([])
+    @gamesList = ko.computed () =>
+      list = []
+      ids = switch @currentPage()
+        when "topGames" then @topGames()
+        when "hotGames" then @hotGames()
+        when "searchGames" then @searchedGames()
+        else []
+      @boardGames.updated()
+      for id in ids
+        if @boardGames[id]?
+          list.push @boardGames[id]
+      list
+      
     @dataTimeStamp = ko.observable()
     $.getJSON 'json/top100.json', (data) =>
       @dataTimeStamp data.date
     # [BoardGame]
     @selectedGame = ko.observable()
     # Client-side routes
-    Sammy(->
+    Sammy( ->
       @get /#search\/(.*)/, ->
-          self.selectedGame null
+          #self.selectedGame null
           self.searchGames @params.splat[0]
           self.currentPage "searchGames"
           return
 
       @get /#game\/(\w*)$/, ->
-        self.currentPage "gameOverview"
-        self.searchedGames.removeAll()
         self.getGameDetails @params.splat[0]
+        self.currentPage "gameOverview"
         return
 
       @get /#game\/(\w*)\/comments\/page\/(\w*)/, ->
@@ -425,9 +504,7 @@ class ViewModel
 
       @get "#topgames/:gameType", ->
         self.topGamesType(@params.gameType)
-        self.selectedGame null
-        self.searchedGames.removeAll()
-        self.topGames.removeAll()
+        #self.selectedGame null
         self.getTopGames(@params.gameType)
         self.currentPage "topGames"
         return
@@ -439,11 +516,7 @@ class ViewModel
         self.getHotItems()
         self.currentPage "hotGames"
         return
-
-      @get "/", ->
-        console.log "dead"
-        return
-
+        
       return
     ).run()
 
@@ -477,138 +550,25 @@ class ViewModel
         , "slow"
     return
 
-  sortColumn: (object,event) =>
-    # console.log event
-    th = $(event.target)
-    $table = th.closest("table")
-    thIndex = th.index()
-    trs = $table.children("tbody").children("tr")
-    column = []
-    # if current sort is descending
-    # then change it to ascending
-    # descending -1 is the default sort
-    sortDir = if th.hasClass("sorting-desc") then 1 else -1
-    type = th.data("sort")
-    trs.each((index,tr) ->
-      $e = $(tr).children().eq(thIndex)
-      sort_val = $e.data("sort-value")
-      order_by = if typeof(sort_val) is not "undefined" then sort_val else $e.text()
-      column.push([order_by, tr])
-      return
-    )
-    # Sort by the data-order-by value
-    column.sort((a, b) =>
-      switch type
-        when "float"
-          sortDir * (parseFloat(a[0], 10) - parseFloat(b[0], 10))
-        when "int"
-          sortDir * (parseInt(a[0], 10) - parseInt(b[0], 10))
-        when "date"
-          date1 = if a[0] is "0" then 0 else @getIntFromDate(a[0])
-          date2 = if b[0] is "0" then 0 else @getIntFromDate(b[0])
-          sortDir * (date1 - date2)
-        else
-          if a[0] < b[0]
-            return sortDir * -1
-          if a[0] > b[0]
-            return sortDir
-          return 0
-      )
-    trs = $.map(column, (kv) ->
-      kv[1]
-      )
-    $table.children("tbody").append(trs)
-    th.siblings().removeClass("sorting-desc sorting-asc")
-    th.removeClass("sorting-desc sorting-asc")
-    if sortDir is 1
-      th.addClass("sorting-asc")
-    else
-      th.addClass('sorting-desc')
-    return
-
-  getIntFromDate: (date) =>
-    parseInt(date.slice(-4) + @getNumFromMonth(date.slice(8,-5)) + date.slice(5,7),10)
-
-  getNumFromMonth: (month) ->
-    switch month.toLowerCase()
-      when "jan" then "00"
-      when "feb" then "01"
-      when "mar" then "02"
-      when "apr" then "03"
-      when "may" then "04"
-      when "jun" then "05"
-      when "jul" then "06"
-      when "aug" then "07"
-      when "sep" then "08"
-      when "oct" then "09"
-      when "nov" then "10"
-      when "dec" then "11"
-
-
-
-  sortList: (list,type) ->
+  sortList: (list,type,dir) ->
+    dir ?= 1
     list.sort (a, b) =>
-      a_prop = parseInt(a.getRank(type))
-      b_prop = parseInt(b.getRank(type))
-      return 1  if a_prop > b_prop
-      return -1  if a_prop < b_prop
+      a_prop = parseFloat(@boardGames[a].getRank(type))
+      b_prop = parseFloat(@boardGames[b].getRank(type))
+      return -1*dir  if a_prop > b_prop
+      return dir  if a_prop < b_prop
       0
-
-  # Sorting of search results by name/title
-  # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
-  sortByName: (direction) ->
-    @sortDirection = direction if direction?
-    # a [BoardGameResult]
-    # b [BoardGameResult]
-    @searchedGames.sort (a, b) =>
-      return 1 * @sortDirection  if a.getName() > b.getName()
-      return -1 * @sortDirection  if a.getName() < b.getName()
-      0
-
-    return
-
-  # Sorting of search results by bayes rating
-  # direction [Number] (1 is ascending, -1 is descending) OPTIONAL
-  sortByBRating: (direction) ->
-    @sortDirection = direction if direction?
-    @searchedGames.sort (a, b) =>
-      return 1 * @sortDirection  if a.getBRating() > b.getBRating()
-      return -1 * @sortDirection  if a.getBRating() < b.getBRating()
-      0
-
-    return
-  # Invoked when user clicks on a table header of search results
-  # Calls appropriate sort method
-  # Calls method to update icons representing sort direction
-  # @param type [String] (name,brating)
-  # @param vm [ViewModel]
-  # @param event [jQueryEvent]
-  handleSort: (type,vm,event) ->
-    #default to descending sort
-    #unless already sorted by the same type
-    @sortDirection = if type is @currentSort then -(@sortDirection) else -1
-    @currentSort = type
-    @updateTableHeaders(type, event)
-    switch type
-      when "name" then @sortByName()
-      when "brating" then @sortByBRating()
-    return
-
-  # Updates sort direction icons
-  # @param type [String] (name,brating)
-  # @param event [jQueryEvent]
-  updateTableHeaders: (type,event) =>
-    $("#results-table thead tr th").removeClass "sorting-asc"
-    $("#results-table thead tr th").removeClass "sorting-desc"
-    if @sortDirection is -1
-      $(event.toElement).addClass "sorting-desc"
-    else
-      $(event.toElement).addClass "sorting-asc"
-    return
 
   # Searches games that match input string
   # @param str [String]
   searchGames: (str) ->
+    processIds = (ids) =>
+      @getGamesDetails(ids, =>
+        @sortList(@searchedGames,"bayesRating")
+        return
+        )
+      @searchedGames(ids)
+      return
     # Clear previous search results
     @searchedGames.removeAll()
     # Do nothing if no characters are entered
@@ -617,26 +577,20 @@ class ViewModel
     regex = new RegExp(" ", "g")
     str = str.replace(regex, "+")
     str = encodeURI(str)
-    console.log str
-
-    @loading(true)
 
     # Check if results are already cached
     ids = loadFromCache("searched_bgs_ids", str)
     if ids
-      console.log 'search from cache'
-      console.log ids
-      @getGamesDetails(ids, str)
-      @searchedGames(ids)
-      @loading null
+      processIds(ids)
       return
-
+      
+    @loading(true)
     $.getJSON "/search?type=boardgame&query=#{str}", (data) =>
       # [Array]
       ids = @extractIdsFromSearch(data)
       saveToCache("searched_bgs_ids", str, ids)
-      @getGamesDetails(ids, str)
-      @searchedGames(ids)
+      processIds(ids)
+      @loading(null)
       return
 
     return
@@ -653,153 +607,105 @@ class ViewModel
         for item in data.items
           ids.push(item?.id)
       else
-        ids.push(items?.id)
+        ids.push(items?.id) if items?.id?
       return ids
 
   getTopGames: (type) ->
+    window.counter = Date.now()
+    console.log 0
+    processItems = (items) =>
+      @topGames(items)
+      @getGamesDetails(items,=>
+        @sortList(@topGames,@topGamesType(),-1)
+        console.log Date.now()-window.counter
+        return
+        )
+      return
+    @topGames.removeAll()
+    # [Array]
+    ids = loadFromCache("topgames", type)
+    if ids
+      processItems(ids)
+      return
     @loading(true)
     $.getJSON 'json/top100.json', (data) =>
-      items = data[type]
-      counter = 0
-
-      for id in items
-        bgdata = @loadFromCache("bgr", id)
-        if bgdata
-          counter += 1
-          @topGames.push(new BoardGameResult(bgdata))
-          if counter is items.length
-            @loading null
-        else
-          url = "http://www.boardgamegeek.com/xmlapi2/thing?id=" + id + "&stats=1"
-          $.getJSON "/bgr/#{id}", (data) =>
-            counter += 1
-            if data
-              bgr = new BoardGameResult(data.items["item"])
-              @topGames.push(bgr)
-              @saveToCache("bgr",bgr.id, bgr)
-            if counter is items.length
-              @sortList(@topGames,@topGamesType())
-              @loading null
-              # @saveToCache("searched_bgs", str, @searchedGames())
-              # @sortByBRating(-1)
-            return
+      ids = data[type]
+      saveToCache("topgames", type, ids)
+      processItems(ids)
+      return
     return
     
   parseData: (data) ->
     if not data?
       return
-    console.log data.id
     if @boardGames[data.id]?
-      #olddata = @boardGames[data.id].getData()
-      #if olddata is not data
       @boardGames[data.id].updateData(data)
-      data = @boardGames[data.id].getData()
-      #else
-        #return
-      #@boardGames.updated(Date.now())
-      #return
+      @boardGames.updated(Date.now())
+      return
     @boardGames[data.id] = new BoardGame(data)
     @boardGames.updated(Date.now())
     return
 
   getHotItems: ->
-    @loading(true)
-    data = @loadFromCache("hot", "games")
+    data = loadFromCache("hot", "games")
     if data
       @hotGames(data)
-      console.log data
       # assume the actual board game data is still in cache if list of hot games has been cached
       for id in data
-        if not @boardGames[id]?
-          console.log id
-          @boardGames[id] = new BoardGame(@loadFromCache("boardgame", id))
-      @loading(null)
+        @needToRetrieveData(id)
       return
+    @loading(true)
     $.getJSON 'hot', (data) =>
       if data
-        #console.log (new BoardGameResult(result) for result in data.query.results.items.item)
         for item in data.items
           item.dataInfo = 
             'hot':1
           @parseData(item) 
         @hotGames((item.id for item in data.items))
         @loading(null)
-        @saveToCache("hot", "games", @hotGames())
+        saveToCache("hot", "games", @hotGames())
       return
     return
 
   # Loads data for a given boardgame id
   # @param id [String]
-  getGameDetails: (id,page) ->
-    @loading(true)
-    if page
-      $.getJSON "bg/#{id}/#{page}", (data) =>
-        if data
-          @selectedGame(new BoardGame(data.items["item"]))
-          @loading(null)
-          subnav = $('#sub-nav').onePageNav({
-            currentClass: 'active'
-            })
+  getGameDetails: (id,query) ->
+    promise = new RSVP.Promise (resolve, reject) =>
+      query ?= 
+        'stats':1
+        'comments':1
+        'pagesize':100
+        'page':page
+      console.log 'getGameDetails'
+      # @needToRetrieveData automatically loads data from cache
+      if @needToRetrieveData(id,query)
+        #@loading(true)
+        url = "/thing?id=#{id}"
+        for k,v of query
+          url += "&#{k}=#{v}"
+        $.getJSON url, (data) =>
+          if data
+            data.dataInfo = query
+            @parseData data
+          #@loading null
+          resolve(true)
         return
-      return
-    page ?= 1
-    data = @loadFromCache("bg", id)
-    if data
-      @selectedGame(new BoardGame(data))
-      @loading(null)
-      return
+      else
+        resolve(true)
+    return promise
 
-    url = "http://www.boardgamegeek.com/xmlapi2/thing?id=#{id}&stats=1&comments=1&pagesize=100&page=#{page}"
-    $.getJSON "/thing?id=#{id}&stats=1", (data) =>
-      if data
-        @selectedGame(new BoardGame(data.items["item"]))
-        @loading(null)
-        subnav = $('#sub-nav').onePageNav({
-          currentClass: 'active'
-          })
-        @saveToCache("bg", {'query':id}, @selectedGame())
-      return
-    return
-
-  getGamesDetails: (ids) ->
+  getGamesDetails: (ids,callback) ->
     query = 
       'stats':1
-      #'comments':1
-      #'pagesize':100
-      #'page':1
     @loading(true)
     console.log 'getGamesDetails'
-    lookupids = []
-    for id in ids
-      if @needToRetrieveData(id,query)
-        lookupids.push(id)
-      #if not id?
-        #continue
-      #if @boardGames[id]?
-        #continue
-      #cachedData = loadFromCache "boardgame",id
-      #if cachedData
-        #@parseData cachedData
-      #else
-        #lookupids.push(id)
-    cnt = 0
-    for id in lookupids
-      cnt++
-      #while cnt > 50
-        #continue
-      url = "/thing?id=#{id}"
-      for k,v of query
-        url += "&#{k}=#{v}"
-      $.getJSON url, (data) =>
-        cnt--
-        if data
-          data.datainfo = query
-          @parseData data
-        if cnt is 0
-          @loading null
-        return
-    if lookupids.length is 0
+    promises = ids.map (id) =>
+      return @getGameDetails(id,query)
+    RSVP.all(promises).then =>
+      console.log "done"
+      callback() if callback?
       @loading null
+      return
     return
     
   needToRetrieveData: (id,dataInfo) ->
@@ -818,44 +724,7 @@ class ViewModel
     if not cachedData?
       return true
     for k,v of dataInfo
-      if not cachedData[k]?
+      if not cachedData.dataInfo[k]?
         return true
     @parseData cachedData
     return false
-
-  #getGamesDetails: (ids) ->
-    #@loading(true)
-    #url = "/bgs/"
-    #console.log 'getGamesDetails'
-    #for id in ids
-      #if not id?
-        #continue
-      #if @boardGames[id]?
-        #continue
-      #cachedData = loadFromCache "boardgame",id
-      #if cachedData
-        #@parseData cachedData
-      #else
-        #url += "#{id},"
-    #url = url.slice(0,-1) if url.slice(-1) is ","
-    #if url isnt "/bgs/"
-      #$.getJSON url, (data) =>
-        #if data
-          #for bg in data.boardgames
-            #@parseData bg
-        #@loading null
-        #return
-    #else
-      #@loading null
-    #return
-
-  saveToCache: (type,key,data) ->
-    if Modernizr.sessionstorage
-      sessionStorage["#{type}_#{key}"] = ko.toJSON(data)
-    return
-  loadFromCache: (type,key) ->
-    if Modernizr.sessionstorage
-      data = sessionStorage["#{type}_#{key}"]
-      data = JSON.parse(data) if data
-      return data
-    return
