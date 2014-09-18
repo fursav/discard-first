@@ -1,0 +1,2118 @@
+html {
+  font-family: "PT Sans", sans-serif;
+  font-size: 18px;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 20px;
+}
+body {
+  background: #fff;
+  color: #222;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  cursor: default;
+}
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+p,
+blockquote,
+th,
+td {
+  margin: 0;
+  padding: 0;
+}
+/* Default Link Styles */
+a {
+  color: #2ba6cb;
+  text-decoration: none;
+  line-height: inherit;
+  cursor: pointer;
+}
+a:hover,
+a:focus {
+  color: #2285a2;
+}
+a img {
+  border: none;
+}
+/* Default paragraph styles */
+p {
+  font-family: inherit;
+  font-weight: normal;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.1rem;
+  text-rendering: optimizeLegibility;
+}
+p.textblock {
+  font-family: "PT Sans";
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+p.textblock p,
+p.textblock ul {
+  font-family: "PT Sans";
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+p.commentblock {
+  font-family: "Libre Baskerville";
+  font-size: 1.15rem;
+  line-height: 1.8;
+}
+p.lead {
+  font-size: 1.21875rem;
+  line-height: 1.6;
+}
+p aside {
+  font-size: 0.875rem;
+  line-height: 1.35;
+  font-style: italic;
+}
+/* Default header styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Raleway", sans-serif;
+  font-weight: normal;
+  font-style: normal;
+  color: #222;
+  text-rendering: optimizeLegibility;
+  margin-top: 0.1rem;
+  margin-bottom: 0.3rem;
+  line-height: 1.4;
+}
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  font-size: 60%;
+  color: #646464;
+  line-height: 0;
+}
+h1.inline,
+h2.inline,
+h3.inline,
+h4.inline,
+h5.inline,
+h6.inline {
+  display: inline;
+}
+h1 {
+  font-size: 1.888888888888889rem;
+}
+h2 {
+  font-size: 1.5rem;
+}
+h3 {
+  font-size: 1.222222222222222rem;
+}
+h4 {
+  font-size: 1rem;
+}
+h5 {
+  font-size: 1rem;
+}
+h6 {
+  font-size: 0.888888888888889rem;
+}
+@media only screen and (min-width: 40rem) {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    line-height: 1.4;
+  }
+  h1 {
+    font-size: 2.444444444444445rem;
+  }
+  h2 {
+    font-size: 2.055555555555556rem;
+  }
+  h3 {
+    font-size: 1.5rem;
+  }
+  h4 {
+    font-size: 1.277777777777778rem;
+  }
+}
+.subheader {
+  line-height: 1.4;
+  color: #646464;
+  font-weight: normal;
+  margin-top: 0.1rem;
+  margin-bottom: 0.3rem;
+}
+hr {
+  border: solid #ddd;
+  border-width: 1px 0 0;
+  clear: both;
+  margin: 1rem 0 1rem;
+  height: 0;
+}
+/* Helpful Typography Defaults */
+em,
+i {
+  font-style: italic;
+  line-height: inherit;
+}
+strong,
+b {
+  font-weight: bold;
+  line-height: inherit;
+}
+small {
+  font-size: 60%;
+  line-height: inherit;
+}
+code {
+  font-family: Consolas, "Liberation Mono", Courier, monospace;
+  font-weight: bold;
+  color: #910b0e;
+}
+table {
+  background: #fff;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+table thead,
+table tfoot {
+  background: #f5f5f5;
+}
+table thead tr th,
+table thead tr td,
+table tfoot tr th,
+table tfoot tr td {
+  padding: 0.5rem 0.625rem 0.625rem;
+  font-family: "Raleway";
+  color: #222;
+  text-align: left;
+}
+table tr th,
+table tr td {
+  padding: 0.5625rem 0.625rem;
+  color: #222;
+}
+table tr.even,
+table tr.alt,
+table tr:nth-of-type(even) {
+  background: #f7f7f7;
+}
+table thead tr th,
+table tfoot tr th,
+table tbody tr td,
+table tr td,
+table tfoot tr td {
+  display: table-cell;
+  line-height: 1.125rem;
+}
+/* Lists */
+ul,
+ol,
+dl {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  list-style-position: outside;
+  font-family: inherit;
+}
+ul {
+  margin-left: 1.1rem;
+}
+ul.no-bullet {
+  margin-left: 0;
+}
+ul.no-bullet li ul,
+ul.no-bullet li ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0;
+  list-style: none;
+}
+/* Unordered Lists */
+ul li ul,
+ul li ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0;
+}
+ul.square li ul,
+ul.circle li ul,
+ul.disc li ul {
+  list-style: inherit;
+}
+ul.square {
+  list-style-type: square;
+  margin-left: 1rem;
+}
+ul.circle {
+  list-style-type: circle;
+  margin-left: 1rem;
+}
+ul.disc {
+  list-style-type: disc;
+  margin-left: 1rem;
+}
+ul.no-bullet {
+  list-style: none;
+}
+/* Ordered Lists */
+ol {
+  margin-left: 1.4rem;
+}
+ol li ul,
+ol li ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0;
+}
+/* Definition Lists */
+dl dt {
+  margin-bottom: 0.3rem;
+  font-weight: bold;
+}
+dl dd {
+  margin-bottom: 0.75rem;
+}
+/* inline flex */
+div.inline {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+}
+.fcenter {
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+dl.inline {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+dl.inline li {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+dl.inline li dd {
+  width: 13rem;
+  max-width: 13rem;
+}
+ul.inline {
+  margin: 0;
+}
+ul.inline li {
+  display: inline;
+  margin-right: 0.5rem;
+}
+/* Abbreviations */
+abbr,
+acronym {
+  text-transform: uppercase;
+  font-size: 90%;
+  color: #222;
+  border-bottom: 1px dotted #ddd;
+  cursor: help;
+}
+abbr {
+  text-transform: none;
+}
+/* Blockquotes */
+blockquote {
+  margin: 0 0 1.25rem;
+  padding: 0.5625rem 1.25rem 0 1.1875rem;
+  border-left: 1px solid #ddd;
+}
+blockquote cite {
+  display: block;
+  font-size: 0.8125rem;
+  color: #919191;
+}
+blockquote cite:before {
+  content: "\2014 \0020";
+}
+blockquote cite a,
+blockquote cite a:visited {
+  color: #919191;
+}
+blockquote,
+blockquote p {
+  line-height: 1.6;
+  color: #646464;
+}
+/* Microformats */
+.title {
+  font-family: "Raleway";
+  font-size: 1.777777777777778rem;
+  color: #fff;
+}
+@media all and (max-width: 60rem) {
+  .title {
+    font-size: 1.333333333333333rem;
+  }
+}
+i:focus,
+button:focus {
+  outline: none;
+}
+.top-nav {
+  list-style: none;
+  margin: 0 0;
+  padding: 0 0;
+  background: #0b5da1;
+  -webkit-box-shadow: -0.05em 0.3em 0.3em -0.3em #000;
+  box-shadow: -0.05em 0.3em 0.3em -0.3em #000;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-flow: row;
+  -ms-flex-flow: row;
+  flex-flow: row;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  color: #fff;
+}
+.top-nav li {
+  text-align: center;
+  text-decoration: none;
+  padding: 0.1rem;
+}
+.top-nav a {
+  display: block;
+  outline: none;
+  color: #fff;
+}
+.top-nav a:hover {
+  background: #0a5491;
+}
+/* Small screens */
+@media all and (max-width: 40rem) {
+  .top-nav {
+/* On small screens, we are no longer using row direction but column */
+    -webkit-box-orient: vertical !important;
+    -webkit-box-direction: normal !important;
+    -webkit-flex-direction: column !important;
+    -ms-flex-direction: column !important;
+    flex-direction: column !important;
+  }
+}
+.selected {
+  background-color: #00506a !important;
+  -webkit-box-shadow: inset 0 0 1rem #002a38;
+  box-shadow: inset 0 0 1rem #002a38;
+}
+.icon-large {
+  font-size: 1.777777777777778rem;
+}
+.icon-xlarge {
+  font-size: 2.666666666666667rem;
+}
+.icon-huge {
+  font-size: 8.88888888888889rem;
+}
+@media (max-width: 40rem) {
+  .icon-huge {
+    display: none;
+  }
+}
+.icon-inline {
+  vertical-align: bottom;
+}
+.sorting-asc:after {
+  font-family: "Ionicons";
+  content: "\f10d";
+  float: right;
+}
+.sorting-desc:after {
+  font-family: "Ionicons";
+  content: "\f104";
+  float: right;
+}
+img.radius {
+  border-radius: 5px;
+}
+.link {
+  background: none;
+  border: none;
+  display: inline;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  outline-offset: 0;
+/* Additional styles to look like a link */
+  color: #2ba6cb;
+  cursor: pointer;
+}
+.link:hover,
+.link:active,
+.link:focus {
+  background: none;
+  border: none;
+  display: inline;
+  font: inherit;
+  margin: 0;
+  padding: 0;
+  outline: none;
+  outline-offset: 0;
+  color: #2285a2;
+  cursor: pointer;
+}
+.link-wide {
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+/* sections */
+.section {
+  margin-bottom: 0.2em;
+  padding: 1rem 0;
+  -webkit-box-shadow: 0 0.3em 0.3em -0.3em #000;
+  box-shadow: 0 0.3em 0.3em -0.3em #000;
+}
+@media (min-width: 40rem) {
+  .section {
+    padding: 4rem 0;
+  }
+}
+.section-white {
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f3eb), color-stop(0%, #fff));
+  background-image: -webkit-linear-gradient(top, #f5f3eb 0%, #fff 0%);
+  background-image: linear-gradient(to bottom, #f5f3eb 0%, #fff 0%);
+}
+.section-gray {
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f3eb), to(#e8e8e8));
+  background-image: -webkit-linear-gradient(top, #f5f3eb 0%, #e8e8e8 100%);
+  background-image: linear-gradient(to bottom, #f5f3eb 0%, #e8e8e8 100%);
+}
+footer {
+  background: #333;
+  padding: 1.7em 0;
+  margin-top: -0.5em;
+}
+footer ul {
+  margin: 0 auto;
+  padding-bottom: 0;
+  text-align: center;
+  list-style: none;
+}
+footer ul li {
+  display: inline;
+  margin: 0 1em;
+  font-size: 1rem;
+  text-align: center;
+}
+footer ul li a {
+  color: #fff;
+  padding: 0 0.5em;
+}
+footer ul li i {
+  vertical-align: bottom;
+  color: #fff;
+}
+footer ul li:hover a,
+footer ul li:hover i {
+  color: #2285a2;
+}
+.categories {
+  list-style: circle;
+}
+.categories li {
+  list-style: circle;
+}
+.sub-nav {
+  list-style-type: none;
+  margin: auto;
+  width: 100%;
+}
+.sub-nav dt {
+  text-transform: uppercase;
+}
+.sub-nav dt,
+.sub-nav dd,
+.sub-nav li {
+  margin-left: 1em;
+  margin-bottom: 0.625em;
+  font-weight: normal;
+  width: 45%;
+  display: inline-block;
+  color: #999;
+}
+.sub-nav dt a,
+.sub-nav dd a,
+.sub-nav li a {
+  text-decoration: none;
+  outline: none;
+  color: #999;
+  padding: 0.1875rem 1rem;
+}
+.sub-nav dt a:hover,
+.sub-nav dd a:hover,
+.sub-nav li a:hover {
+  color: #737373;
+}
+.sub-nav dt.active a,
+.sub-nav dd.active a,
+.sub-nav li.active a {
+  border-radius: 3px;
+  display: block;
+  font-weight: normal;
+  background: #008cba;
+  padding: 0.1875rem 1rem;
+  cursor: default;
+  color: #fff;
+}
+.sub-nav dt.active a:hover,
+.sub-nav dd.active a:hover,
+.sub-nav li.active a:hover {
+  background: #008cba;
+  -webkit-box-shadow: inset 0 0 1rem #00465d;
+  box-shadow: inset 0 0 1rem #00465d;
+}
+.sub-nav > li:first-child {
+  display: none;
+}
+@media only screen and (min-width: 40rem) {
+  .sub-nav {
+    background-color: #fff;
+    -webkit-box-shadow: 0px 0px 5px 0px #ccc;
+    box-shadow: 0px 0px 5px 0px #ccc;
+    border-radius: 10px;
+    display: block;
+    position: fixed;
+    overflow: hidden;
+    width: 10em;
+    margin: -0.25rem 0 1.125rem;
+    padding: 1em 0;
+    margin-top: 2em;
+    margin-right: 0em;
+    margin-left: -0.6rem;
+    z-index: 999;
+  }
+  .sub-nav li {
+    display: block;
+    width: auto;
+  }
+  .sub-nav > li:first-child {
+    display: block;
+  }
+}
+.text-center {
+  text-align: center !important;
+}
+.body-style {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 100vh;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.main {
+  margin-top: 1rem;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+.input-addon {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  margin: 0 1rem;
+}
+.input-addon-field {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  margin-right: -0.15em;
+}
+.input-addon-field:not(:first-child) {
+  border-left: 0;
+}
+.input-addon-field:not(:last-child) {
+  border-right: 0;
+}
+.input-addon-item {
+  font-weight: 400;
+}
+.input-addon-field,
+.input-addon-item {
+  border: 1px solid rgba(147,128,108,0.25);
+  padding: 0.2rem 0.5rem !important;
+  margin: 0;
+}
+.input-addon-field:first-child,
+.input-addon-item:first-child {
+  border-radius: 2px 0 0 2px;
+}
+.input-addon-field:last-child,
+.input-addon-item:last-child {
+  border-radius: 0 2px 2px 0;
+}
+button,
+.button {
+  border-style: solid;
+  border-width: 0px;
+  cursor: pointer;
+  font-weight: normal;
+  line-height: normal;
+  margin: 0 0 1.25rem;
+  position: relative;
+  text-decoration: none;
+  text-align: center;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  display: inline-block;
+  padding: 0.8rem;
+  font-size: 1rem;
+  font-family: "PT Sans";
+  background-color: #008cba;
+  border-color: #007095;
+  color: #fff;
+  -webkit-transition: background-color 300ms ease-out;
+  transition: background-color 300ms ease-out;
+}
+button:hover,
+button:focus,
+.button:hover,
+.button:focus {
+  background-color: #007095;
+}
+button:hover,
+button:focus,
+.button:hover,
+.button:focus {
+  color: #fff;
+}
+button.radius,
+.button.radius {
+  border-radius: 3px;
+}
+/* We use this to get basic styling on all basic form elements */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="time"],
+input[type="url"],
+textarea {
+  -webkit-appearance: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  -webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  font-family: "PT Sans";
+  color: rgba(0,0,0,0.75);
+  display: block;
+  font-size: 0.777777777777778rem;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-transition: -webkit-box-shadow 0.45s, border-color 0.45s ease-in-out;
+  transition: box-shadow 0.45s, border-color 0.45s ease-in-out;
+}
+input[type="text"] input[type="text"]:focus,
+input[type="password"] input[type="text"]:focus,
+input[type="date"] input[type="text"]:focus,
+input[type="datetime"] input[type="text"]:focus,
+input[type="datetime-local"] input[type="text"]:focus,
+input[type="month"] input[type="text"]:focus,
+input[type="week"] input[type="text"]:focus,
+input[type="email"] input[type="text"]:focus,
+input[type="number"] input[type="text"]:focus,
+input[type="search"] input[type="text"]:focus,
+input[type="tel"] input[type="text"]:focus,
+input[type="time"] input[type="text"]:focus,
+input[type="url"] input[type="text"]:focus,
+textarea input[type="text"]:focus,
+input[type="text"] input[type="password"]:focus,
+input[type="password"] input[type="password"]:focus,
+input[type="date"] input[type="password"]:focus,
+input[type="datetime"] input[type="password"]:focus,
+input[type="datetime-local"] input[type="password"]:focus,
+input[type="month"] input[type="password"]:focus,
+input[type="week"] input[type="password"]:focus,
+input[type="email"] input[type="password"]:focus,
+input[type="number"] input[type="password"]:focus,
+input[type="search"] input[type="password"]:focus,
+input[type="tel"] input[type="password"]:focus,
+input[type="time"] input[type="password"]:focus,
+input[type="url"] input[type="password"]:focus,
+textarea input[type="password"]:focus,
+input[type="text"] input[type="date"]:focus,
+input[type="password"] input[type="date"]:focus,
+input[type="date"] input[type="date"]:focus,
+input[type="datetime"] input[type="date"]:focus,
+input[type="datetime-local"] input[type="date"]:focus,
+input[type="month"] input[type="date"]:focus,
+input[type="week"] input[type="date"]:focus,
+input[type="email"] input[type="date"]:focus,
+input[type="number"] input[type="date"]:focus,
+input[type="search"] input[type="date"]:focus,
+input[type="tel"] input[type="date"]:focus,
+input[type="time"] input[type="date"]:focus,
+input[type="url"] input[type="date"]:focus,
+textarea input[type="date"]:focus,
+input[type="text"] input[type="datetime"]:focus,
+input[type="password"] input[type="datetime"]:focus,
+input[type="date"] input[type="datetime"]:focus,
+input[type="datetime"] input[type="datetime"]:focus,
+input[type="datetime-local"] input[type="datetime"]:focus,
+input[type="month"] input[type="datetime"]:focus,
+input[type="week"] input[type="datetime"]:focus,
+input[type="email"] input[type="datetime"]:focus,
+input[type="number"] input[type="datetime"]:focus,
+input[type="search"] input[type="datetime"]:focus,
+input[type="tel"] input[type="datetime"]:focus,
+input[type="time"] input[type="datetime"]:focus,
+input[type="url"] input[type="datetime"]:focus,
+textarea input[type="datetime"]:focus,
+input[type="text"] input[type="datetime-local"]:focus,
+input[type="password"] input[type="datetime-local"]:focus,
+input[type="date"] input[type="datetime-local"]:focus,
+input[type="datetime"] input[type="datetime-local"]:focus,
+input[type="datetime-local"] input[type="datetime-local"]:focus,
+input[type="month"] input[type="datetime-local"]:focus,
+input[type="week"] input[type="datetime-local"]:focus,
+input[type="email"] input[type="datetime-local"]:focus,
+input[type="number"] input[type="datetime-local"]:focus,
+input[type="search"] input[type="datetime-local"]:focus,
+input[type="tel"] input[type="datetime-local"]:focus,
+input[type="time"] input[type="datetime-local"]:focus,
+input[type="url"] input[type="datetime-local"]:focus,
+textarea input[type="datetime-local"]:focus,
+input[type="text"] input[type="month"]:focus,
+input[type="password"] input[type="month"]:focus,
+input[type="date"] input[type="month"]:focus,
+input[type="datetime"] input[type="month"]:focus,
+input[type="datetime-local"] input[type="month"]:focus,
+input[type="month"] input[type="month"]:focus,
+input[type="week"] input[type="month"]:focus,
+input[type="email"] input[type="month"]:focus,
+input[type="number"] input[type="month"]:focus,
+input[type="search"] input[type="month"]:focus,
+input[type="tel"] input[type="month"]:focus,
+input[type="time"] input[type="month"]:focus,
+input[type="url"] input[type="month"]:focus,
+textarea input[type="month"]:focus,
+input[type="text"] input[type="week"]:focus,
+input[type="password"] input[type="week"]:focus,
+input[type="date"] input[type="week"]:focus,
+input[type="datetime"] input[type="week"]:focus,
+input[type="datetime-local"] input[type="week"]:focus,
+input[type="month"] input[type="week"]:focus,
+input[type="week"] input[type="week"]:focus,
+input[type="email"] input[type="week"]:focus,
+input[type="number"] input[type="week"]:focus,
+input[type="search"] input[type="week"]:focus,
+input[type="tel"] input[type="week"]:focus,
+input[type="time"] input[type="week"]:focus,
+input[type="url"] input[type="week"]:focus,
+textarea input[type="week"]:focus,
+input[type="text"] input[type="email"]:focus,
+input[type="password"] input[type="email"]:focus,
+input[type="date"] input[type="email"]:focus,
+input[type="datetime"] input[type="email"]:focus,
+input[type="datetime-local"] input[type="email"]:focus,
+input[type="month"] input[type="email"]:focus,
+input[type="week"] input[type="email"]:focus,
+input[type="email"] input[type="email"]:focus,
+input[type="number"] input[type="email"]:focus,
+input[type="search"] input[type="email"]:focus,
+input[type="tel"] input[type="email"]:focus,
+input[type="time"] input[type="email"]:focus,
+input[type="url"] input[type="email"]:focus,
+textarea input[type="email"]:focus,
+input[type="text"] input[type="number"]:focus,
+input[type="password"] input[type="number"]:focus,
+input[type="date"] input[type="number"]:focus,
+input[type="datetime"] input[type="number"]:focus,
+input[type="datetime-local"] input[type="number"]:focus,
+input[type="month"] input[type="number"]:focus,
+input[type="week"] input[type="number"]:focus,
+input[type="email"] input[type="number"]:focus,
+input[type="number"] input[type="number"]:focus,
+input[type="search"] input[type="number"]:focus,
+input[type="tel"] input[type="number"]:focus,
+input[type="time"] input[type="number"]:focus,
+input[type="url"] input[type="number"]:focus,
+textarea input[type="number"]:focus,
+input[type="text"] input[type="search"]:focus,
+input[type="password"] input[type="search"]:focus,
+input[type="date"] input[type="search"]:focus,
+input[type="datetime"] input[type="search"]:focus,
+input[type="datetime-local"] input[type="search"]:focus,
+input[type="month"] input[type="search"]:focus,
+input[type="week"] input[type="search"]:focus,
+input[type="email"] input[type="search"]:focus,
+input[type="number"] input[type="search"]:focus,
+input[type="search"] input[type="search"]:focus,
+input[type="tel"] input[type="search"]:focus,
+input[type="time"] input[type="search"]:focus,
+input[type="url"] input[type="search"]:focus,
+textarea input[type="search"]:focus,
+input[type="text"] input[type="tel"]:focus,
+input[type="password"] input[type="tel"]:focus,
+input[type="date"] input[type="tel"]:focus,
+input[type="datetime"] input[type="tel"]:focus,
+input[type="datetime-local"] input[type="tel"]:focus,
+input[type="month"] input[type="tel"]:focus,
+input[type="week"] input[type="tel"]:focus,
+input[type="email"] input[type="tel"]:focus,
+input[type="number"] input[type="tel"]:focus,
+input[type="search"] input[type="tel"]:focus,
+input[type="tel"] input[type="tel"]:focus,
+input[type="time"] input[type="tel"]:focus,
+input[type="url"] input[type="tel"]:focus,
+textarea input[type="tel"]:focus,
+input[type="text"] input[type="time"]:focus,
+input[type="password"] input[type="time"]:focus,
+input[type="date"] input[type="time"]:focus,
+input[type="datetime"] input[type="time"]:focus,
+input[type="datetime-local"] input[type="time"]:focus,
+input[type="month"] input[type="time"]:focus,
+input[type="week"] input[type="time"]:focus,
+input[type="email"] input[type="time"]:focus,
+input[type="number"] input[type="time"]:focus,
+input[type="search"] input[type="time"]:focus,
+input[type="tel"] input[type="time"]:focus,
+input[type="time"] input[type="time"]:focus,
+input[type="url"] input[type="time"]:focus,
+textarea input[type="time"]:focus,
+input[type="text"] input[type="url"]:focus,
+input[type="password"] input[type="url"]:focus,
+input[type="date"] input[type="url"]:focus,
+input[type="datetime"] input[type="url"]:focus,
+input[type="datetime-local"] input[type="url"]:focus,
+input[type="month"] input[type="url"]:focus,
+input[type="week"] input[type="url"]:focus,
+input[type="email"] input[type="url"]:focus,
+input[type="number"] input[type="url"]:focus,
+input[type="search"] input[type="url"]:focus,
+input[type="tel"] input[type="url"]:focus,
+input[type="time"] input[type="url"]:focus,
+input[type="url"] input[type="url"]:focus,
+textarea input[type="url"]:focus,
+input[type="text"] textarea:focus,
+input[type="password"] textarea:focus,
+input[type="date"] textarea:focus,
+input[type="datetime"] textarea:focus,
+input[type="datetime-local"] textarea:focus,
+input[type="month"] textarea:focus,
+input[type="week"] textarea:focus,
+input[type="email"] textarea:focus,
+input[type="number"] textarea:focus,
+input[type="search"] textarea:focus,
+input[type="tel"] textarea:focus,
+input[type="time"] textarea:focus,
+input[type="url"] textarea:focus,
+textarea textarea:focus {
+  -webkit-box-shadow: 0 0 5px #999;
+  box-shadow: 0 0 5px #999;
+  border-color: #999;
+}
+input[type="text"] input[type="text"]:focus,
+input[type="password"] input[type="text"]:focus,
+input[type="date"] input[type="text"]:focus,
+input[type="datetime"] input[type="text"]:focus,
+input[type="datetime-local"] input[type="text"]:focus,
+input[type="month"] input[type="text"]:focus,
+input[type="week"] input[type="text"]:focus,
+input[type="email"] input[type="text"]:focus,
+input[type="number"] input[type="text"]:focus,
+input[type="search"] input[type="text"]:focus,
+input[type="tel"] input[type="text"]:focus,
+input[type="time"] input[type="text"]:focus,
+input[type="url"] input[type="text"]:focus,
+textarea input[type="text"]:focus,
+input[type="text"] input[type="password"]:focus,
+input[type="password"] input[type="password"]:focus,
+input[type="date"] input[type="password"]:focus,
+input[type="datetime"] input[type="password"]:focus,
+input[type="datetime-local"] input[type="password"]:focus,
+input[type="month"] input[type="password"]:focus,
+input[type="week"] input[type="password"]:focus,
+input[type="email"] input[type="password"]:focus,
+input[type="number"] input[type="password"]:focus,
+input[type="search"] input[type="password"]:focus,
+input[type="tel"] input[type="password"]:focus,
+input[type="time"] input[type="password"]:focus,
+input[type="url"] input[type="password"]:focus,
+textarea input[type="password"]:focus,
+input[type="text"] input[type="date"]:focus,
+input[type="password"] input[type="date"]:focus,
+input[type="date"] input[type="date"]:focus,
+input[type="datetime"] input[type="date"]:focus,
+input[type="datetime-local"] input[type="date"]:focus,
+input[type="month"] input[type="date"]:focus,
+input[type="week"] input[type="date"]:focus,
+input[type="email"] input[type="date"]:focus,
+input[type="number"] input[type="date"]:focus,
+input[type="search"] input[type="date"]:focus,
+input[type="tel"] input[type="date"]:focus,
+input[type="time"] input[type="date"]:focus,
+input[type="url"] input[type="date"]:focus,
+textarea input[type="date"]:focus,
+input[type="text"] input[type="datetime"]:focus,
+input[type="password"] input[type="datetime"]:focus,
+input[type="date"] input[type="datetime"]:focus,
+input[type="datetime"] input[type="datetime"]:focus,
+input[type="datetime-local"] input[type="datetime"]:focus,
+input[type="month"] input[type="datetime"]:focus,
+input[type="week"] input[type="datetime"]:focus,
+input[type="email"] input[type="datetime"]:focus,
+input[type="number"] input[type="datetime"]:focus,
+input[type="search"] input[type="datetime"]:focus,
+input[type="tel"] input[type="datetime"]:focus,
+input[type="time"] input[type="datetime"]:focus,
+input[type="url"] input[type="datetime"]:focus,
+textarea input[type="datetime"]:focus,
+input[type="text"] input[type="datetime-local"]:focus,
+input[type="password"] input[type="datetime-local"]:focus,
+input[type="date"] input[type="datetime-local"]:focus,
+input[type="datetime"] input[type="datetime-local"]:focus,
+input[type="datetime-local"] input[type="datetime-local"]:focus,
+input[type="month"] input[type="datetime-local"]:focus,
+input[type="week"] input[type="datetime-local"]:focus,
+input[type="email"] input[type="datetime-local"]:focus,
+input[type="number"] input[type="datetime-local"]:focus,
+input[type="search"] input[type="datetime-local"]:focus,
+input[type="tel"] input[type="datetime-local"]:focus,
+input[type="time"] input[type="datetime-local"]:focus,
+input[type="url"] input[type="datetime-local"]:focus,
+textarea input[type="datetime-local"]:focus,
+input[type="text"] input[type="month"]:focus,
+input[type="password"] input[type="month"]:focus,
+input[type="date"] input[type="month"]:focus,
+input[type="datetime"] input[type="month"]:focus,
+input[type="datetime-local"] input[type="month"]:focus,
+input[type="month"] input[type="month"]:focus,
+input[type="week"] input[type="month"]:focus,
+input[type="email"] input[type="month"]:focus,
+input[type="number"] input[type="month"]:focus,
+input[type="search"] input[type="month"]:focus,
+input[type="tel"] input[type="month"]:focus,
+input[type="time"] input[type="month"]:focus,
+input[type="url"] input[type="month"]:focus,
+textarea input[type="month"]:focus,
+input[type="text"] input[type="week"]:focus,
+input[type="password"] input[type="week"]:focus,
+input[type="date"] input[type="week"]:focus,
+input[type="datetime"] input[type="week"]:focus,
+input[type="datetime-local"] input[type="week"]:focus,
+input[type="month"] input[type="week"]:focus,
+input[type="week"] input[type="week"]:focus,
+input[type="email"] input[type="week"]:focus,
+input[type="number"] input[type="week"]:focus,
+input[type="search"] input[type="week"]:focus,
+input[type="tel"] input[type="week"]:focus,
+input[type="time"] input[type="week"]:focus,
+input[type="url"] input[type="week"]:focus,
+textarea input[type="week"]:focus,
+input[type="text"] input[type="email"]:focus,
+input[type="password"] input[type="email"]:focus,
+input[type="date"] input[type="email"]:focus,
+input[type="datetime"] input[type="email"]:focus,
+input[type="datetime-local"] input[type="email"]:focus,
+input[type="month"] input[type="email"]:focus,
+input[type="week"] input[type="email"]:focus,
+input[type="email"] input[type="email"]:focus,
+input[type="number"] input[type="email"]:focus,
+input[type="search"] input[type="email"]:focus,
+input[type="tel"] input[type="email"]:focus,
+input[type="time"] input[type="email"]:focus,
+input[type="url"] input[type="email"]:focus,
+textarea input[type="email"]:focus,
+input[type="text"] input[type="number"]:focus,
+input[type="password"] input[type="number"]:focus,
+input[type="date"] input[type="number"]:focus,
+input[type="datetime"] input[type="number"]:focus,
+input[type="datetime-local"] input[type="number"]:focus,
+input[type="month"] input[type="number"]:focus,
+input[type="week"] input[type="number"]:focus,
+input[type="email"] input[type="number"]:focus,
+input[type="number"] input[type="number"]:focus,
+input[type="search"] input[type="number"]:focus,
+input[type="tel"] input[type="number"]:focus,
+input[type="time"] input[type="number"]:focus,
+input[type="url"] input[type="number"]:focus,
+textarea input[type="number"]:focus,
+input[type="text"] input[type="search"]:focus,
+input[type="password"] input[type="search"]:focus,
+input[type="date"] input[type="search"]:focus,
+input[type="datetime"] input[type="search"]:focus,
+input[type="datetime-local"] input[type="search"]:focus,
+input[type="month"] input[type="search"]:focus,
+input[type="week"] input[type="search"]:focus,
+input[type="email"] input[type="search"]:focus,
+input[type="number"] input[type="search"]:focus,
+input[type="search"] input[type="search"]:focus,
+input[type="tel"] input[type="search"]:focus,
+input[type="time"] input[type="search"]:focus,
+input[type="url"] input[type="search"]:focus,
+textarea input[type="search"]:focus,
+input[type="text"] input[type="tel"]:focus,
+input[type="password"] input[type="tel"]:focus,
+input[type="date"] input[type="tel"]:focus,
+input[type="datetime"] input[type="tel"]:focus,
+input[type="datetime-local"] input[type="tel"]:focus,
+input[type="month"] input[type="tel"]:focus,
+input[type="week"] input[type="tel"]:focus,
+input[type="email"] input[type="tel"]:focus,
+input[type="number"] input[type="tel"]:focus,
+input[type="search"] input[type="tel"]:focus,
+input[type="tel"] input[type="tel"]:focus,
+input[type="time"] input[type="tel"]:focus,
+input[type="url"] input[type="tel"]:focus,
+textarea input[type="tel"]:focus,
+input[type="text"] input[type="time"]:focus,
+input[type="password"] input[type="time"]:focus,
+input[type="date"] input[type="time"]:focus,
+input[type="datetime"] input[type="time"]:focus,
+input[type="datetime-local"] input[type="time"]:focus,
+input[type="month"] input[type="time"]:focus,
+input[type="week"] input[type="time"]:focus,
+input[type="email"] input[type="time"]:focus,
+input[type="number"] input[type="time"]:focus,
+input[type="search"] input[type="time"]:focus,
+input[type="tel"] input[type="time"]:focus,
+input[type="time"] input[type="time"]:focus,
+input[type="url"] input[type="time"]:focus,
+textarea input[type="time"]:focus,
+input[type="text"] input[type="url"]:focus,
+input[type="password"] input[type="url"]:focus,
+input[type="date"] input[type="url"]:focus,
+input[type="datetime"] input[type="url"]:focus,
+input[type="datetime-local"] input[type="url"]:focus,
+input[type="month"] input[type="url"]:focus,
+input[type="week"] input[type="url"]:focus,
+input[type="email"] input[type="url"]:focus,
+input[type="number"] input[type="url"]:focus,
+input[type="search"] input[type="url"]:focus,
+input[type="tel"] input[type="url"]:focus,
+input[type="time"] input[type="url"]:focus,
+input[type="url"] input[type="url"]:focus,
+textarea input[type="url"]:focus,
+input[type="text"] textarea:focus,
+input[type="password"] textarea:focus,
+input[type="date"] textarea:focus,
+input[type="datetime"] textarea:focus,
+input[type="datetime-local"] textarea:focus,
+input[type="month"] textarea:focus,
+input[type="week"] textarea:focus,
+input[type="email"] textarea:focus,
+input[type="number"] textarea:focus,
+input[type="search"] textarea:focus,
+input[type="tel"] textarea:focus,
+input[type="time"] textarea:focus,
+input[type="url"] textarea:focus,
+textarea textarea:focus {
+  background: #fafafa;
+  border-color: #999;
+  outline: none;
+}
+input[type="text"] input[type="text"][disabled],
+input[type="password"] input[type="text"][disabled],
+input[type="date"] input[type="text"][disabled],
+input[type="datetime"] input[type="text"][disabled],
+input[type="datetime-local"] input[type="text"][disabled],
+input[type="month"] input[type="text"][disabled],
+input[type="week"] input[type="text"][disabled],
+input[type="email"] input[type="text"][disabled],
+input[type="number"] input[type="text"][disabled],
+input[type="search"] input[type="text"][disabled],
+input[type="tel"] input[type="text"][disabled],
+input[type="time"] input[type="text"][disabled],
+input[type="url"] input[type="text"][disabled],
+textarea input[type="text"][disabled],
+input[type="text"] fieldset[disabled] input[type="text"],
+input[type="password"] fieldset[disabled] input[type="text"],
+input[type="date"] fieldset[disabled] input[type="text"],
+input[type="datetime"] fieldset[disabled] input[type="text"],
+input[type="datetime-local"] fieldset[disabled] input[type="text"],
+input[type="month"] fieldset[disabled] input[type="text"],
+input[type="week"] fieldset[disabled] input[type="text"],
+input[type="email"] fieldset[disabled] input[type="text"],
+input[type="number"] fieldset[disabled] input[type="text"],
+input[type="search"] fieldset[disabled] input[type="text"],
+input[type="tel"] fieldset[disabled] input[type="text"],
+input[type="time"] fieldset[disabled] input[type="text"],
+input[type="url"] fieldset[disabled] input[type="text"],
+textarea fieldset[disabled] input[type="text"],
+input[type="text"] input[type="password"][disabled],
+input[type="password"] input[type="password"][disabled],
+input[type="date"] input[type="password"][disabled],
+input[type="datetime"] input[type="password"][disabled],
+input[type="datetime-local"] input[type="password"][disabled],
+input[type="month"] input[type="password"][disabled],
+input[type="week"] input[type="password"][disabled],
+input[type="email"] input[type="password"][disabled],
+input[type="number"] input[type="password"][disabled],
+input[type="search"] input[type="password"][disabled],
+input[type="tel"] input[type="password"][disabled],
+input[type="time"] input[type="password"][disabled],
+input[type="url"] input[type="password"][disabled],
+textarea input[type="password"][disabled],
+input[type="text"] fieldset[disabled],
+input[type="password"] fieldset[disabled],
+input[type="date"] fieldset[disabled],
+input[type="datetime"] fieldset[disabled],
+input[type="datetime-local"] fieldset[disabled],
+input[type="month"] fieldset[disabled],
+input[type="week"] fieldset[disabled],
+input[type="email"] fieldset[disabled],
+input[type="number"] fieldset[disabled],
+input[type="search"] fieldset[disabled],
+input[type="tel"] fieldset[disabled],
+input[type="time"] fieldset[disabled],
+input[type="url"] fieldset[disabled],
+textarea fieldset[disabled],
+input[type="text"] input[type="password"],
+input[type="password"] input[type="password"],
+input[type="date"] input[type="password"],
+input[type="datetime"] input[type="password"],
+input[type="datetime-local"] input[type="password"],
+input[type="month"] input[type="password"],
+input[type="week"] input[type="password"],
+input[type="email"] input[type="password"],
+input[type="number"] input[type="password"],
+input[type="search"] input[type="password"],
+input[type="tel"] input[type="password"],
+input[type="time"] input[type="password"],
+input[type="url"] input[type="password"],
+textarea input[type="password"],
+input[type="text"] input[type="date"][disabled],
+input[type="password"] input[type="date"][disabled],
+input[type="date"] input[type="date"][disabled],
+input[type="datetime"] input[type="date"][disabled],
+input[type="datetime-local"] input[type="date"][disabled],
+input[type="month"] input[type="date"][disabled],
+input[type="week"] input[type="date"][disabled],
+input[type="email"] input[type="date"][disabled],
+input[type="number"] input[type="date"][disabled],
+input[type="search"] input[type="date"][disabled],
+input[type="tel"] input[type="date"][disabled],
+input[type="time"] input[type="date"][disabled],
+input[type="url"] input[type="date"][disabled],
+textarea input[type="date"][disabled],
+input[type="text"] input[type="date"],
+input[type="password"] input[type="date"],
+input[type="date"] input[type="date"],
+input[type="datetime"] input[type="date"],
+input[type="datetime-local"] input[type="date"],
+input[type="month"] input[type="date"],
+input[type="week"] input[type="date"],
+input[type="email"] input[type="date"],
+input[type="number"] input[type="date"],
+input[type="search"] input[type="date"],
+input[type="tel"] input[type="date"],
+input[type="time"] input[type="date"],
+input[type="url"] input[type="date"],
+textarea input[type="date"],
+input[type="text"] input[type="datetime"][disabled],
+input[type="password"] input[type="datetime"][disabled],
+input[type="date"] input[type="datetime"][disabled],
+input[type="datetime"] input[type="datetime"][disabled],
+input[type="datetime-local"] input[type="datetime"][disabled],
+input[type="month"] input[type="datetime"][disabled],
+input[type="week"] input[type="datetime"][disabled],
+input[type="email"] input[type="datetime"][disabled],
+input[type="number"] input[type="datetime"][disabled],
+input[type="search"] input[type="datetime"][disabled],
+input[type="tel"] input[type="datetime"][disabled],
+input[type="time"] input[type="datetime"][disabled],
+input[type="url"] input[type="datetime"][disabled],
+textarea input[type="datetime"][disabled],
+input[type="text"] input[type="datetime"],
+input[type="password"] input[type="datetime"],
+input[type="date"] input[type="datetime"],
+input[type="datetime"] input[type="datetime"],
+input[type="datetime-local"] input[type="datetime"],
+input[type="month"] input[type="datetime"],
+input[type="week"] input[type="datetime"],
+input[type="email"] input[type="datetime"],
+input[type="number"] input[type="datetime"],
+input[type="search"] input[type="datetime"],
+input[type="tel"] input[type="datetime"],
+input[type="time"] input[type="datetime"],
+input[type="url"] input[type="datetime"],
+textarea input[type="datetime"],
+input[type="text"] input[type="datetime-local"][disabled],
+input[type="password"] input[type="datetime-local"][disabled],
+input[type="date"] input[type="datetime-local"][disabled],
+input[type="datetime"] input[type="datetime-local"][disabled],
+input[type="datetime-local"] input[type="datetime-local"][disabled],
+input[type="month"] input[type="datetime-local"][disabled],
+input[type="week"] input[type="datetime-local"][disabled],
+input[type="email"] input[type="datetime-local"][disabled],
+input[type="number"] input[type="datetime-local"][disabled],
+input[type="search"] input[type="datetime-local"][disabled],
+input[type="tel"] input[type="datetime-local"][disabled],
+input[type="time"] input[type="datetime-local"][disabled],
+input[type="url"] input[type="datetime-local"][disabled],
+textarea input[type="datetime-local"][disabled],
+input[type="text"] input[type="datetime-local"],
+input[type="password"] input[type="datetime-local"],
+input[type="date"] input[type="datetime-local"],
+input[type="datetime"] input[type="datetime-local"],
+input[type="datetime-local"] input[type="datetime-local"],
+input[type="month"] input[type="datetime-local"],
+input[type="week"] input[type="datetime-local"],
+input[type="email"] input[type="datetime-local"],
+input[type="number"] input[type="datetime-local"],
+input[type="search"] input[type="datetime-local"],
+input[type="tel"] input[type="datetime-local"],
+input[type="time"] input[type="datetime-local"],
+input[type="url"] input[type="datetime-local"],
+textarea input[type="datetime-local"],
+input[type="text"] input[type="month"][disabled],
+input[type="password"] input[type="month"][disabled],
+input[type="date"] input[type="month"][disabled],
+input[type="datetime"] input[type="month"][disabled],
+input[type="datetime-local"] input[type="month"][disabled],
+input[type="month"] input[type="month"][disabled],
+input[type="week"] input[type="month"][disabled],
+input[type="email"] input[type="month"][disabled],
+input[type="number"] input[type="month"][disabled],
+input[type="search"] input[type="month"][disabled],
+input[type="tel"] input[type="month"][disabled],
+input[type="time"] input[type="month"][disabled],
+input[type="url"] input[type="month"][disabled],
+textarea input[type="month"][disabled],
+input[type="text"] input[type="month"],
+input[type="password"] input[type="month"],
+input[type="date"] input[type="month"],
+input[type="datetime"] input[type="month"],
+input[type="datetime-local"] input[type="month"],
+input[type="month"] input[type="month"],
+input[type="week"] input[type="month"],
+input[type="email"] input[type="month"],
+input[type="number"] input[type="month"],
+input[type="search"] input[type="month"],
+input[type="tel"] input[type="month"],
+input[type="time"] input[type="month"],
+input[type="url"] input[type="month"],
+textarea input[type="month"],
+input[type="text"] input[type="week"][disabled],
+input[type="password"] input[type="week"][disabled],
+input[type="date"] input[type="week"][disabled],
+input[type="datetime"] input[type="week"][disabled],
+input[type="datetime-local"] input[type="week"][disabled],
+input[type="month"] input[type="week"][disabled],
+input[type="week"] input[type="week"][disabled],
+input[type="email"] input[type="week"][disabled],
+input[type="number"] input[type="week"][disabled],
+input[type="search"] input[type="week"][disabled],
+input[type="tel"] input[type="week"][disabled],
+input[type="time"] input[type="week"][disabled],
+input[type="url"] input[type="week"][disabled],
+textarea input[type="week"][disabled],
+input[type="text"] input[type="week"],
+input[type="password"] input[type="week"],
+input[type="date"] input[type="week"],
+input[type="datetime"] input[type="week"],
+input[type="datetime-local"] input[type="week"],
+input[type="month"] input[type="week"],
+input[type="week"] input[type="week"],
+input[type="email"] input[type="week"],
+input[type="number"] input[type="week"],
+input[type="search"] input[type="week"],
+input[type="tel"] input[type="week"],
+input[type="time"] input[type="week"],
+input[type="url"] input[type="week"],
+textarea input[type="week"],
+input[type="text"] input[type="email"][disabled],
+input[type="password"] input[type="email"][disabled],
+input[type="date"] input[type="email"][disabled],
+input[type="datetime"] input[type="email"][disabled],
+input[type="datetime-local"] input[type="email"][disabled],
+input[type="month"] input[type="email"][disabled],
+input[type="week"] input[type="email"][disabled],
+input[type="email"] input[type="email"][disabled],
+input[type="number"] input[type="email"][disabled],
+input[type="search"] input[type="email"][disabled],
+input[type="tel"] input[type="email"][disabled],
+input[type="time"] input[type="email"][disabled],
+input[type="url"] input[type="email"][disabled],
+textarea input[type="email"][disabled],
+input[type="text"] input[type="email"],
+input[type="password"] input[type="email"],
+input[type="date"] input[type="email"],
+input[type="datetime"] input[type="email"],
+input[type="datetime-local"] input[type="email"],
+input[type="month"] input[type="email"],
+input[type="week"] input[type="email"],
+input[type="email"] input[type="email"],
+input[type="number"] input[type="email"],
+input[type="search"] input[type="email"],
+input[type="tel"] input[type="email"],
+input[type="time"] input[type="email"],
+input[type="url"] input[type="email"],
+textarea input[type="email"],
+input[type="text"] input[type="number"][disabled],
+input[type="password"] input[type="number"][disabled],
+input[type="date"] input[type="number"][disabled],
+input[type="datetime"] input[type="number"][disabled],
+input[type="datetime-local"] input[type="number"][disabled],
+input[type="month"] input[type="number"][disabled],
+input[type="week"] input[type="number"][disabled],
+input[type="email"] input[type="number"][disabled],
+input[type="number"] input[type="number"][disabled],
+input[type="search"] input[type="number"][disabled],
+input[type="tel"] input[type="number"][disabled],
+input[type="time"] input[type="number"][disabled],
+input[type="url"] input[type="number"][disabled],
+textarea input[type="number"][disabled],
+input[type="text"] input[type="number"],
+input[type="password"] input[type="number"],
+input[type="date"] input[type="number"],
+input[type="datetime"] input[type="number"],
+input[type="datetime-local"] input[type="number"],
+input[type="month"] input[type="number"],
+input[type="week"] input[type="number"],
+input[type="email"] input[type="number"],
+input[type="number"] input[type="number"],
+input[type="search"] input[type="number"],
+input[type="tel"] input[type="number"],
+input[type="time"] input[type="number"],
+input[type="url"] input[type="number"],
+textarea input[type="number"],
+input[type="text"] input[type="search"][disabled],
+input[type="password"] input[type="search"][disabled],
+input[type="date"] input[type="search"][disabled],
+input[type="datetime"] input[type="search"][disabled],
+input[type="datetime-local"] input[type="search"][disabled],
+input[type="month"] input[type="search"][disabled],
+input[type="week"] input[type="search"][disabled],
+input[type="email"] input[type="search"][disabled],
+input[type="number"] input[type="search"][disabled],
+input[type="search"] input[type="search"][disabled],
+input[type="tel"] input[type="search"][disabled],
+input[type="time"] input[type="search"][disabled],
+input[type="url"] input[type="search"][disabled],
+textarea input[type="search"][disabled],
+input[type="text"] input[type="search"],
+input[type="password"] input[type="search"],
+input[type="date"] input[type="search"],
+input[type="datetime"] input[type="search"],
+input[type="datetime-local"] input[type="search"],
+input[type="month"] input[type="search"],
+input[type="week"] input[type="search"],
+input[type="email"] input[type="search"],
+input[type="number"] input[type="search"],
+input[type="search"] input[type="search"],
+input[type="tel"] input[type="search"],
+input[type="time"] input[type="search"],
+input[type="url"] input[type="search"],
+textarea input[type="search"],
+input[type="text"] input[type="tel"][disabled],
+input[type="password"] input[type="tel"][disabled],
+input[type="date"] input[type="tel"][disabled],
+input[type="datetime"] input[type="tel"][disabled],
+input[type="datetime-local"] input[type="tel"][disabled],
+input[type="month"] input[type="tel"][disabled],
+input[type="week"] input[type="tel"][disabled],
+input[type="email"] input[type="tel"][disabled],
+input[type="number"] input[type="tel"][disabled],
+input[type="search"] input[type="tel"][disabled],
+input[type="tel"] input[type="tel"][disabled],
+input[type="time"] input[type="tel"][disabled],
+input[type="url"] input[type="tel"][disabled],
+textarea input[type="tel"][disabled],
+input[type="text"] input[type="tel"],
+input[type="password"] input[type="tel"],
+input[type="date"] input[type="tel"],
+input[type="datetime"] input[type="tel"],
+input[type="datetime-local"] input[type="tel"],
+input[type="month"] input[type="tel"],
+input[type="week"] input[type="tel"],
+input[type="email"] input[type="tel"],
+input[type="number"] input[type="tel"],
+input[type="search"] input[type="tel"],
+input[type="tel"] input[type="tel"],
+input[type="time"] input[type="tel"],
+input[type="url"] input[type="tel"],
+textarea input[type="tel"],
+input[type="text"] input[type="time"][disabled],
+input[type="password"] input[type="time"][disabled],
+input[type="date"] input[type="time"][disabled],
+input[type="datetime"] input[type="time"][disabled],
+input[type="datetime-local"] input[type="time"][disabled],
+input[type="month"] input[type="time"][disabled],
+input[type="week"] input[type="time"][disabled],
+input[type="email"] input[type="time"][disabled],
+input[type="number"] input[type="time"][disabled],
+input[type="search"] input[type="time"][disabled],
+input[type="tel"] input[type="time"][disabled],
+input[type="time"] input[type="time"][disabled],
+input[type="url"] input[type="time"][disabled],
+textarea input[type="time"][disabled],
+input[type="text"] input[type="time"],
+input[type="password"] input[type="time"],
+input[type="date"] input[type="time"],
+input[type="datetime"] input[type="time"],
+input[type="datetime-local"] input[type="time"],
+input[type="month"] input[type="time"],
+input[type="week"] input[type="time"],
+input[type="email"] input[type="time"],
+input[type="number"] input[type="time"],
+input[type="search"] input[type="time"],
+input[type="tel"] input[type="time"],
+input[type="time"] input[type="time"],
+input[type="url"] input[type="time"],
+textarea input[type="time"],
+input[type="text"] input[type="url"][disabled],
+input[type="password"] input[type="url"][disabled],
+input[type="date"] input[type="url"][disabled],
+input[type="datetime"] input[type="url"][disabled],
+input[type="datetime-local"] input[type="url"][disabled],
+input[type="month"] input[type="url"][disabled],
+input[type="week"] input[type="url"][disabled],
+input[type="email"] input[type="url"][disabled],
+input[type="number"] input[type="url"][disabled],
+input[type="search"] input[type="url"][disabled],
+input[type="tel"] input[type="url"][disabled],
+input[type="time"] input[type="url"][disabled],
+input[type="url"] input[type="url"][disabled],
+textarea input[type="url"][disabled],
+input[type="text"] input[type="url"],
+input[type="password"] input[type="url"],
+input[type="date"] input[type="url"],
+input[type="datetime"] input[type="url"],
+input[type="datetime-local"] input[type="url"],
+input[type="month"] input[type="url"],
+input[type="week"] input[type="url"],
+input[type="email"] input[type="url"],
+input[type="number"] input[type="url"],
+input[type="search"] input[type="url"],
+input[type="tel"] input[type="url"],
+input[type="time"] input[type="url"],
+input[type="url"] input[type="url"],
+textarea input[type="url"],
+input[type="text"] textarea[disabled],
+input[type="password"] textarea[disabled],
+input[type="date"] textarea[disabled],
+input[type="datetime"] textarea[disabled],
+input[type="datetime-local"] textarea[disabled],
+input[type="month"] textarea[disabled],
+input[type="week"] textarea[disabled],
+input[type="email"] textarea[disabled],
+input[type="number"] textarea[disabled],
+input[type="search"] textarea[disabled],
+input[type="tel"] textarea[disabled],
+input[type="time"] textarea[disabled],
+input[type="url"] textarea[disabled],
+textarea textarea[disabled],
+input[type="text"] textarea,
+input[type="password"] textarea,
+input[type="date"] textarea,
+input[type="datetime"] textarea,
+input[type="datetime-local"] textarea,
+input[type="month"] textarea,
+input[type="week"] textarea,
+input[type="email"] textarea,
+input[type="number"] textarea,
+input[type="search"] textarea,
+input[type="tel"] textarea,
+input[type="time"] textarea,
+input[type="url"] textarea,
+textarea textarea {
+  background-color: #ddd;
+}
+input[type="text"] input[type="text"].radius,
+input[type="password"] input[type="text"].radius,
+input[type="date"] input[type="text"].radius,
+input[type="datetime"] input[type="text"].radius,
+input[type="datetime-local"] input[type="text"].radius,
+input[type="month"] input[type="text"].radius,
+input[type="week"] input[type="text"].radius,
+input[type="email"] input[type="text"].radius,
+input[type="number"] input[type="text"].radius,
+input[type="search"] input[type="text"].radius,
+input[type="tel"] input[type="text"].radius,
+input[type="time"] input[type="text"].radius,
+input[type="url"] input[type="text"].radius,
+textarea input[type="text"].radius,
+input[type="text"] input[type="password"].radius,
+input[type="password"] input[type="password"].radius,
+input[type="date"] input[type="password"].radius,
+input[type="datetime"] input[type="password"].radius,
+input[type="datetime-local"] input[type="password"].radius,
+input[type="month"] input[type="password"].radius,
+input[type="week"] input[type="password"].radius,
+input[type="email"] input[type="password"].radius,
+input[type="number"] input[type="password"].radius,
+input[type="search"] input[type="password"].radius,
+input[type="tel"] input[type="password"].radius,
+input[type="time"] input[type="password"].radius,
+input[type="url"] input[type="password"].radius,
+textarea input[type="password"].radius,
+input[type="text"] input[type="date"].radius,
+input[type="password"] input[type="date"].radius,
+input[type="date"] input[type="date"].radius,
+input[type="datetime"] input[type="date"].radius,
+input[type="datetime-local"] input[type="date"].radius,
+input[type="month"] input[type="date"].radius,
+input[type="week"] input[type="date"].radius,
+input[type="email"] input[type="date"].radius,
+input[type="number"] input[type="date"].radius,
+input[type="search"] input[type="date"].radius,
+input[type="tel"] input[type="date"].radius,
+input[type="time"] input[type="date"].radius,
+input[type="url"] input[type="date"].radius,
+textarea input[type="date"].radius,
+input[type="text"] input[type="datetime"].radius,
+input[type="password"] input[type="datetime"].radius,
+input[type="date"] input[type="datetime"].radius,
+input[type="datetime"] input[type="datetime"].radius,
+input[type="datetime-local"] input[type="datetime"].radius,
+input[type="month"] input[type="datetime"].radius,
+input[type="week"] input[type="datetime"].radius,
+input[type="email"] input[type="datetime"].radius,
+input[type="number"] input[type="datetime"].radius,
+input[type="search"] input[type="datetime"].radius,
+input[type="tel"] input[type="datetime"].radius,
+input[type="time"] input[type="datetime"].radius,
+input[type="url"] input[type="datetime"].radius,
+textarea input[type="datetime"].radius,
+input[type="text"] input[type="datetime-local"].radius,
+input[type="password"] input[type="datetime-local"].radius,
+input[type="date"] input[type="datetime-local"].radius,
+input[type="datetime"] input[type="datetime-local"].radius,
+input[type="datetime-local"] input[type="datetime-local"].radius,
+input[type="month"] input[type="datetime-local"].radius,
+input[type="week"] input[type="datetime-local"].radius,
+input[type="email"] input[type="datetime-local"].radius,
+input[type="number"] input[type="datetime-local"].radius,
+input[type="search"] input[type="datetime-local"].radius,
+input[type="tel"] input[type="datetime-local"].radius,
+input[type="time"] input[type="datetime-local"].radius,
+input[type="url"] input[type="datetime-local"].radius,
+textarea input[type="datetime-local"].radius,
+input[type="text"] input[type="month"].radius,
+input[type="password"] input[type="month"].radius,
+input[type="date"] input[type="month"].radius,
+input[type="datetime"] input[type="month"].radius,
+input[type="datetime-local"] input[type="month"].radius,
+input[type="month"] input[type="month"].radius,
+input[type="week"] input[type="month"].radius,
+input[type="email"] input[type="month"].radius,
+input[type="number"] input[type="month"].radius,
+input[type="search"] input[type="month"].radius,
+input[type="tel"] input[type="month"].radius,
+input[type="time"] input[type="month"].radius,
+input[type="url"] input[type="month"].radius,
+textarea input[type="month"].radius,
+input[type="text"] input[type="week"].radius,
+input[type="password"] input[type="week"].radius,
+input[type="date"] input[type="week"].radius,
+input[type="datetime"] input[type="week"].radius,
+input[type="datetime-local"] input[type="week"].radius,
+input[type="month"] input[type="week"].radius,
+input[type="week"] input[type="week"].radius,
+input[type="email"] input[type="week"].radius,
+input[type="number"] input[type="week"].radius,
+input[type="search"] input[type="week"].radius,
+input[type="tel"] input[type="week"].radius,
+input[type="time"] input[type="week"].radius,
+input[type="url"] input[type="week"].radius,
+textarea input[type="week"].radius,
+input[type="text"] input[type="email"].radius,
+input[type="password"] input[type="email"].radius,
+input[type="date"] input[type="email"].radius,
+input[type="datetime"] input[type="email"].radius,
+input[type="datetime-local"] input[type="email"].radius,
+input[type="month"] input[type="email"].radius,
+input[type="week"] input[type="email"].radius,
+input[type="email"] input[type="email"].radius,
+input[type="number"] input[type="email"].radius,
+input[type="search"] input[type="email"].radius,
+input[type="tel"] input[type="email"].radius,
+input[type="time"] input[type="email"].radius,
+input[type="url"] input[type="email"].radius,
+textarea input[type="email"].radius,
+input[type="text"] input[type="number"].radius,
+input[type="password"] input[type="number"].radius,
+input[type="date"] input[type="number"].radius,
+input[type="datetime"] input[type="number"].radius,
+input[type="datetime-local"] input[type="number"].radius,
+input[type="month"] input[type="number"].radius,
+input[type="week"] input[type="number"].radius,
+input[type="email"] input[type="number"].radius,
+input[type="number"] input[type="number"].radius,
+input[type="search"] input[type="number"].radius,
+input[type="tel"] input[type="number"].radius,
+input[type="time"] input[type="number"].radius,
+input[type="url"] input[type="number"].radius,
+textarea input[type="number"].radius,
+input[type="text"] input[type="search"].radius,
+input[type="password"] input[type="search"].radius,
+input[type="date"] input[type="search"].radius,
+input[type="datetime"] input[type="search"].radius,
+input[type="datetime-local"] input[type="search"].radius,
+input[type="month"] input[type="search"].radius,
+input[type="week"] input[type="search"].radius,
+input[type="email"] input[type="search"].radius,
+input[type="number"] input[type="search"].radius,
+input[type="search"] input[type="search"].radius,
+input[type="tel"] input[type="search"].radius,
+input[type="time"] input[type="search"].radius,
+input[type="url"] input[type="search"].radius,
+textarea input[type="search"].radius,
+input[type="text"] input[type="tel"].radius,
+input[type="password"] input[type="tel"].radius,
+input[type="date"] input[type="tel"].radius,
+input[type="datetime"] input[type="tel"].radius,
+input[type="datetime-local"] input[type="tel"].radius,
+input[type="month"] input[type="tel"].radius,
+input[type="week"] input[type="tel"].radius,
+input[type="email"] input[type="tel"].radius,
+input[type="number"] input[type="tel"].radius,
+input[type="search"] input[type="tel"].radius,
+input[type="tel"] input[type="tel"].radius,
+input[type="time"] input[type="tel"].radius,
+input[type="url"] input[type="tel"].radius,
+textarea input[type="tel"].radius,
+input[type="text"] input[type="time"].radius,
+input[type="password"] input[type="time"].radius,
+input[type="date"] input[type="time"].radius,
+input[type="datetime"] input[type="time"].radius,
+input[type="datetime-local"] input[type="time"].radius,
+input[type="month"] input[type="time"].radius,
+input[type="week"] input[type="time"].radius,
+input[type="email"] input[type="time"].radius,
+input[type="number"] input[type="time"].radius,
+input[type="search"] input[type="time"].radius,
+input[type="tel"] input[type="time"].radius,
+input[type="time"] input[type="time"].radius,
+input[type="url"] input[type="time"].radius,
+textarea input[type="time"].radius,
+input[type="text"] input[type="url"].radius,
+input[type="password"] input[type="url"].radius,
+input[type="date"] input[type="url"].radius,
+input[type="datetime"] input[type="url"].radius,
+input[type="datetime-local"] input[type="url"].radius,
+input[type="month"] input[type="url"].radius,
+input[type="week"] input[type="url"].radius,
+input[type="email"] input[type="url"].radius,
+input[type="number"] input[type="url"].radius,
+input[type="search"] input[type="url"].radius,
+input[type="tel"] input[type="url"].radius,
+input[type="time"] input[type="url"].radius,
+input[type="url"] input[type="url"].radius,
+textarea input[type="url"].radius,
+input[type="text"] textarea.radius,
+input[type="password"] textarea.radius,
+input[type="date"] textarea.radius,
+input[type="datetime"] textarea.radius,
+input[type="datetime-local"] textarea.radius,
+input[type="month"] textarea.radius,
+input[type="week"] textarea.radius,
+input[type="email"] textarea.radius,
+input[type="number"] textarea.radius,
+input[type="search"] textarea.radius,
+input[type="tel"] textarea.radius,
+input[type="time"] textarea.radius,
+input[type="url"] textarea.radius,
+textarea textarea.radius {
+  border-radius: 3px;
+}
+input[type="submit"] {
+  -webkit-appearance: none;
+}
+/* Respect enforced amount of rows for textarea */
+textarea[rows] {
+  height: auto;
+}
+.grid {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+/* Small to medium screens */
+@media (min-width: 60rem) {
+  .grid {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+/* With gutters */
+.grid-gutters {
+  margin-left: -1rem;
+}
+.grid-gutters > .grid-cell {
+  padding-left: 1rem;
+}
+/* Alignment per row */
+.grid-top {
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+}
+.grid-bottom {
+  -webkit-box-align: end;
+  -webkit-align-items: flex-end;
+  -ms-flex-align: end;
+  align-items: flex-end;
+}
+.grid-center {
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  -ms-flex-align: center;
+  align-items: center;
+}
+/* Alignment per cell */
+.grid-cell-top {
+  -webkit-align-self: flex-start;
+  -ms-flex-item-align: start;
+  align-self: flex-start;
+}
+.grid-cell-bottom {
+  -webkit-align-self: flex-end;
+  -ms-flex-item-align: end;
+  align-self: flex-end;
+}
+.grid-cell-center {
+  -webkit-align-self: center;
+  -ms-flex-item-align: center;
+  align-self: center;
+}
+/* Base classes for all media */
+.grid-fit > .grid-cell {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.grid-full > .grid-cell {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 100%;
+  -ms-flex: 0 0 100%;
+  flex: 0 0 100%;
+}
+.grid-1of2 > .grid-cell {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 50%;
+  -ms-flex: 0 0 50%;
+  flex: 0 0 50%;
+}
+.grid-1of3 > .grid-cell {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 33.3333%;
+  -ms-flex: 0 0 33.3333%;
+  flex: 0 0 33.3333%;
+}
+.grid-1of4 > .grid-cell {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 25%;
+  -ms-flex: 0 0 25%;
+  flex: 0 0 25%;
+}
+/* Small to medium screens */
+@media (min-width: 24em) {
+  .small-grid-fit > .grid-cell {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+  }
+  .small-grid-full > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 100%;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+  }
+  .small-grid-1of2 > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 50%;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+  }
+  .small-grid-1of3 > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 33.3333%;
+    -ms-flex: 0 0 33.3333%;
+    flex: 0 0 33.3333%;
+  }
+  .small-grid-1of4 > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 25%;
+    -ms-flex: 0 0 25%;
+    flex: 0 0 25%;
+  }
+}
+/* Large screens */
+@media (min-width: 48em) {
+  .large-grid-fit > .grid-cell {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+  }
+  .large-grid-full > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 100%;
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+  }
+  .large-grid-1of2 > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 50%;
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+  }
+  .large-grid-1of3 > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 33.3333%;
+    -ms-flex: 0 0 33.3333%;
+    flex: 0 0 33.3333%;
+  }
+  .large-grid-1of4 > .grid-cell {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 25%;
+    -ms-flex: 0 0 25%;
+    flex: 0 0 25%;
+  }
+}
+.media {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+@media (max-width: 60rem) {
+  .media > .media-figure {
+    width: 100%;
+  }
+  .media > .media-body {
+    width: 100%;
+  }
+}
+@media (min-width: 60rem) {
+  .media {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: row;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}
+.media-figure {
+  margin-right: 2.666666666666667rem;
+}
+.media-body {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+.cell20 {
+  width: 20%;
+}
+.cell40 {
+  width: 40%;
+}
+.column {
+  padding: 0 1rem;
+}
+@media (min-width: 40rem) {
+  .column {
+    padding-left: 12rem;
+  }
+}
+@media (min-width: 60rem) {
+  .column {
+    padding: 0 12rem;
+  }
+}
+.nav-anchor {
+  visibility: hidden;
+}
+#page-num {
+  width: 2.666666666666667rem;
+}
+.alert-title {
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
+.vex-content {
+  margin-top: -5.5em !important;
+}
+.forum-nav {
+  list-style-type: none;
+  max-height: 25.7rem;
+  overflow: auto;
+}
+.forum-nav li {
+  margin-left: 1em;
+  margin-bottom: 0.625em;
+  font-weight: normal;
+  display: block;
+  color: #999;
+}
+.forum-nav dt a,
+.forum-nav dd a,
+.forum-nav li a {
+  text-decoration: none;
+  outline: none;
+  color: #999;
+  padding: 0.1875rem 1rem;
+}
+.forum-nav dt a:hover,
+.forum-nav dd a:hover,
+.forum-nav li a:hover {
+  color: #737373;
+}
+.forum-nav dt.active a,
+.forum-nav dd.active a,
+.forum-nav li.active a {
+  border-radius: 3px;
+  display: block;
+  font-weight: normal;
+  background: #008cba;
+  padding: 0.1875rem 1rem;
+  cursor: default;
+  color: #fff;
+}
+.forum-nav dt.active a:hover,
+.forum-nav dd.active a:hover,
+.forum-nav li.active a:hover {
+  background: #008cba;
+  -webkit-box-shadow: inset 0 0 1rem #00465d;
+  box-shadow: inset 0 0 1rem #00465d;
+}
+.thread-table {
+  background: rgba(0,0,0,0);
+  width: 100%;
+}
+.thread-table thead,
+.thread-table tfoot {
+  background: rgba(0,0,0,0);
+}
+.thread-table tr.even,
+.thread-table tr.alt,
+.thread-table tr:nth-of-type(even) {
+  background: rgba(0,0,0,0);
+}
+.heavy-font {
+  font-weight: 500;
+}
+.thread-title,
+.forum-title {
+  position: relative;
+}
+.thread-title .link,
+.forum-title .link {
+  float: left;
+  padding: 5px;
+}
+.thread-title.stuck {
+  background: #555;
+}
+.thread-title.stuck > * {
+  color: #fff;
+}
+.stuck {
+  position: fixed !important;
+  top: 0px;
+  -webkit-box-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+  box-shadow: 0px 2px 4px rgba(0,0,0,0.3);
+}
+.clickable {
+  cursor: pointer;
+}

@@ -1,0 +1,55 @@
+{
+  "name": "OpenShift-Sample-App",
+  "version": "1.0.0",
+  "description": "OpenShift Sample Application",
+  "keywords": [
+    "OpenShift",
+    "Node.js",
+    "application",
+    "openshift"
+  ],
+  "author": {
+    "name": "OpenShift",
+    "email": "ramr@example.org",
+    "url": "http://www.openshift.com/"
+  },
+  "homepage": "http://www.openshift.com/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/openshift/origin-server"
+  },
+  "engines": {
+    "node": ">= 0.10.0",
+    "npm": ">= 1.0.0"
+  },
+  "dependencies": {
+    "express": "~3.4.4"
+  },
+  "devDependencies": {
+    "async": "0.8.x",
+    "connect-livereload": "^0.4.0",
+    "grunt": "0.4.x",
+    "grunt-autoprefixer": "0.7.x",
+    "grunt-concurrent": "^0.5.0",
+    "grunt-contrib-clean": "^0.5.0",
+    "grunt-contrib-coffee": "~0.10.1",
+    "grunt-contrib-concat": "^0.4.0",
+    "grunt-contrib-connect": "^0.8.0",
+    "grunt-contrib-copy": "~0.5.0",
+    "grunt-contrib-cssmin": "^0.10.0",
+    "grunt-contrib-htmlmin": "^0.3.0",
+    "grunt-contrib-stylus": "~0.14.0",
+    "grunt-contrib-uglify": "^0.5.0",
+    "grunt-contrib-watch": "~0.6.1",
+    "grunt-nodemon": "^0.3.0",
+    "grunt-usemin": "^2.3.0",
+    "load-grunt-tasks": "0.3.x",
+    "request": "2.36.x",
+    "stylus": "~0.43.1",
+    "xml2json": "0.4.x"
+  },
+  "bundleDependencies": [],
+  "private": true,
+  "main": "server.coffee",
+  "scripts":{"start":"coffee server.coffee"} 
+}

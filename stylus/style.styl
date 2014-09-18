@@ -1,0 +1,1131 @@
+//fonts
+font = "PT Sans"
+serif-font = "Libre Baskerville"
+$fontsize = 18px
+title-font = "Raleway"
+color-blue = #0B5DA1
+darkgray = #222222
+linkblue = #2ba6cb
+linkblue-hover = darken(linkblue,20%)
+sheadinggray = #6f6f6f
+buttonblue = #008cba
+buttonblue-hover = darken(buttonblue,20%)
+footerbg = #333333
+
+-font-size()
+  (16/$fontsize)*arguments rem
+
+//screen sizes
+small-screen = 28rem
+medium-screen = 40rem
+large-screen = 60rem
+
+html
+  font-family font, sans-serif
+  font-size $fontsize
+  font-weight normal
+  font-style normal
+  line-height 20px
+  
+@media all and (max-width: small-screen)
+  html
+    font-size 16px
+
+body
+  background white
+  color darkgray
+  padding 0
+  margin 0
+  position relative
+  cursor default
+  display flex
+  min-height 100vh
+  flex-direction column
+
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+p,
+blockquote,
+th,
+td
+  margin 0
+  padding 0
+
+/* Default Link Styles */
+a
+  color linkblue
+  text-decoration none
+  line-height inherit
+  cursor pointer
+
+a:hover, a:focus 
+  color linkblue-hover
+a img
+  border none
+
+
+/* Default paragraph styles */
+p
+  font-family inherit
+  font-weight normal
+  font-size 1rem
+  line-height 1.6
+  margin-bottom 1.1rem
+  text-rendering optimizeLegibility 
+
+p.textblock
+  font-family font
+  font-size 1.1rem
+  line-height 1.6
+  // text-indent 2.5rem
+  p,ul
+    font-family font
+    font-size 1.1rem
+    line-height 1.6
+
+p.commentblock
+  font-family serif-font
+  font-size 1.15rem
+  line-height 1.8
+
+p.lead
+  font-size 1.21875rem
+  line-height 1.6
+p aside
+  font-size 0.875rem
+  line-height 1.35
+  font-style italic
+
+/* Default header styles */
+h1, h2, h3, h4, h5, h6
+  font-family: title-font, sans-serif
+  font-weight: normal
+  font-style: normal
+  color: darkgray
+  text-rendering: optimizeLegibility
+  margin-top: 0.1rem
+  margin-bottom: 0.3rem
+  line-height: 1.4
+h1 small, h2 small, h3 small, h4 small, h5 small, h6 small
+  font-size 60%
+  color lighten(darkgray,30%)
+  line-height 0
+
+h1.inline, h2.inline, h3.inline, h4.inline, h5.inline, h6.inline
+    display inline
+
+h1
+  font-size -font-size(2.125)
+
+h2
+  font-size -font-size(1.6875)
+
+h3
+  font-size -font-size(1.375)
+
+h4
+  font-size -font-size(1.125)
+
+h5
+  font-size -font-size(1.125)
+
+h6
+  font-size -font-size(1)
+
+
+@media only screen and (min-width: medium-screen) 
+  h1, h2, h3, h4, h5, h6 
+    line-height 1.4
+
+  h1 
+    font-size -font-size(2.75)
+
+  h2 
+    font-size -font-size(2.3125)
+
+  h3 
+    font-size -font-size(1.6875)
+
+  h4 
+    font-size -font-size(1.4375)
+
+
+.subheader 
+  line-height: 1.4
+  color: lighten(darkgray,30%)
+  font-weight: normal
+  margin-top: 0.1rem
+  margin-bottom: 0.3rem
+
+hr
+  border solid #dddddd
+  border-width 1px 0 0
+  clear both
+  margin 1rem 0 1rem
+  height 0
+
+/* Helpful Typography Defaults */
+em,
+i
+  font-style italic
+  line-height inherit
+
+strong,
+b
+  font-weight bold
+  line-height inherit
+
+small
+  font-size: 60%
+  line-height: inherit
+
+code
+  font-family Consolas, "Liberation Mono", Courier, monospace
+  font-weight bold
+  color #910b0e
+
+table
+  background white
+  margin-top 1rem
+  margin-bottom 1rem
+table thead,
+table tfoot
+  background whitesmoke
+table thead tr th,
+table thead tr td,
+table tfoot tr th,
+table tfoot tr td
+  padding 0.5rem 0.625rem 0.625rem
+  font-family title-font
+  // font-size 0.9rem
+  color darkgray
+  text-align left
+table tr th,
+table tr td
+  padding 0.5625rem 0.625rem
+  // font-size 0.875rem
+  color darkgray
+table tr.even, table tr.alt, table tr:nth-of-type(even)
+  background lighten(whitesmoke,20%)
+table thead tr th,
+table tfoot tr th,
+table tbody tr td,
+table tr td,
+table tfoot tr td
+  display table-cell
+  line-height 1.125rem
+//
+/* Lists */
+ul,
+ol,
+dl
+  font-size 1rem
+  line-height 1.6
+  margin-bottom 1.25rem
+  list-style-position outside
+  font-family inherit
+
+ul
+  margin-left 1.1rem
+ul.no-bullet
+  margin-left 0
+ul.no-bullet li ul,
+ul.no-bullet li ol
+  margin-left 1.25rem
+  margin-bottom: 0
+  list-style none
+
+/* Unordered Lists */
+ul li ul,
+ul li ol 
+  margin-left 1.25rem
+  margin-bottom 0
+ul.square li ul, ul.circle li ul, ul.disc li ul
+  list-style inherit
+ul.square
+  list-style-type:square
+  margin-left 1rem
+ul.circle
+  list-style-type: circle
+  margin-left 1rem
+ul.disc
+  list-style-type: disc
+  margin-left 1rem
+ul.no-bullet
+  list-style none
+
+/* Ordered Lists */
+ol
+  margin-left 1.4rem
+ol li ul,
+ol li ol
+  margin-left 1.25rem
+  margin-bottom 0
+
+/* Definition Lists */
+dl dt
+  margin-bottom 0.3rem
+  font-weight bold
+dl dd
+  margin-bottom 0.75rem
+
+/* inline flex */
+
+div.inline
+  display flex
+  flex-direction row
+.fcenter
+  justify-content center
+
+dl.inline
+  display flex
+  flex-direction column
+
+dl.inline li
+  display flex
+  flex-direction row
+  justify-content space-between
+
+dl.inline li dd
+  width 13rem
+  max-width 13rem
+
+ul.inline
+  margin 0
+
+ul.inline li
+  display inline
+  margin-right .5rem
+
+
+/* Abbreviations */
+abbr,
+acronym
+  text-transform uppercase
+  font-size 90%
+  color darkgray
+  border-bottom 1px dotted #dddddd
+  cursor help
+
+abbr
+  text-transform none
+
+/* Blockquotes */
+blockquote
+  margin 0 0 1.25rem
+  padding 0.5625rem 1.25rem 0 1.1875rem
+  border-left 1px solid #dddddd
+blockquote cite 
+  display block
+  font-size 0.8125rem
+  color lighten(darkgray,50%)
+blockquote cite:before 
+  content "\2014 \0020"
+blockquote cite a,
+blockquote cite a:visited
+  color lighten(darkgray,50%)
+
+blockquote,
+blockquote p
+  line-height 1.6
+  color lighten(darkgray,30%)
+
+/* Microformats */
+// .vcard {
+//   display: inline-block;
+//   margin: 0 0 1.25rem 0;
+//   border: 1px solid #dddddd;
+//   padding: 0.625rem 0.75rem; }
+// .vcard li {
+//   margin: 0;
+//   display: block; }
+// .vcard .fn {
+//   font-weight: bold;
+//   font-size: 0.9375rem; }
+
+// .vevent .summary {
+//   font-weight: bold; }
+// .vevent abbr {
+//   cursor: default;
+//   text-decoration: none;
+//   font-weight: bold;
+//   border: none;
+//   padding: 0 0.0625rem; }
+
+i:focus, button:focus
+  outline none
+
+
+img.radius
+    border-radius 5px
+
+.categories
+  list-style circle
+  li 
+    list-style circle
+
+.sub-nav
+  list-style-type none
+  margin auto
+  width 100%
+  dt 
+    text-transform uppercase
+  dt,
+  dd,
+  li
+    margin-left 1em
+    margin-bottom 0.625em
+    font-weight normal
+    width 45%
+    display inline-block
+    color #999999
+  dt a,
+  dd a,
+  li a 
+    text-decoration none
+    outline none
+    color #999999
+    padding 0.1875rem 1rem
+  dt a:hover,
+  dd a:hover,
+  li a:hover
+    color #737373 
+  dt.active a,
+  dd.active a,
+  li.active a
+    border-radius 3px
+    display block
+    font-weight normal
+    background buttonblue
+    padding 0.1875rem 1rem
+    cursor default
+    color white
+  dt.active a:hover,
+  dd.active a:hover,
+  li.active a:hover 
+    background buttonblue
+    box-shadow inset 0 0 1rem darken(buttonblue,50%)
+
+//hide the name of the game on smaller screens
+.sub-nav > li:first-child
+  display none
+
+@media only screen and (min-width: medium-screen)
+  .sub-nav
+    background-color white
+    box-shadow 0px 0px 5px 0px #ccc
+    border-radius 10px
+    display block
+    position fixed
+    overflow hidden
+    width 10em
+    margin -0.25rem 0 1.125rem
+    padding 1em 0
+    margin-top 2em
+    margin-right 0em
+    margin-left -0.6rem
+    z-index 999
+  .sub-nav li
+    display block 
+    width auto 
+  .sub-nav > li:first-child
+    display block
+
+.text-center
+  text-align center !important
+
+.input-addon 
+  display:flex
+  margin 0 1rem
+
+.input-addon-field 
+  flex 1
+  margin-right -0.15em
+  &:not(:first-child)
+    border-left 0
+  &:not(:last-child)
+    border-right 0
+
+
+.input-addon-item
+  font-weight 400
+  // background-color: hsla(31, 15%, 50%, 0.1);
+  // color: hsl(0, 0%, 40%);
+
+
+.input-addon-field, .input-addon-item {
+  border 1px solid hsla(31, 15%, 50%, 0.25)
+  padding 0.2rem 0.5rem !important
+  margin 0
+  &:first-child {
+    border-radius 2px 0 0 2px
+  }
+  &:last-child {
+    border-radius 0 2px 2px 0
+  }
+}
+
+button, .button
+  border-style solid
+  border-width 0px
+  cursor pointer
+  font-weight normal
+  line-height normal
+  margin 0 0 1.25rem
+  position relative
+  text-decoration none
+  text-align center
+  -webkit-appearance none
+  -webkit-border-radius 0
+  display inline-block
+  padding .8rem
+  font-size 1rem
+  font-family font
+  background-color buttonblue
+  border-color #007095
+  color white
+  transition background-color 300ms ease-out
+
+button:hover, button:focus, .button:hover, .button:focus
+  background-color buttonblue-hover
+button:hover, button:focus, .button:hover, .button:focus
+  color white
+// button.secondary, .button.secondary {
+//   background-color: #e7e7e7;
+//   border-color: #b9b9b9;
+//   color: #333333; }
+// button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
+//   background-color: #b9b9b9; }
+// button.secondary:hover, button.secondary:focus, .button.secondary:hover, .button.secondary:focus {
+//   color: #333333; }
+// button.success, .button.success {
+//   background-color: #43ac6a;
+//   border-color: #368a55;
+//   color: white; }
+// button.success:hover, button.success:focus, .button.success:hover, .button.success:focus {
+//   background-color: #368a55; }
+// button.success:hover, button.success:focus, .button.success:hover, .button.success:focus {
+//   color: white; }
+// button.alert, .button.alert {
+//   background-color: #f04124;
+//   border-color: #cf2a0e;
+//   color: white; }
+// button.alert:hover, button.alert:focus, .button.alert:hover, .button.alert:focus {
+//   background-color: #cf2a0e; }
+// button.alert:hover, button.alert:focus, .button.alert:hover, .button.alert:focus {
+//   color: white; }
+// button.large, .button.large {
+//   padding-top: 1.125rem;
+//   padding-right: 2.25rem;
+//   padding-bottom: 1.1875rem;
+//   padding-left: 2.25rem;
+//   font-size: 1.25rem; }
+// button.small, .button.small {
+//   padding-top: 0.875rem;
+//   padding-right: 1.75rem;
+//   padding-bottom: 0.9375rem;
+//   padding-left: 1.75rem;
+//   font-size: 0.8125rem; }
+// button.tiny, .button.tiny {
+//   padding-top: 0.625rem;
+//   padding-right: 1.25rem;
+//   padding-bottom: 0.6875rem;
+//   padding-left: 1.25rem;
+//   font-size: 0.6875rem; }
+// button.expand, .button.expand {
+//   padding-right: 0;
+//   padding-left: 0;
+//   width: 100%; }
+// button.left-align, .button.left-align {
+//   text-align: left;
+//   text-indent: 0.75rem; }
+// button.right-align, .button.right-align {
+//   text-align: right;
+//   padding-right: 0.75rem; }
+button.radius, .button.radius 
+  border-radius 3px
+// button.round, .button.round {
+//   border-radius: 1000px; }
+// button.disabled, button[disabled], .button.disabled, .button[disabled] {
+//   background-color: #008cba;
+//   border-color: #007095;
+//   color: white;
+//   cursor: default;
+//   opacity: 0.7;
+//   box-shadow: none; }
+// button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
+//   background-color: #007095; }
+// button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
+//   color: white; }
+// button.disabled:hover, button.disabled:focus, button[disabled]:hover, button[disabled]:focus, .button.disabled:hover, .button.disabled:focus, .button[disabled]:hover, .button[disabled]:focus {
+//   background-color: #008cba; }
+// button.disabled.secondary, button[disabled].secondary, .button.disabled.secondary, .button[disabled].secondary {
+//   background-color: #e7e7e7;
+//   border-color: #b9b9b9;
+//   color: #333333;
+//   cursor: default;
+//   opacity: 0.7;
+//   box-shadow: none; }
+// button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
+//   background-color: #b9b9b9; }
+// button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
+//   color: #333333; }
+// button.disabled.secondary:hover, button.disabled.secondary:focus, button[disabled].secondary:hover, button[disabled].secondary:focus, .button.disabled.secondary:hover, .button.disabled.secondary:focus, .button[disabled].secondary:hover, .button[disabled].secondary:focus {
+//   background-color: #e7e7e7; }
+// button.disabled.success, button[disabled].success, .button.disabled.success, .button[disabled].success {
+//   background-color: #43ac6a;
+//   border-color: #368a55;
+//   color: white;
+//   cursor: default;
+//   opacity: 0.7;
+//   box-shadow: none; }
+// button.disabled.success:hover, button.disabled.success:focus, button[disabled].success:hover, button[disabled].success:focus, .button.disabled.success:hover, .button.disabled.success:focus, .button[disabled].success:hover, .button[disabled].success:focus {
+//   background-color: #368a55; }
+// button.disabled.success:hover, button.disabled.success:focus, button[disabled].success:hover, button[disabled].success:focus, .button.disabled.success:hover, .button.disabled.success:focus, .button[disabled].success:hover, .button[disabled].success:focus {
+//   color: white; }
+// button.disabled.success:hover, button.disabled.success:focus, button[disabled].success:hover, button[disabled].success:focus, .button.disabled.success:hover, .button.disabled.success:focus, .button[disabled].success:hover, .button[disabled].success:focus {
+//   background-color: #43ac6a; }
+// button.disabled.alert, button[disabled].alert, .button.disabled.alert, .button[disabled].alert {
+//   background-color: #f04124;
+//   border-color: #cf2a0e;
+//   color: white;
+//   cursor: default;
+//   opacity: 0.7;
+//   box-shadow: none; }
+// button.disabled.alert:hover, button.disabled.alert:focus, button[disabled].alert:hover, button[disabled].alert:focus, .button.disabled.alert:hover, .button.disabled.alert:focus, .button[disabled].alert:hover, .button[disabled].alert:focus {
+//   background-color: #cf2a0e; }
+// button.disabled.alert:hover, button.disabled.alert:focus, button[disabled].alert:hover, button[disabled].alert:focus, .button.disabled.alert:hover, .button.disabled.alert:focus, .button[disabled].alert:hover, .button[disabled].alert:focus {
+//   color: white; }
+// button.disabled.alert:hover, button.disabled.alert:focus, button[disabled].alert:hover, button[disabled].alert:focus, .button.disabled.alert:hover, .button.disabled.alert:focus, .button[disabled].alert:hover, .button[disabled].alert:focus {
+//   background-color: #f04124; }
+
+// @media only screen and (min-width: 40.063em) {
+//   button, .button {
+//     display: inline-block; } }
+
+/* We use this to get basic styling on all basic form elements */
+input[type="text"],
+input[type="password"],
+input[type="date"],
+input[type="datetime"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="time"],
+input[type="url"],
+textarea
+  -webkit-appearance none
+  background-color white
+  border 1px solid #cccccc
+  box-shadow inset 0 1px 2px rgba(0, 0, 0, 0.1)
+  font-family font
+  color rgba(0, 0, 0, 0.75)
+  display block
+  font-size -font-size(0.875)
+  box-sizing border-box;
+  transition box-shadow 0.45s, border-color 0.45s ease-in-out
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="date"]:focus,
+  input[type="datetime"]:focus,
+  input[type="datetime-local"]:focus,
+  input[type="month"]:focus,
+  input[type="week"]:focus,
+  input[type="email"]:focus,
+  input[type="number"]:focus,
+  input[type="search"]:focus,
+  input[type="tel"]:focus,
+  input[type="time"]:focus,
+  input[type="url"]:focus,
+  textarea:focus 
+    box-shadow 0 0 5px #999999
+    border-color #999999
+  input[type="text"]:focus,
+  input[type="password"]:focus,
+  input[type="date"]:focus,
+  input[type="datetime"]:focus,
+  input[type="datetime-local"]:focus,
+  input[type="month"]:focus,
+  input[type="week"]:focus,
+  input[type="email"]:focus,
+  input[type="number"]:focus,
+  input[type="search"]:focus,
+  input[type="tel"]:focus,
+  input[type="time"]:focus,
+  input[type="url"]:focus,
+  textarea:focus
+    background #fafafa
+    border-color #999999
+    outline none
+  input[type="text"][disabled], fieldset[disabled] input[type="text"],
+  input[type="password"][disabled], fieldset[disabled]
+  input[type="password"],
+  input[type="date"][disabled], fieldset[disabled]
+  input[type="date"],
+  input[type="datetime"][disabled], fieldset[disabled]
+  input[type="datetime"],
+  input[type="datetime-local"][disabled], fieldset[disabled]
+  input[type="datetime-local"],
+  input[type="month"][disabled], fieldset[disabled]
+  input[type="month"],
+  input[type="week"][disabled], fieldset[disabled]
+  input[type="week"],
+  input[type="email"][disabled], fieldset[disabled]
+  input[type="email"],
+  input[type="number"][disabled], fieldset[disabled]
+  input[type="number"],
+  input[type="search"][disabled], fieldset[disabled]
+  input[type="search"],
+  input[type="tel"][disabled], fieldset[disabled]
+  input[type="tel"],
+  input[type="time"][disabled], fieldset[disabled]
+  input[type="time"],
+  input[type="url"][disabled], fieldset[disabled]
+  input[type="url"],
+  textarea[disabled], fieldset[disabled]
+  textarea 
+    background-color #dddddd
+  input[type="text"].radius,
+  input[type="password"].radius,
+  input[type="date"].radius,
+  input[type="datetime"].radius,
+  input[type="datetime-local"].radius,
+  input[type="month"].radius,
+  input[type="week"].radius,
+  input[type="email"].radius,
+  input[type="number"].radius,
+  input[type="search"].radius,
+  input[type="tel"].radius,
+  input[type="time"].radius,
+  input[type="url"].radius,
+  textarea.radius
+    border-radius 3px
+
+input[type="submit"]
+  -webkit-appearance none
+
+/* Respect enforced amount of rows for textarea */
+textarea[rows]
+  height auto
+
+.grid {
+  display: flex;
+  flex-direction column
+}
+
+/* Small to medium screens */
+@media (min-width: large-screen)
+  .grid
+    flex-direction row
+
+
+/* With gutters */
+.grid-gutters {
+  margin-left: -1rem;
+}
+.grid-gutters > .grid-cell {
+  padding-left: 1rem;
+}
+
+/* Alignment per row */
+.grid-top {
+  align-items: flex-start;
+}
+.grid-bottom {
+  align-items: flex-end;
+}
+.grid-center {
+  align-items: center;
+}
+
+/* Alignment per cell */
+.grid-cell-top {
+  align-self: flex-start;
+}
+.grid-cell-bottom {
+  align-self: flex-end;
+}
+.grid-cell-center {
+  align-self: center;
+}
+
+
+/* Base classes for all media */
+.grid-fit > .grid-cell 
+  flex: 1;
+
+.grid-full > .grid-cell {
+  flex: 0 0 100%;
+}
+.grid-1of2 > .grid-cell {
+  flex: 0 0 50%
+}
+.grid-1of3 > .grid-cell {
+  flex: 0 0 33.3333%
+}
+.grid-1of4 > .grid-cell {
+  flex: 0 0 25%
+}
+
+/* Small to medium screens */
+@media (min-width: 24em) {
+  .small-grid-fit > .grid-cell {
+    flex: 1;
+  }
+  .small-grid-full > .grid-cell {
+    flex: 0 0 100%
+  }
+  .small-grid-1of2 > .grid-cell {
+    flex: 0 0 50%
+  }
+  .small-grid-1of3 > .grid-cell {
+    flex: 0 0 33.3333%
+  }
+  .small-grid-1of4 > .grid-cell {
+    flex: 0 0 25%
+  }
+}
+
+/* Large screens */
+@media (min-width: 48em) {
+  .large-grid-fit > .grid-cell {
+    flex: 1;
+  }
+  .large-grid-full > .grid-cell {
+    flex: 0 0 100%;
+  }
+  .large-grid-1of2 > .grid-cell {
+    flex: 0 0 50%
+  }
+  .large-grid-1of3 > .grid-cell {
+    flex: 0 0 33.3333%
+  }
+  .large-grid-1of4 > .grid-cell {
+    flex: 0 0 25%
+  }
+}
+
+
+.media {
+  display: flex;
+  align-items: flex-start;
+  flex-direction column
+}
+
+@media (max-width: large-screen)
+  .media > .media-figure
+    width 100%
+  .media > .media-body
+    width 100%
+
+
+@media (min-width: large-screen)
+  .media
+    flex-direction row
+
+
+.media-figure {
+  margin-right: -font-size(3);
+}
+
+.media-body {
+  flex: 1;
+}
+
+.cell20
+  width 20%
+
+.cell40
+  width 40%
+
+.column  
+    padding 0 1rem
+
+@media (min-width: medium-screen)
+  .column  
+    padding-left 12rem
+
+@media (min-width: large-screen)
+  .column  
+    padding 0 12rem
+
+.nav-anchor
+  visibility hidden
+
+#page-num
+  width -font-size(3)
+
+.alert-title
+  text-align center
+  border-bottom 1px solid #ccc
+
+.vex-content
+  margin-top -5.5em !important
+
+.forum-nav
+  list-style-type none
+  max-height 25.7rem
+  overflow auto
+  li
+    margin-left 1em
+    margin-bottom 0.625em
+    font-weight normal
+    display block
+    color #999999
+  dt a,
+  dd a,
+  li a 
+    text-decoration none
+    outline none
+    color #999999
+    padding 0.1875rem 1rem
+  dt a:hover,
+  dd a:hover,
+  li a:hover
+    color #737373 
+  dt.active a,
+  dd.active a,
+  li.active a
+    border-radius 3px
+    display block
+    font-weight normal
+    background buttonblue
+    padding 0.1875rem 1rem
+    cursor default
+    color white
+  dt.active a:hover,
+  dd.active a:hover,
+  li.active a:hover 
+    background buttonblue
+    box-shadow inset 0 0 1rem darken(buttonblue,50%)
+
+.thread-table
+  background rgba(0,0,0,0)
+  width 100%
+  thead,
+  tfoot
+    background rgba(0,0,0,0)
+  tr.even, tr.alt, tr:nth-of-type(even)
+    background rgba(0,0,0,0)
+
+.heavy-font
+  font-weight 500
+
+.thread-title, .forum-title
+  position relative
+
+.thread-title .link, .forum-title .link
+  // position absolute
+  // left 1em
+  float left
+  padding 5px
+
+.thread-title.stuck
+  // box-shadow 0 3px 3px #eee
+  background rgb(85, 85, 85)
+  // color #fff
+
+.thread-title.stuck > *
+  color #fff
+  
+.link
+  background none
+  border none
+  display inline
+  font: inherit
+  margin 0
+  padding 0
+  outline none
+  outline-offset 0
+  /* Additional styles to look like a link */
+  color linkblue
+  cursor pointer
+  // text-decoration: underline;
+  &:hover,
+  &:active,
+  &:focus
+    background none
+    border none
+    display inline
+    font inherit
+    margin 0
+    padding 0
+    outline none
+    outline-offset 0
+    color linkblue-hover
+    cursor pointer
+
+.link-wide
+  display block
+  width 100%
+  text-align center
+// hr 
+//   border 0 
+//   height .02em 
+//   background-image -webkit-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0)) 
+//   background-image -moz-linear-gradient(left, rgba(0,0,0,0), rgba(0,0,0,0.75), rgba(0,0,0,0))
+
+/* sections */
+
+.section
+    margin-bottom .2em
+    padding 1rem 0
+    box-shadow 0 .3em .3em -.3em black
+
+@media (min-width: medium-screen)
+  .section
+    padding 4rem 0
+
+.section-white    
+  background-image linear-gradient(to bottom, #F5F3EB 0%, #FFFFFF 0%)
+
+.section-gray 
+  background-image linear-gradient(to bottom, #F5F3EB 0%, #E8E8E8 100%)
+
+.selected
+  background-color darken(buttonblue-hover,29%) !important
+  box-shadow inset 0 0 1rem darken(buttonblue,70%)
+
+//icons
+.icon-large
+    font-size -font-size(2)
+
+.icon-xlarge
+    font-size -font-size(3)
+
+.icon-huge
+    font-size -font-size(10)
+
+@media (max-width: medium-screen)
+  .icon-huge
+    display none
+
+.icon-inline
+    vertical-align bottom
+
+.sorting-asc:after 
+    font-family "Ionicons"
+    content "\f10d"
+    float right
+    padding-left 5px
+
+.sorting-desc:after 
+    font-family "Ionicons"
+    content "\f104"
+    float right
+    padding-left 5px
+    
+.stuck 
+  position fixed !important
+  top 0px
+  box-shadow 0px 2px 4px rgba(0, 0, 0, 0.3)
+
+.clickable
+  cursor pointer
+
+@media (max-width: small-screen)
+  .hidden-small
+    display none
+    
+//------------------------------------------------------------------------------    
+// Specific styles
+//------------------------------------------------------------------------------  
+  
+main {
+  padding-top 1rem
+  display flex
+  flex 1
+  width 100%
+  align-items center
+  justify-content center
+}
+
+.top-nav 
+  list-style none
+  margin 0
+  padding 0
+  background color-blue
+  box-shadow -.05em .3em .3em -.3em black
+  display flex
+  flex-flow row
+  justify-content center
+  align-items center
+  color white
+  li    
+    text-align center
+    text-decoration none
+    padding 5px 0
+    color white
+  a
+    display block
+    outline none
+    color white
+
+.top-nav *{
+  color white
+}
+
+.top-nav li:hover {
+  background: darken(color-blue, 10%);
+}
+
+/* Small screens */
+@media all and (max-width: medium-screen)
+  .top-nav
+    /* On small screens, we are no longer using row direction but column */
+    flex-direction column !important
+  
+.games-table
+  max-width 60rem
+
+@media (max-width: small-screen)
+  .game-image
+    max-width -font-size(3)
+  .hidden-small
+    display none
+  
+// footer
+
+footer 
+  background footerbg
+  padding 0.5rem 0
+  ul
+    margin 0 auto
+    padding-bottom 0
+    text-align center
+    list-style none
+    li 
+      display inline
+      padding 0.5rem 1rem
+      //font-size 1rem
+      text-align center
+      a
+        color white
+        padding 0 .5em
+      i
+        vertical-align top
+        color white
+    li:hover a, li:hover i
+      color linkblue-hover
+
+@media (max-width: small-screen)
+  footer ul li
+    display block
+    
