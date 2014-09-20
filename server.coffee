@@ -77,7 +77,7 @@ class App
       console.log 'hot'
       request "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame", (err,response,body) ->
         result = parser.toJson(body,jsonOptions)
-        result.items = result.items.item
+        result = result.items.item
         res.send(result)
         return
       return

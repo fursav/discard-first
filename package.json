@@ -43,13 +43,18 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-nodemon": "^0.3.0",
     "grunt-usemin": "^2.3.0",
+    "jeet": "^6.1.1",
     "load-grunt-tasks": "0.3.x",
     "request": "2.36.x",
+    "rupture": "^0.4.0",
     "stylus": "~0.43.1",
+    "time-grunt": "^1.0.0",
     "xml2json": "0.4.x"
   },
   "bundleDependencies": [],
   "private": true,
   "main": "server.coffee",
-  "scripts":{"start":"coffee server.coffee"} 
+  "scripts": {
+    "start": "coffee server.coffee"
+  }
 }

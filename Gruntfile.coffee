@@ -345,11 +345,20 @@ module.exports = (grunt) ->
       build:
         options:
           compress: false
+          use: [
+            require('jeet')
+            require('rupture')
+            ]
+          import: [
+            'normalize'
+            'vars'
+            'base'
+            ]
 
         files: [
           expand: true
           cwd: "stylus"
-          src: "*.styl"
+          src: "style.styl"
           dest: "css"
           ext: ".css"
         ]
@@ -359,7 +368,7 @@ module.exports = (grunt) ->
         expand: true
         flatten: true
         cwd: 'coffee'
-        src: ['*.coffee']
+        src: ['script.coffee']
         dest: 'js'
         ext: '.js'
 
@@ -415,7 +424,7 @@ module.exports = (grunt) ->
   grunt.registerTask 'serve', [
     'stylus'
     'coffee:compile'
-    'autoprefixer:server'
+    #'autoprefixer:server'
     # 'connect:livereload'
     'watch'
   ]
