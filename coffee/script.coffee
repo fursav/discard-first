@@ -17,30 +17,46 @@ styler.styleTableHeader = (root,parent) ->
         root.attrs.class += " clickable"
 
     return root;
+    
+orLoading = (elements,loading)->
+    console.log "here"
+    console.log loading
+    if loading
+        return [m("i",{class:"icon ion-loading-c icon-large"})]
+    return elements
 
 model = {
     getData: ()->
-        return m.request({method:'Get',url:'/hot',type:TrendingGame})
+        return m.request({method:'Get',url:'/hot',type:TrendingGame,background: true})
     }
 
 trendingPage = {}
 
 trendingPage.controller = ->
     @games = m.prop([])
+    @loading = m.prop(true)
     model.getData().then(@games).then(=>
+        console.log "loaded"
+        @loading(false)
         @trendingTable = new TrendingTable.controller(@games())
         return
-        )
+        ).then(m.redraw)
     return
     
 trendingPage.view = (ctrl) ->
-    return m("div.main",[new TrendingTable.view(ctrl.trendingTable)])
+    #return m("div.main",[new TrendingTable.view(ctrl.trendingTable)])
+    #if ctrl.loading 
+    #body = [m("div.text-center",{style:{width:"100%"}},[m("i",{class:"icon ion-loading-c icon-large"})])]     
+    #else
+        #body = [new TrendingTable.view(ctrl.trendingTable)]
+    body = if ctrl.loading() then [m("div.text-center",[m("i",{class:"icon ion-loading-c icon-large"})])] else [new TrendingTable.view(ctrl.trendingTable)]
+    return m("div.main",body)
     
 TrendingGame = (data) ->
     @name = data.name.value
     @thumbnail = data.thumbnail.value
     @rank = data.rank
-    @year = data.yearpublished.value
+    @year = data?.yearpublished?.value
     return
     
 TrendingTable = {}    
@@ -61,14 +77,28 @@ TrendingTable.controller = (data) ->
         }
     ]
     row = [
-        (data) -> [
-            new Image({
-                src:data.thumbnail
-                class:'radius thumbnail'
+        {
+            attrs: {
+                style: {
+                    textAlign:'center'
+                }
+            },
+            el: (data) -> [
+                new Image({
+                    src:data.thumbnail
+                    class:'radius thumbnail'
                 })
-        ],
+            ]
+        },
         (data) -> [m("span.game-title--small",[data.name," ",m("small",data.year)])],
-        (data) -> data.rank
+        {
+            attrs: {
+                style: {
+                    textAlign:'right'
+                }
+            },
+            el: (data) -> data.rank
+        }
     ]
     @table = new Table.controller(header,row,data)
     return
@@ -81,7 +111,7 @@ Table = {}
 Table.controller = (header,row,data,state) ->
     @state = state ? {}
     #@data = m.prop(data)
-    @data = () =>
+    @data = =>
         if @state.sortType
             sortMult = {asc:1,des:-1}[@state.sortDir]
             data.sort (a,b) =>
@@ -123,7 +153,9 @@ Table.view = (ctrl) ->
         ))])
     body = m("tbody",ctrl.data().map((item,index) ->
         return m("tr", ctrl.row().map((cell) ->
-            return m("td", cell(item))
+            if typeof(cell) is "function"
+                return m("td", cell(item))
+            return m("td",cell.attrs, cell.el(item))
             )
         )
     ))

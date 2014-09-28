@@ -3,6 +3,8 @@ path    = require('path')
 request = require('request')
 async   = require('async')
 parser  = require('xml2json')
+cache_manager = require('cache-manager')
+memory_cache = cache_manager.caching({store: 'memory', max: 500, ttl: 300})
 app     = express()
 
 class App
@@ -51,6 +53,39 @@ class App
       sanitize      : false
       trim          : false
       arrayNotation : false
+    
+    _request = (url,res) ->
+      cb = (result) ->
+        res.set('Cache-Control', 'public, max-age=300')
+        res.send result
+        return
+      memory_cache.get url,(err, result) ->
+        if result
+          console.log 'cached'
+          cb result
+          return
+        console.log 'hitting'
+        request url, (err,response,body) ->
+          result = parser.toJson(body,jsonOptions)
+          result = result.items.item
+          memory_cache.set(url, result)
+          cb result
+          return
+        return
+          
+      #result
+      #if result isnt {}
+        #console.log 'caching'
+        #res.send result
+      #else
+        #console.log 'hitting'
+        #request url, (err,response,body) ->
+          #result = parser.toJson(body,jsonOptions)
+          #result = result.items.item
+          #_cache.set(url, result)
+          #res.send(result)
+          #return
+      return
     @routes = {}
     
     @routes['/thing'] = (req,res) ->
@@ -75,11 +110,13 @@ class App
       
     @routes['/hot'] = (req,res) ->
       console.log 'hot'
-      request "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame", (err,response,body) ->
-        result = parser.toJson(body,jsonOptions)
-        result = result.items.item
-        res.send(result)
-        return
+      _request("http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame",res)
+      #request "http://www.boardgamegeek.com/xmlapi2/hot?type=boardgame", (err,response,body) ->
+        #result = parser.toJson(body,jsonOptions)
+        #result = result.items.item
+        #value = cache.set( req.originalUrl, )
+        #res.send(result)
+        #return
       return
       
     @routes['/'] = (req,res) ->

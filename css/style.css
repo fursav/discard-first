@@ -240,12 +240,19 @@ table.alternate tr:nth-of-type(even) {
 table.bordered tbody tr {
   border-bottom: 1px solid #eee;
 }
+img {
+  max-width: 100%;
+}
+.text-center {
+  text-align: center !important;
+}
 img.radius {
   border-radius: 5px;
 }
 @media only screen and (max-width: 400px) {
   .thumbnail {
     max-height: 50px;
+    max-width: 100px;
   }
 }
 .main {

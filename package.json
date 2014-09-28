@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "async": "0.8.x",
+    "cache-manager": "^0.11.0",
     "connect-livereload": "^0.4.0",
     "grunt": "0.4.x",
     "grunt-autoprefixer": "0.7.x",

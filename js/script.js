@@ -1,5 +1,5 @@
 (function() {
-  var Image, Table, TrendingGame, TrendingTable, model, styler, trendingPage;
+  var Image, Table, TrendingGame, TrendingTable, model, orLoading, styler, trendingPage;
 
   styler = {};
 
@@ -30,12 +30,26 @@
     return root;
   };
 
+  orLoading = function(elements, loading) {
+    console.log("here");
+    console.log(loading);
+    if (loading) {
+      return [
+        m("i", {
+          "class": "icon ion-loading-c icon-large"
+        })
+      ];
+    }
+    return elements;
+  };
+
   model = {
     getData: function() {
       return m.request({
         method: 'Get',
         url: '/hot',
-        type: TrendingGame
+        type: TrendingGame,
+        background: true
       });
     }
   };
@@ -44,22 +58,34 @@
 
   trendingPage.controller = function() {
     this.games = m.prop([]);
+    this.loading = m.prop(true);
     model.getData().then(this.games).then((function(_this) {
       return function() {
+        console.log("loaded");
+        _this.loading(false);
         _this.trendingTable = new TrendingTable.controller(_this.games());
       };
-    })(this));
+    })(this)).then(m.redraw);
   };
 
   trendingPage.view = function(ctrl) {
-    return m("div.main", [new TrendingTable.view(ctrl.trendingTable)]);
+    var body;
+    body = ctrl.loading() ? [
+      m("div.text-center", [
+        m("i", {
+          "class": "icon ion-loading-c icon-large"
+        })
+      ])
+    ] : [new TrendingTable.view(ctrl.trendingTable)];
+    return m("div.main", body);
   };
 
   TrendingGame = function(data) {
+    var _ref;
     this.name = data.name.value;
     this.thumbnail = data.thumbnail.value;
     this.rank = data.rank;
-    this.year = data.yearpublished.value;
+    this.year = data != null ? (_ref = data.yearpublished) != null ? _ref.value : void 0 : void 0;
   };
 
   TrendingTable = {};
@@ -80,17 +106,31 @@
       }
     ];
     row = [
-      function(data) {
-        return [
-          new Image({
-            src: data.thumbnail,
-            "class": 'radius thumbnail'
-          })
-        ];
+      {
+        attrs: {
+          style: {
+            textAlign: 'center'
+          }
+        },
+        el: function(data) {
+          return [
+            new Image({
+              src: data.thumbnail,
+              "class": 'radius thumbnail'
+            })
+          ];
+        }
       }, function(data) {
         return [m("span.game-title--small", [data.name, " ", m("small", data.year)])];
-      }, function(data) {
-        return data.rank;
+      }, {
+        attrs: {
+          style: {
+            textAlign: 'right'
+          }
+        },
+        el: function(data) {
+          return data.rank;
+        }
       }
     ];
     this.table = new Table.controller(header, row, data);
@@ -136,7 +176,6 @@
         var sortKey, sortType;
         sortType = e.target.getAttribute('data-sort-type');
         sortKey = e.target.getAttribute('data-sort-key');
-        console.log(sortType);
         if (sortType != null) {
           if (sortType === _this.state.sortType) {
             _this.state.sortDir = _this.state.sortDir === "asc" ? "des" : "asc";
@@ -173,7 +212,10 @@
     ]);
     body = m("tbody", ctrl.data().map(function(item, index) {
       return m("tr", ctrl.row().map(function(cell) {
-        return m("td", cell(item));
+        if (typeof cell === "function") {
+          return m("td", cell(item));
+        }
+        return m("td", cell.attrs, cell.el(item));
       }));
     }));
     return m("table", [head, body]);
