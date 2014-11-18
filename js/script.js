@@ -1,5 +1,5 @@
 (function() {
-  var Image, Table, TrendingGame, TrendingTable, model, orLoading, styler, trendingPage;
+  var Image, List, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, slidesIn, slidesUp, styler, trendingPage;
 
   styler = {};
 
@@ -30,6 +30,8 @@
     return root;
   };
 
+  this.animating = false;
+
   orLoading = function(elements, loading) {
     console.log("here");
     console.log(loading);
@@ -59,25 +61,57 @@
   trendingPage.controller = function() {
     this.games = m.prop([]);
     this.loading = m.prop(true);
-    model.getData().then(this.games).then((function(_this) {
-      return function() {
-        console.log("loaded");
-        _this.loading(false);
-        _this.trendingTable = new TrendingTable.controller(_this.games());
-      };
-    })(this)).then(m.redraw);
+    this.trendingTable = new TrendingTable.controller(this.games);
+    model.getData().then(this.games).then(m.redraw);
   };
 
   trendingPage.view = function(ctrl) {
-    var body;
-    body = ctrl.loading() ? [
-      m("div.text-center", [
-        m("i", {
-          "class": "icon ion-loading-c icon-large"
-        })
-      ])
-    ] : [new TrendingTable.view(ctrl.trendingTable)];
-    return m("div.main", body);
+    var ttable;
+    ttable = [new TrendingTable.view(ctrl.trendingTable)];
+    return m("div.main", ttable);
+  };
+
+  slidesIn = (function(_this) {
+    return function(element, isInitialized, context) {
+      if (!isInitialized) {
+        element.style.left = "100%";
+        window.animating = true;
+        $.Velocity(element, {
+          translateX: "-100%"
+        });
+        return $.Velocity(element, {
+          translateY: "-100%"
+        }, {
+          complete: function(e) {
+            window.animating = false;
+            m.redraw();
+          }
+        });
+      }
+    };
+  })(this);
+
+  slidesUp = (function(_this) {
+    return function(element, isInitialized, context) {
+      if (!isInitialized) {
+        element.style.top = "10%";
+        window.animating = true;
+        return $.Velocity(element, {
+          translateX: "-10%"
+        });
+      }
+    };
+  })(this);
+
+  fadesOut = function(element, isInitialized, context) {
+    console.log("fade");
+    console.log(element);
+    console.log(element.style.opacity);
+    console.log(element.style.opacity != null);
+    if (element.style.opacity === "" || element.style.opacity === !0) {
+      console.log("out");
+      return $.Velocity(element, "transition.fadeOut");
+    }
   };
 
   TrendingGame = function(data) {
@@ -109,23 +143,45 @@
       {
         attrs: {
           style: {
-            textAlign: 'center'
+            textAlign: 'center',
+            position: 'relative',
+            width: '30%',
+            height: '50px',
+            overflow: 'hidden',
+            maxWidth: '100px'
           }
         },
         el: function(data) {
           return [
             new Image({
               src: data.thumbnail,
-              "class": 'radius thumbnail'
+              "class": 'img-center'
             })
           ];
         }
-      }, function(data) {
-        return [m("span.game-title--small", [data.name, " ", m("small", data.year)])];
       }, {
         attrs: {
           style: {
-            textAlign: 'right'
+            width: "60%",
+            overflow: 'hidden',
+            padding: '0 5px'
+          }
+        },
+        el: function(data) {
+          return [
+            m("span.game-title--small", data.name + " "), m("small", {
+              style: {
+                display: "block"
+              }
+            }, data.year)
+          ];
+        }
+      }, {
+        attrs: {
+          style: {
+            textAlign: 'right',
+            width: "10%",
+            padding: "0 10px"
           }
         },
         el: function(data) {
@@ -133,11 +189,73 @@
         }
       }
     ];
-    this.table = new Table.controller(header, row, data);
+    this.table = new List.controller(row, data);
   };
 
   TrendingTable.view = function(ctrl) {
-    return styler.styleTableHeader(styler.styleTable(new Table.view(ctrl.table)));
+    return new List.view(ctrl.table);
+  };
+
+  List = {};
+
+  List.controller = function(row, data) {
+    this.state = {};
+    this.data = data;
+    this.row = m.prop(row);
+  };
+
+  List.view = function(ctrl) {
+    var body, list, loaded;
+    loaded = (ctrl.data() != null) && ctrl.data().length > 0;
+    if (loaded) {
+      list = m("ul", {
+        "class": 'trending-list'
+      }, ctrl.data().map(function(item, index) {
+        return m("li", ctrl.row().map(function(cell) {
+          if (typeof cell === "function") {
+            return m("div", cell(item));
+          }
+          return m("div", cell.attrs, cell.el(item));
+        }));
+      }));
+    } else {
+      list = m("ul");
+    }
+    body = m("div", [TempList(loaded), list]);
+    return body;
+  };
+
+  TempList = function(loaded) {
+    var anim, styl;
+    anim = (function(_this) {
+      return function(a, b, c) {
+        console.log("here");
+        if (loaded) {
+          fadesOut(a, b, c);
+        }
+      };
+    })(this);
+    styl = loaded ? {
+      display: "none"
+    } : void 0;
+    return m("ul.temp-list", {
+      style: styl
+    }, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function() {
+      return m("li", [
+        m("div", {
+          style: {
+            width: '30%',
+            height: '50px',
+            maxWidth: '100px'
+          }
+        }, [m("span.placeholder-yellow")]), m("div", {
+          style: {
+            width: '70%',
+            height: '50px'
+          }
+        }, [m("span.placeholder-blue")])
+      ]);
+    }));
   };
 
   Table = {};

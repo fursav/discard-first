@@ -1,3 +1,10 @@
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
 html
   font-family $font, sans-serif
   font-size $fontsize
@@ -6,17 +13,17 @@ html
   line-height 20px
   +mobile()
     font-size: 16px
-  
+
 h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4
   font-family: $title-font, sans-serif
   font-weight: normal
   font-style: normal
-    
+
 small
   font-size 60%
   color lighten(darkgray,30%)
-  line-height 0
-  
+  // line-height 0
+
 table
   background white
 table thead,
@@ -43,23 +50,28 @@ table tr td,
 table tfoot tr td
   display table-cell
   line-height 1.125rem
-  
+
 table.alternate tr:nth-of-type(even)
   background: lighten(whitesmoke,20%)
-  
+
 table.bordered tbody tr
   border-bottom: 1px solid #eee
-  
+
 img
   max-width: 100%
-  
 
 .text-center
   text-align center !important
-  
+
 img.radius
     border-radius 5px
-  
+
+ul
+  margin: 0
+  padding: 0
+li
+  margin: 0
+
 // @media all and (max-width: small-screen)
 //   html
 //     font-size 16px
@@ -104,7 +116,7 @@ img.radius
 //   line-height inherit
 //   cursor pointer
 
-// a:hover, a:focus 
+// a:hover, a:focus
 //   color linkblue-hover
 // a img
 //   border none
@@ -117,7 +129,7 @@ img.radius
 //   font-size 1rem
 //   line-height 1.6
 //   margin-bottom 1.1rem
-//   text-rendering optimizeLegibility 
+//   text-rendering optimizeLegibility
 
 // p.textblock
 //   font-family font
@@ -179,24 +191,24 @@ img.radius
 //   font-size -font-size(1)
 
 
-// @media only screen and (min-width: medium-screen) 
-//   h1, h2, h3, h4, h5, h6 
+// @media only screen and (min-width: medium-screen)
+//   h1, h2, h3, h4, h5, h6
 //     line-height 1.4
 
-//   h1 
+//   h1
 //     font-size -font-size(2.75)
 
-//   h2 
+//   h2
 //     font-size -font-size(2.3125)
 
-//   h3 
+//   h3
 //     font-size -font-size(1.6875)
 
-//   h4 
+//   h4
 //     font-size -font-size(1.4375)
 
 
-// .subheader 
+// .subheader
 //   line-height: 1.4
 //   color: lighten(darkgray,30%)
 //   font-weight: normal
@@ -254,7 +266,7 @@ img.radius
 
 // /* Unordered Lists */
 // ul li ul,
-// ul li ol 
+// ul li ol
 //   margin-left 1.25rem
 //   margin-bottom 0
 // ul.square li ul, ul.circle li ul, ul.disc li ul
@@ -332,11 +344,11 @@ img.radius
 //   margin 0 0 1.25rem
 //   padding 0.5625rem 1.25rem 0 1.1875rem
 //   border-left 1px solid #dddddd
-// blockquote cite 
+// blockquote cite
 //   display block
 //   font-size 0.8125rem
 //   color lighten(darkgray,50%)
-// blockquote cite:before 
+// blockquote cite:before
 //   content "\2014 \0020"
 // blockquote cite a,
 // blockquote cite a:visited
@@ -377,14 +389,14 @@ img.radius
 
 // .categories
 //   list-style circle
-//   li 
+//   li
 //     list-style circle
 
 // .sub-nav
 //   list-style-type none
 //   margin auto
 //   width 100%
-//   dt 
+//   dt
 //     text-transform uppercase
 //   dt,
 //   dd,
@@ -397,7 +409,7 @@ img.radius
 //     color #999999
 //   dt a,
 //   dd a,
-//   li a 
+//   li a
 //     text-decoration none
 //     outline none
 //     color #999999
@@ -405,7 +417,7 @@ img.radius
 //   dt a:hover,
 //   dd a:hover,
 //   li a:hover
-//     color #737373 
+//     color #737373
 //   dt.active a,
 //   dd.active a,
 //   li.active a
@@ -418,7 +430,7 @@ img.radius
 //     color white
 //   dt.active a:hover,
 //   dd.active a:hover,
-//   li.active a:hover 
+//   li.active a:hover
 //     background buttonblue
 //     box-shadow inset 0 0 1rem darken(buttonblue,50%)
 
@@ -442,17 +454,17 @@ img.radius
 //     margin-left -0.6rem
 //     z-index 999
 //   .sub-nav li
-//     display block 
-//     width auto 
+//     display block
+//     width auto
 //   .sub-nav > li:first-child
 //     display block
 
 
-// .input-addon 
+// .input-addon
 //   display:flex
 //   margin 0 1rem
 
-// .input-addon-field 
+// .input-addon-field
 //   flex 1
 //   margin-right -0.15em
 //   &:not(:first-child)
@@ -556,7 +568,7 @@ img.radius
 // // button.right-align, .button.right-align {
 // //   text-align: right;
 // //   padding-right: 0.75rem; }
-// button.radius, .button.radius 
+// button.radius, .button.radius
 //   border-radius 3px
 // // button.round, .button.round {
 // //   border-radius: 1000px; }
@@ -655,7 +667,7 @@ img.radius
 //   input[type="tel"]:focus,
 //   input[type="time"]:focus,
 //   input[type="url"]:focus,
-//   textarea:focus 
+//   textarea:focus
 //     box-shadow 0 0 5px #999999
 //     border-color #999999
 //   input[type="text"]:focus,
@@ -701,7 +713,7 @@ img.radius
 //   input[type="url"][disabled], fieldset[disabled]
 //   input[type="url"],
 //   textarea[disabled], fieldset[disabled]
-//   textarea 
+//   textarea
 //     background-color #dddddd
 //   input[type="text"].radius,
 //   input[type="password"].radius,

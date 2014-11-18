@@ -174,6 +174,18 @@ td,
 th {
   padding: 0;
 }
+@font-face {
+  font-family: "Artifika";
+  src: url("../fonts/Artifika-Regular.ttf");
+}
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
 html {
   font-family: "PT Sans", sans-serif;
   font-size: 18px;
@@ -203,7 +215,6 @@ h6,
 small {
   font-size: 60%;
   color: #646464;
-  line-height: 0;
 }
 table {
   background: #fff;
@@ -249,6 +260,13 @@ img {
 img.radius {
   border-radius: 5px;
 }
+ul {
+  margin: 0;
+  padding: 0;
+}
+li {
+  margin: 0;
+}
 @media only screen and (max-width: 400px) {
   .thumbnail {
     max-height: 50px;
@@ -277,11 +295,101 @@ img.radius {
 .game-title--small {
   font-family: "Raleway", sans-serif;
   font-size: 1.25rem;
+  white-space: nowrap;
 }
 @media only screen and (max-width: 400px) {
   .game-title--small {
     font-size: 1rem;
   }
+}
+.full-screen {
+  height: 100vh;
+  width: 100vw;
+  background: #1a8dff;
+  color: #fff;
+  font-size: 20px;
+  font-family: "Artifika";
+  position: absolute;
+}
+div.center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  width: 100%;
+  text-align: center;
+}
+.trending-list {
+  list-style-type: none;
+  -webkit-animation: fadein 1s;
+/* Safari, Chrome and Opera > 12.1 */
+}
+.trending-list li {
+  border-bottom: solid 1px #eee;
+}
+.trending-list div {
+  display: inline-block;
+  vertical-align: middle;
+  text-overflow: ellipsis;
+}
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes slideup {
+  0% {
+    top: 10%;
+  }
+
+  100% {
+    top: 0%;
+  }
+}
+/* Firefox < 16 */
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+/* Internet Explorer */
+@-ms-keyframes fadein {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+/* Opera < 12.1 */
+.temp-list {
+  list-style-type: none;
+}
+.temp-list div {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 10px;
+}
+.placeholder-yellow {
+  background: #ffeb3b;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.placeholder-blue {
+  background: #2196f3;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.img-center {
+  position: absolute;
+  top: 0;
+  margin: auto;
+  left: 0;
 }
 .game-table {
   width: 100%;
@@ -720,5 +828,32 @@ footer ul li:hover i {
 @media (max-width: small-screen) {
   footer ul li {
     display: block;
+  }
+}
+@-webkit-keyframes fadein {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+@-ms-keyframes fadein {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes fadein {
+  0% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
   }
 }
