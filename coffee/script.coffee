@@ -216,7 +216,7 @@ List.controller = (row,data) ->
 List.view = (ctrl) ->
     loaded = ctrl.data()? and ctrl.data().length>0
     if loaded
-        list = m("ul",{class:'trending-list'},ctrl.data().map((item,index) ->
+        list = m("ul",{class:'trending-list animation-bounce-up'},ctrl.data().map((item,index) ->
             return m("li", ctrl.row().map((cell) ->
                 if typeof(cell) is "function"
                     return m("div", cell(item))
@@ -314,6 +314,6 @@ Image = (options) ->
 #use default mode
 m.route.mode = "search"
 
-m.route(document.body, "/", {
+m.route(document.querySelector("main"), "/", {
     "/": trendingPage
 })

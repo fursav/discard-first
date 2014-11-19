@@ -209,7 +209,7 @@
     loaded = (ctrl.data() != null) && ctrl.data().length > 0;
     if (loaded) {
       list = m("ul", {
-        "class": 'trending-list'
+        "class": 'trending-list animation-bounce-up'
       }, ctrl.data().map(function(item, index) {
         return m("li", ctrl.row().map(function(cell) {
           if (typeof cell === "function") {
@@ -348,7 +348,7 @@
 
   m.route.mode = "search";
 
-  m.route(document.body, "/", {
+  m.route(document.querySelector("main"), "/", {
     "/": trendingPage
   });
 

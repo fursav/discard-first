@@ -2,6 +2,11 @@
 
 // edit()
 
+#wrap
+  overflow-x: hidden;
+  position relative
+  transition: transform 0.5s ease 0s;
+
 .thumbnail
   +mobile()
     max-height: 50px
@@ -34,10 +39,109 @@ div.center
   transform: translate(-50%, -50%);
   width: 100%
   text-align: center
+  
+.banner 
+  position fixed
+  z-index 99
+  background $blue
+  color #f7f9fc
+  margin 0 auto
+  // padding 1.5rem 1.25rem
+  height 60px
+  line-height 60px
+  width 100%
+  top 0
+  
+.banner-left
+  col(1/5)
+  text-align center
+  
+.nav-btn
+  padding 1rem
+  
+.invisible
+  position fixed
+  clip rect(0, 0, 0, 0)
+  
+#nav-expand:checked + .off-canvas
+  visibility: visible;
+  transform: translate3d(0px, 0px, 0px);
+  
+.off-canvas  
+  position fixed
+  top 0
+  left 0
+  height 100%
+  z-index 100
+  visibility hidden
+  background $blue
+  color white
+  transform: translate3d(-100%, 0px, 0px);
+  transition: all 0.5s ease 0s;
+  width 12rem
+  
+.off-canvas-title 
+  height 60px
+  line-height 60px
+  
+.off-canvas-nav li
+  padding 1rem 2rem
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  
+.off-canvas-nav li:last-child 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1)
+  
+#nav-expand:checked ~ .overlay
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,.5);
+  opacity: 1;
+  transition: opacity .3s;
+  z-index 99
+  
+.overlay
+  // position: absolute;
+  // top: 0;
+  // left: 0;
+  // right: 0;
+  // bottom: 0;
+  // height: 0;
+  // width: 0;
+  opacity: 0;
+  position absolute
+  // clip rect(0, 0, 0, 0)
+  
+.banner-title
+  col(3/5)
+  margin 0
+  // font-size 1.875rem
+  font-size 1.5rem
+  // line-height 1.2rem
+  text-align center
+  white-space nowrap
+
+// .nav-btn
+//   display: block;
+//   width: 2.625em;
+//   height: 2.25em;
+//   padding: 0px;
+//   border: 0px none;
+//   outline: medium none;
+//   // background: url("../img/nav-icon.svg") no-repeat scroll left center / 1.875em 1.5em rgb(51, 51, 51);
+//   overflow: hidden;
+//   white-space: nowrap;
+//   text-indent: 100%;
+  
+  
+main
+  margin-top: 60px;
 
 .trending-list
   list-style-type: none
-  -webkit-animation: fadein 1s; /* Safari, Chrome and Opera > 12.1 */
+  // -webkit-animation: fadein 1s; /* Safari, Chrome and Opera > 12.1 */
   //-moz-animation: fadein 1s; /* Firefox < 16 */
   //-ms-animation: fadein 1s; /* Internet Explorer */
   //-o-animation: fadein 1s; /* Opera < 12.1 */
@@ -439,43 +543,43 @@ div.center
 // Specific styles
 //------------------------------------------------------------------------------
 
-main {
-  padding-top 1rem
-  display flex
-  flex 1
-  width 100%
-  align-items center
-  justify-content center
-}
+// main {
+//   padding-top 1rem
+//   display flex
+//   flex 1
+//   width 100%
+//   align-items center
+//   justify-content center
+// }
 
-.top-nav
-  list-style none
-  margin 0
-  padding 0
-  background color-blue
-  box-shadow -.05em .3em .3em -.3em black
-  display flex
-  flex-flow row
-  justify-content center
-  align-items center
-  color white
-  li
-    text-align center
-    text-decoration none
-    padding 5px 0
-    color white
-  a
-    display block
-    outline none
-    color white
+// .top-nav
+//   list-style none
+//   margin 0
+//   padding 0
+//   background color-blue
+//   box-shadow -.05em .3em .3em -.3em black
+//   display flex
+//   flex-flow row
+//   justify-content center
+//   align-items center
+//   color white
+//   li
+//     text-align center
+//     text-decoration none
+//     padding 5px 0
+//     color white
+//   a
+//     display block
+//     outline none
+//     color white
 
-.top-nav *{
-  color white
-}
+// .top-nav *{
+//   color white
+// }
 
-.top-nav li:hover {
-  background: darken(color-blue, 10%);
-}
+// .top-nav li:hover {
+//   background: darken(color-blue, 10%);
+// }
 
 /* Small screens */
 @media all and (max-width: medium-screen)

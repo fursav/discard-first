@@ -6,10 +6,45 @@
     <title>Discard First</title>
     <link rel="stylesheet" href="//brick.a.ssl.fastly.net/PT+Sans:400,400i,700,700i/Libre+Baskerville:400,400i,700,700i/Lato:300,400,400i,700,700i/Raleway:300,400,500,400i,700,700i">
     <link rel="stylesheet" href="css/ionicons.min.css" />
+    <link rel="stylesheet" href="css/anim.css" />
     <link rel="stylesheet" href="css/style.css" />
   </head>
   <body>
+    <div id='wrap'>
+     <header class="banner" role="banner">
+        <div class="banner-left">
+          <label for="nav-expand" class="nav-btn">
+            <i class="icon icon-large ion-navicon"></i>
+          </label>
+        </div>
+        <span class="banner-title">Trending</span>
+    </header>
+    <input type="checkbox" id="nav-expand" name="nav" class="invisible" />
+    <nav class='off-canvas'>
+      <div class="off-canvas-title">
+        <label for="nav-expand" class="nav-btn">
+          <i class="icon icon-large ion-close"></i>
+        </label>
+      </div>
+      <ul class="off-canvas-nav">
+        <li>
+          Item 1
+        </li>
+        <li>
+          Item 2
+        </li>
+        <li>
+          Item 3
+        </li>
+      </ul>
+    </nav>
+    <!--<input type="radio" id="nav-collapse" name="nav" checked="checked" class="invisible" />-->
 
+    <label for="nav-expand" class="overlay"></label>
+    <main>
+      
+    </main>
+    </div>
     <script src="js/zepto.min.js"></script>
     <script src="js/mithril.min.js"></script>
     <script src="js/velocity.min.js"></script>
