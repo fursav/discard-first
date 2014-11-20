@@ -1,5 +1,5 @@
 (function() {
-  var Image, List, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, slidesIn, slidesUp, styler, trendingPage;
+  var Image, List, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, searchInput, searchPage, slidesIn, slidesUp, styler, trendingPage, util;
 
   styler = {};
 
@@ -45,6 +45,59 @@
     return elements;
   };
 
+  util = {};
+
+  util.layout = (function(_this) {
+    return function(title, body) {
+      return m("#wrap", [util.header(title), util.nav(), m("main", body)]);
+    };
+  })(this);
+
+  util.header = function(title) {
+    return m("header.banner", [
+      m("div.banner-left", m("label.nav-btn", {
+        "for": "nav-expand"
+      }, m("i.icon.icon-large.ion-navicon"))), m("div.banner-title", title)
+    ]);
+  };
+
+  util.nav = function() {
+    var closeNav;
+    closeNav = function() {
+      document.getElementById("nav-expand").checked = false;
+      m.route("/");
+    };
+    return [
+      m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas", m("div.off-canvas-title", m("label[for=nav-expand].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.off-canvas-nav", [
+        m("li", m("a", {
+          config: m.route,
+          onclick: closeNav
+        }, "Trending")), m("li", m("div", "Item 2")), m("li", searchInput())
+      ])), m("label[for=nav-expand].overlay")
+    ];
+  };
+
+  searchInput = function(keyword) {
+    var search;
+    if (keyword == null) {
+      keyword = "";
+    }
+    search = function(e) {
+      var searchTerm;
+      e.preventDefault();
+      searchTerm = document.getElementById("search-input").value;
+      document.getElementById("nav-expand").checked = "";
+      m.route("/search/" + searchTerm);
+    };
+    return m("form", {
+      onsubmit: search
+    }, m("div.inner-addon.left-addon", [
+      m("i.icon.ion-search"), m("input#search-input[type=text][name=search]", {
+        value: keyword
+      })
+    ]));
+  };
+
   model = {
     getData: function() {
       return m.request({
@@ -56,9 +109,22 @@
     }
   };
 
+  searchPage = {};
+
+  searchPage.controller = function() {
+    m.redraw.strategy("diff");
+    this.term = m.route.param("keyword");
+    console.log(this.term);
+  };
+
+  searchPage.view = function(ctrl) {
+    return util.layout("Search", m('div.full-search.animation-bounce-in-right', searchInput(ctrl.term)));
+  };
+
   trendingPage = {};
 
   trendingPage.controller = function() {
+    m.redraw.strategy("diff");
     this.games = m.prop([]);
     this.loading = m.prop(true);
     this.trendingTable = new TrendingTable.controller(this.games);
@@ -68,7 +134,7 @@
   trendingPage.view = function(ctrl) {
     var ttable;
     ttable = [new TrendingTable.view(ctrl.trendingTable)];
-    return m("div.main", ttable);
+    return util.layout("Trending", ttable);
   };
 
   slidesIn = (function(_this) {
@@ -208,9 +274,7 @@
     var body, list, loaded;
     loaded = (ctrl.data() != null) && ctrl.data().length > 0;
     if (loaded) {
-      list = m("ul", {
-        "class": 'trending-list animation-bounce-up'
-      }, ctrl.data().map(function(item, index) {
+      list = m("ul.trending-list.above.animation-bounce-up", ctrl.data().map(function(item, index) {
         return m("li", ctrl.row().map(function(cell) {
           if (typeof cell === "function") {
             return m("div", cell(item));
@@ -236,11 +300,13 @@
       };
     })(this);
     styl = loaded ? {
-      display: "none"
+      style: {
+        position: "absolute",
+        width: "100%",
+        zIndex: "-2"
+      }
     } : void 0;
-    return m("ul.temp-list", {
-      style: styl
-    }, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function() {
+    return m("ul.temp-list.under", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function() {
       return m("li", [
         m("div", {
           style: {
@@ -348,8 +414,9 @@
 
   m.route.mode = "search";
 
-  m.route(document.querySelector("main"), "/", {
-    "/": trendingPage
+  m.route(document.body, "/", {
+    "/": trendingPage,
+    "/search/:keyword": searchPage
   });
 
 }).call(this);

@@ -26,16 +26,90 @@ orLoading = (elements,loading)->
     if loading
         return [m("i",{class:"icon ion-loading-c icon-large"})]
     return elements
+    
+util = {}    
+    
+util.layout = (title, body) =>
+    return m("#wrap", [
+        util.header(title),
+        util.nav(),
+        m("main", body)
+    ]);
+
+util.header = (title) ->
+    return m("header.banner",
+        [
+            m("div.banner-left",
+                m("label.nav-btn",{for:"nav-expand"},
+                    m("i.icon.icon-large.ion-navicon")
+                )
+            ),
+            m("div.banner-title",title)
+        ])
+
+util.nav = ->
+    closeNav = ->
+        document.getElementById("nav-expand").checked = false
+        m.route("/")
+        #m.redraw.strategy("none")
+        return
+    return [
+        m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"),
+        m("nav.off-canvas",
+            m("div.off-canvas-title",
+                m("label[for=nav-expand].nav-btn",
+                    m("i.icon.icon-large.ion-close")
+                )
+            ),
+            m("ul.off-canvas-nav",
+                [
+                    m("li",m("a",{config: m.route, onclick: closeNav },"Trending")),
+                    m("li",m("div","Item 2")),
+                    m("li",searchInput())
+                ]
+            )
+        ),
+        m("label[for=nav-expand].overlay")
+        ]
+
+searchInput = (keyword) ->
+    keyword ?= ""
+    search = (e) ->
+        e.preventDefault()
+        searchTerm = document.getElementById("search-input").value
+        document.getElementById("nav-expand").checked = ""
+        m.route("/search/#{searchTerm}")
+        return
+    return m("form",{onsubmit:search},
+        m("div.inner-addon.left-addon",
+            [
+                m("i.icon.ion-search"),
+                m("input#search-input[type=text][name=search]",{value:keyword})
+            ]
+        )
+    )
 
 model = {
     getData: ()->
         return m.request({method:'Get',url:'/hot',type:TrendingGame,background: true})
         # return m.request({method:'Get',url:'/hot',type:TrendingGame})
     }
+    
+    
+searchPage = {}
+
+searchPage.controller = ->
+    m.redraw.strategy("diff")
+    @term = m.route.param("keyword")
+    console.log @term
+    return
+searchPage.view = (ctrl) ->
+    return util.layout("Search",m('div.full-search.animation-bounce-in-right',searchInput(ctrl.term)))
 
 trendingPage = {}
 
 trendingPage.controller = ->
+    m.redraw.strategy("diff")
     @games = m.prop([])
     @loading = m.prop(true)
     @trendingTable = new TrendingTable.controller(@games)
@@ -61,7 +135,8 @@ trendingPage.view = (ctrl) ->
     ttable = [new TrendingTable.view(ctrl.trendingTable)]
     # body = [m("div.full-screen",{config:slidesIn},[m("div.center","Trending Games")]),ttable]
     # console.log window.animating
-    return m("div.main",ttable)
+    #return m("div.main",ttable)
+    return util.layout("Trending",ttable)
 
 slidesIn = (element, isInitialized, context) =>
     if not isInitialized
@@ -216,7 +291,7 @@ List.controller = (row,data) ->
 List.view = (ctrl) ->
     loaded = ctrl.data()? and ctrl.data().length>0
     if loaded
-        list = m("ul",{class:'trending-list animation-bounce-up'},ctrl.data().map((item,index) ->
+        list = m("ul.trending-list.above.animation-bounce-up",ctrl.data().map((item,index) ->
             return m("li", ctrl.row().map((cell) ->
                 if typeof(cell) is "function"
                     return m("div", cell(item))
@@ -235,13 +310,20 @@ TempList = (loaded)->
         if loaded then fadesOut(a,b,c)
         return
     styl = if loaded then {
-        # opacity: 0
-        # left: "1000%"
+        style:
+            #opacity: 0
+            position: "absolute"
+            width: "100%"
+            zIndex: "-2"
+         #class: 
+             #"animation-fly-out"
+             #"animation-fade-out"
+         #left: "1000%"
         # position: "absolute"
-        # visibility: "hidden"
-        display: "none"
+         #visibility: "hidden"
+        #display: "none"
     }
-    return m("ul.temp-list",{style:styl},[0..10].map ->
+    return m("ul.temp-list.under",[0..10].map ->
         return m("li",[m("div",{style:{
                     width:'30%'
                     height:'50px'
@@ -314,6 +396,7 @@ Image = (options) ->
 #use default mode
 m.route.mode = "search"
 
-m.route(document.querySelector("main"), "/", {
+m.route document.body, "/", {
     "/": trendingPage
-})
+    "/search/:keyword": searchPage
+}
