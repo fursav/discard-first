@@ -63,7 +63,7 @@ util.nav = ->
             ),
             m("ul.off-canvas-nav",
                 [
-                    m("li",m("a",{config: m.route, onclick: closeNav },"Trending")),
+                    m("li",m("a.clickable",{onclick: closeNav },"Trending")),
                     m("li",m("div","Item 2")),
                     m("li",searchInput())
                 ]
@@ -72,27 +72,37 @@ util.nav = ->
         m("label[for=nav-expand].overlay")
         ]
 
-searchInput = (keyword) ->
-    keyword ?= ""
+searchInput = () ->
     search = (e) ->
         e.preventDefault()
-        searchTerm = document.getElementById("search-input").value
+        #searchTerm = document.querySelector(".search-input").value
         document.getElementById("nav-expand").checked = ""
-        m.route("/search/#{searchTerm}")
+        #console.log searchTerm
+        m.route("/search/#{model.searchTerm()}")
         return
     return m("form",{onsubmit:search},
         m("div.inner-addon.left-addon",
             [
                 m("i.icon.ion-search"),
-                m("input#search-input[type=text][name=search]",{value:keyword})
+                m("input.search-input[type=text][name=search][pattern='.{4,}'][required][title='4 characters minimum']",{value: model.searchTerm(), oninput: m.withAttr("value", model.searchTerm)})
             ]
         )
     )
 
 model = {
+    searchTerm: m.prop("")
     getData: ()->
         return m.request({method:'Get',url:'/hot',type:TrendingGame,background: true})
         # return m.request({method:'Get',url:'/hot',type:TrendingGame})
+    getSearchResults: (keyword) ->
+        return m.request({method:'Get',url:"/search?type=boardgame&query=#{keyword}",type:SearchResult,background: true})
+    getGameData: (id,query) ->
+        query ?= {}
+        url = "/thing?id=#{id}"
+        for k,v of query
+          url += "&#{k}=#{v}"
+        console.log id
+        return m.request({method:'Get',url:url,background:true})
     }
     
     
@@ -101,10 +111,14 @@ searchPage = {}
 searchPage.controller = ->
     m.redraw.strategy("diff")
     @term = m.route.param("keyword")
-    console.log @term
+    @results = m.prop([])
+    @resultsTable = new TrendingTable.controller(@results)
+    model.getSearchResults(@term).then(@results).then(m.redraw)
     return
+    
 searchPage.view = (ctrl) ->
-    return util.layout("Search",m('div.full-search.animation-bounce-in-right',searchInput(ctrl.term)))
+    resultsTable = [new TrendingTable.view(ctrl.resultsTable)]
+    return util.layout("Search",m('div.animation-bounce-in-right',[m('div.full-search',searchInput()),resultsTable]))
 
 trendingPage = {}
 
@@ -192,8 +206,20 @@ fadesOut = (element, isInitialized, context) ->
         #     m.redraw()
         #     return});
 
-
-
+SearchResult = (data) ->
+    populate = (data) =>
+        #console.log data
+        if data?
+            @id = data?.id
+            @name = if data?.name instanceof Array then data?.name[0].value else data?.name?.value
+            @thumbnail = data?.thumbnail?.value or data?.thumbnail
+            @year = data?.yearpublished?.value
+            @rank = ""
+            return
+    populate(data)
+    model.getGameData(@id).then(populate).then(m.redraw)
+        
+    return
 
 TrendingGame = (data) ->
     @name = data.name.value

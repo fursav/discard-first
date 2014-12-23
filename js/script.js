@@ -1,5 +1,5 @@
 (function() {
-  var Image, List, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, searchInput, searchPage, slidesIn, slidesUp, styler, trendingPage, util;
+  var Image, List, SearchResult, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, searchInput, searchPage, slidesIn, slidesUp, styler, trendingPage, util;
 
   styler = {};
 
@@ -69,41 +69,62 @@
     };
     return [
       m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas", m("div.off-canvas-title", m("label[for=nav-expand].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.off-canvas-nav", [
-        m("li", m("a", {
-          config: m.route,
+        m("li", m("a.clickable", {
           onclick: closeNav
         }, "Trending")), m("li", m("div", "Item 2")), m("li", searchInput())
       ])), m("label[for=nav-expand].overlay")
     ];
   };
 
-  searchInput = function(keyword) {
+  searchInput = function() {
     var search;
-    if (keyword == null) {
-      keyword = "";
-    }
     search = function(e) {
-      var searchTerm;
       e.preventDefault();
-      searchTerm = document.getElementById("search-input").value;
       document.getElementById("nav-expand").checked = "";
-      m.route("/search/" + searchTerm);
+      m.route("/search/" + (model.searchTerm()));
     };
     return m("form", {
       onsubmit: search
     }, m("div.inner-addon.left-addon", [
-      m("i.icon.ion-search"), m("input#search-input[type=text][name=search]", {
-        value: keyword
+      m("i.icon.ion-search"), m("input.search-input[type=text][name=search][pattern='.{4,}'][required][title='4 characters minimum']", {
+        value: model.searchTerm(),
+        oninput: m.withAttr("value", model.searchTerm)
       })
     ]));
   };
 
   model = {
+    searchTerm: m.prop(""),
     getData: function() {
       return m.request({
         method: 'Get',
         url: '/hot',
         type: TrendingGame,
+        background: true
+      });
+    },
+    getSearchResults: function(keyword) {
+      return m.request({
+        method: 'Get',
+        url: "/search?type=boardgame&query=" + keyword,
+        type: SearchResult,
+        background: true
+      });
+    },
+    getGameData: function(id, query) {
+      var k, url, v;
+      if (query == null) {
+        query = {};
+      }
+      url = "/thing?id=" + id;
+      for (k in query) {
+        v = query[k];
+        url += "&" + k + "=" + v;
+      }
+      console.log(id);
+      return m.request({
+        method: 'Get',
+        url: url,
         background: true
       });
     }
@@ -114,11 +135,15 @@
   searchPage.controller = function() {
     m.redraw.strategy("diff");
     this.term = m.route.param("keyword");
-    console.log(this.term);
+    this.results = m.prop([]);
+    this.resultsTable = new TrendingTable.controller(this.results);
+    model.getSearchResults(this.term).then(this.results).then(m.redraw);
   };
 
   searchPage.view = function(ctrl) {
-    return util.layout("Search", m('div.full-search.animation-bounce-in-right', searchInput(ctrl.term)));
+    var resultsTable;
+    resultsTable = [new TrendingTable.view(ctrl.resultsTable)];
+    return util.layout("Search", m('div.animation-bounce-in-right', [m('div.full-search', searchInput()), resultsTable]));
   };
 
   trendingPage = {};
@@ -178,6 +203,24 @@
       console.log("out");
       return $.Velocity(element, "transition.fadeOut");
     }
+  };
+
+  SearchResult = function(data) {
+    var populate;
+    populate = (function(_this) {
+      return function(data) {
+        var _ref, _ref1, _ref2;
+        if (data != null) {
+          _this.id = data != null ? data.id : void 0;
+          _this.name = (data != null ? data.name : void 0) instanceof Array ? data != null ? data.name[0].value : void 0 : data != null ? (_ref = data.name) != null ? _ref.value : void 0 : void 0;
+          _this.thumbnail = (data != null ? (_ref1 = data.thumbnail) != null ? _ref1.value : void 0 : void 0) || (data != null ? data.thumbnail : void 0);
+          _this.year = data != null ? (_ref2 = data.yearpublished) != null ? _ref2.value : void 0 : void 0;
+          _this.rank = "";
+        }
+      };
+    })(this);
+    populate(data);
+    model.getGameData(this.id).then(populate).then(m.redraw);
   };
 
   TrendingGame = function(data) {

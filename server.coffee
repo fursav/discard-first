@@ -1,10 +1,26 @@
 express = require('express')
-path    = require('path')
-request = require('request')
+#request = require('request')
+#OiBackoff = require('oibackoff')
+#backoff = OiBackoff.backoff({
+    #algorithm  : 'exponential',
+    #delayRatio : 0.4,
+#})
+requestRetry = require "requestretry"
+RateLimiter = require('limiter').RateLimiter
+limiter = new RateLimiter(1, 500); # at most 1 request every 100 ms
+
+throttledRequest = ->
+  requestArgs = arguments
+  limiter.removeTokens 1, ->
+    #request.apply(this, requestArgs);
+    requestRetry.apply(this, requestArgs)
+    return
+  return
+  
 async   = require('async')
 parser  = require('xml2json')
 cache_manager = require('cache-manager')
-memory_cache = cache_manager.caching({store: 'memory', max: 500, ttl: 300})
+memory_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 300})
 app     = express()
 
 class App
@@ -56,7 +72,7 @@ class App
     
     _request = (url,res) ->
       cb = (result) ->
-        res.set('Cache-Control', 'public, max-age=300')
+        #res.set('Cache-Control', 'public, max-age=300')
         res.send result
         return
       memory_cache.get url,(err, result) ->
@@ -64,12 +80,26 @@ class App
           console.log 'cached'
           cb result
           return
-        console.log 'hitting'
-        request url, (err,response,body) ->
-          result = parser.toJson(body,jsonOptions)
-          result = result.items.item
-          memory_cache.set(url, result)
-          cb result
+        #console.log 'hitting'
+        #request url, (err,response,body) ->
+        opts =
+          maxAttempts     : 3
+          retryDelay      : 1000
+          retryStrategy   : requestRetry.RetryStrategies.HTTPOrNetworkError 
+          url             : url
+        #requestRetry opts, (err,response,body) ->
+        throttledRequest opts, (err,response,body) ->
+          if err
+            throw err
+          #if err
+          try
+            result = parser.toJson(body,jsonOptions)
+            result = result.items.item
+            memory_cache.set(url, result)
+            cb result
+          catch error
+            console.log error
+            #res.end()
           return
         return
           
@@ -89,23 +119,29 @@ class App
     @routes = {}
     
     @routes['/thing'] = (req,res) ->
-      console.log 'bg'
-      request "http://www.boardgamegeek.com/xmlapi2#{req.originalUrl}", (err,response,body) ->
-        result = parser.toJson(body,jsonOptions)
-        result = result?.items?.item
-        #console.log result
-        res.send(result)
-        return
+      #console.log 'bg'
+      #console.log req.originalUrl
+      _request("http://www.boardgamegeek.com/xmlapi2#{req.originalUrl}",res)
+      #request "http://www.boardgamegeek.com/xmlapi2#{req.originalUrl}", (err,response,body) ->
+        #try
+          #result = parser.toJson(body,jsonOptions)
+          #result = result?.items?.item
+        #catch error
+          #res.end()
+          #return
+        #res.send(result)
+        #return
       return
     
     @routes['/search'] = (req,res) ->
       console.log 'search'
       console.log req.originalUrl
-      request "http://www.boardgamegeek.com/xmlapi2#{req.originalUrl}", (err,response,body) ->
-        result = parser.toJson(body,jsonOptions)
-        result.items = result.items.item
-        res.send(result)
-        return
+      _request("http://www.boardgamegeek.com/xmlapi2#{req.originalUrl}",res)
+      #request "http://www.boardgamegeek.com/xmlapi2#{req.originalUrl}", (err,response,body) ->
+        #result = parser.toJson(body,jsonOptions).items.item
+        ##result.items = result.items.item
+        #res.send(result)
+        #return
       return
       
     @routes['/hot'] = (req,res) ->
@@ -128,10 +164,11 @@ class App
   initServer: ->
     @createRoutes()
     @app = express()
-    @app.configure =>
-      #@app.use(express.static(path.join(__dirname, 'dist')))
-      @app.use(express.static(path.join(__dirname, '')))
-      return
+    #env = process.env.NODE_ENV || 'development';
+    #if ('development' == env) 
+      # configure stuff here
+    @app.use(express.static(__dirname + ''));
+      #return
     for r of @routes
       @app.get(r, @routes[r])
     return

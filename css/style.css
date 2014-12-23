@@ -424,6 +424,7 @@ div.center {
 }
 .nav-btn {
   padding: 1rem;
+  cursor: pointer;
 }
 .invisible {
   position: fixed;
@@ -519,6 +520,7 @@ main {
 .trending-list {
   list-style-type: none;
   background: #fff;
+  min-height: 80vh;
 }
 .trending-list li {
   border-bottom: solid 1px #eee;
@@ -562,6 +564,8 @@ main {
 /* Opera < 12.1 */
 .temp-list {
   list-style-type: none;
+  max-height: 80vh;
+  overflow: hidden;
 }
 .temp-list div {
   display: inline-block;
@@ -585,6 +589,7 @@ main {
   top: 0;
   margin: auto;
   left: 0;
+  right: 0;
 }
 .game-table {
   width: 100%;
