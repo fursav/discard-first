@@ -1,49 +1,5 @@
 (function() {
-  var Image, List, Mobile3ColList, SearchResult, SearchTable, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, searchInput, searchPage, slidesIn, slidesUp, styler, trendingPage, util;
-
-  styler = {};
-
-  styler.styleTable = function(root) {
-    if (root.tag === "table") {
-      root.attrs["class"] = "bordered";
-    }
-    return root;
-  };
-
-  styler.styleTableHeader = function(root, parent) {
-    var item, _base, _i, _len;
-    if (!root) {
-      return root;
-    } else if (root instanceof Array) {
-      for (_i = 0, _len = root.length; _i < _len; _i++) {
-        item = root[_i];
-        this.styleTableHeader(item, parent);
-      }
-    } else if (root.children instanceof Array) {
-      this.styleTableHeader(root.children, root);
-    } else if (root.tag === "th" && root.attrs['data-sort-type']) {
-      if ((_base = root.attrs)["class"] == null) {
-        _base["class"] = "";
-      }
-      root.attrs["class"] += " clickable";
-    }
-    return root;
-  };
-
-  this.animating = false;
-
-  orLoading = function(elements, loading) {
-    console.log("here");
-    console.log(loading);
-    if (loading) {
-      return [
-        m("i", {
-          "class": "icon ion-loading-c icon-large"
-        })
-      ];
-    }
-    return elements;
-  };
+  var Image, List, Mobile3ColList, SearchResult, SearchTable, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, searchInput, searchPage, slidesIn, slidesUp, trendingPage, util;
 
   util = {};
 
@@ -132,19 +88,17 @@
   searchPage = {};
 
   searchPage.controller = function() {
-    var log;
-    log = function(string) {
-      return console.log(string);
-    };
     m.redraw.strategy("diff");
     this.term = m.route.param("keyword");
     this.results = m.prop([]);
     this.resultsTable = new SearchTable.controller(this.results);
-    model.getSearchResults(this.term).then(this.results).then(m.redraw);
     model.getSearchResults(this.term).then((function(_this) {
       return function(data) {
         if (data instanceof Array) {
           return _this.results(data);
+        } else if (data.id == null) {
+          console.log("nulling");
+          return _this.results(null);
         } else {
           return _this.results([data]);
         }
@@ -356,10 +310,11 @@
   };
 
   List.view = function(ctrl) {
-    var body, list, loaded;
-    loaded = (ctrl.data() != null) && ctrl.data().length > 0;
-    console.log(loaded);
-    if (loaded) {
+    var body, list, loaded, _ref;
+    loaded = (ctrl.data() == null) || (ctrl != null ? (_ref = ctrl.data()) != null ? _ref.length : void 0 : void 0) > 0;
+    if (ctrl.data() == null) {
+      list = m("ul.trending-list.above.animation-bounce-up", m("li.text-center", "No results found"));
+    } else if (loaded) {
       list = m("ul.trending-list.above.animation-bounce-up", ctrl.data().map(function(item, index) {
         return m("li", ctrl.row().map(function(cell) {
           if (typeof cell === "function") {

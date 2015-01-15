@@ -1,130 +1,104 @@
-styler = {}
-styler.styleTable = (root) ->
-    if root.tag is "table"
-        root.attrs.class = "bordered"
-    return root
-
-styler.styleTableHeader = (root,parent) ->
-    if (not root)
-        return root
-    else if (root instanceof Array)
-        for item in root
-            this.styleTableHeader(item, parent)
-    else if (root.children instanceof Array)
-        this.styleTableHeader(root.children, root)
-    else if (root.tag is "th" and root.attrs['data-sort-type'])
-        root.attrs.class ?= ""
-        root.attrs.class += " clickable"
-
-    return root;
-
-@animating = false
-
-orLoading = (elements,loading)->
-    console.log "here"
-    console.log loading
-    if loading
-        return [m("i",{class:"icon ion-loading-c icon-large"})]
-    return elements
-    
+# defines the layout of the page
 util = {}    
     
 util.layout = (title, body) =>
-    return m("#wrap", [
-        util.header(title),
-        util.nav(),
-        m("main", body)
-    ]);
+  return m("#wrap", [
+      util.header(title),
+      util.nav(),
+      m("main", body)
+  ]);
 
 util.header = (title) ->
-    return m("header.banner",
-        [
-            m("div.banner-left",
-                m("label.nav-btn",{for:"nav-expand"},
-                    m("i.icon.icon-large.ion-navicon")
-                )
-            ),
-            m("div.banner-title",title)
-        ])
+  return m("header.banner",
+    [
+      m("div.banner-left",
+        m("label.nav-btn",{for:"nav-expand"},
+          m("i.icon.icon-large.ion-navicon")
+        )
+      ),
+      m("div.banner-title",title)
+    ])
 
 util.nav = ->
     closeNav = ->
-        document.getElementById("nav-expand").checked = false
-        m.route("/")
-        #m.redraw.strategy("none")
-        return
+      document.getElementById("nav-expand").checked = false
+      m.route("/")
+      return
     return [
-        m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"),
-        m("nav.off-canvas",
-            m("div.off-canvas-title",
-                m("label[for=nav-expand].nav-btn",
-                    m("i.icon.icon-large.ion-close")
-                )
-            ),
-            m("ul.off-canvas-nav",
-                [
-                    m("li",m("a.clickable",{onclick: closeNav },"Trending")),
-                    m("li",m("div","Item 2")),
-                    m("li",searchInput())
-                ]
-            )
+      m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"),
+      m("nav.off-canvas",
+        m("div.off-canvas-title",
+          m("label[for=nav-expand].nav-btn",
+            m("i.icon.icon-large.ion-close")
+          )
         ),
-        m("label[for=nav-expand].overlay")
-        ]
-
-searchInput = () ->
-    search = (e) ->
-        e.preventDefault()
-        #searchTerm = document.querySelector(".search-input").value
-        document.getElementById("nav-expand").checked = ""
-        #console.log searchTerm
-        m.route("/search/#{model.searchTerm()}")
-        return
-    return m("form",{onsubmit:search},
-        m("div.inner-addon.left-addon",
-            [
-                m("i.icon.ion-search"),
-                m("input.search-input[type=text][name=search][pattern='.{4,}'][required][title='4 characters minimum']",{value: model.searchTerm(), oninput: m.withAttr("value", model.searchTerm)})
-            ]
+        m("ul.off-canvas-nav",
+          [
+            m("li",m("a.clickable",{onclick: closeNav },"Trending")),
+            m("li",m("div","Item 2")),
+            m("li",searchInput())
+          ]
         )
+      ),
+      m("label[for=nav-expand].overlay")
+    ]
+  
+# not reusable component used to search
+searchInput = () ->
+  search = (e) ->
+    e.preventDefault()
+    document.getElementById("nav-expand").checked = ""
+    m.route("/search/#{model.searchTerm()}")
+    return
+  return m("form",{onsubmit:search},
+    m("div.inner-addon.left-addon",
+      [
+        m("i.icon.ion-search"),
+        m("input.search-input[type=text][name=search][pattern='.{4,}'][required][title='4 characters minimum']",{value: model.searchTerm(), oninput: m.withAttr("value", model.searchTerm)})
+      ]
     )
+  )
 
+#contains all of the data
 model = {
-    searchTerm: m.prop("")
-    getData: ()->
-        return m.request({method:'Get',url:'/hot',type:TrendingGame,background: true})
-        # return m.request({method:'Get',url:'/hot',type:TrendingGame})
-    getSearchResults: (keyword) ->
-        return m.request({method:'Get',url:"/search?type=boardgame&query=#{keyword}",type:SearchResult,background: true})
-    getGameData: (id,query) ->
-        query ?= {}
-        url = "/thing?id=#{id}"
-        for k,v of query
-          url += "&#{k}=#{v}"
-        #console.log id
-        return m.request({method:'Get',url:url,background:true})
-    }
+  searchTerm: m.prop("")
+  getData: ()->
+    return m.request({method:'Get',url:'/hot',type:TrendingGame,background: true})
+  getSearchResults: (keyword) ->
+    return m.request({method:'Get',url:"/search?type=boardgame&query=#{keyword}",type:SearchResult,background: true})
+  getGameData: (id,query) ->
+    query ?= {}
+    url = "/thing?id=#{id}"
+    for k,v of query
+      url += "&#{k}=#{v}"
+    return m.request({method:'Get',url:url,background:true})
+  }
     
-    
+#---------------------------------------------------------------------  
+# PAGES
+#---------------------------------------------------------------------
+
 searchPage = {}
 
 searchPage.controller = ->
-    log = (string) ->
-        console.log string
-        #console.log string()
-    m.redraw.strategy("diff")
-    @term = m.route.param("keyword")
-    @results = m.prop([])
-    @resultsTable = new SearchTable.controller(@results)
-    model.getSearchResults(@term).then(@results).then(m.redraw)
-    model.getSearchResults(@term).then((data) =>
-        if data instanceof Array
-            @results(data)
-        else
-            @results([data])
-        )
-        .then(m.redraw)
-    return
+  m.redraw.strategy("diff")
+  @term = m.route.param("keyword")
+  @results = m.prop([])
+  @resultsTable = new SearchTable.controller(@results)
+  #model.getSearchResults(@term).then(@results).then(m.redraw)
+  model.getSearchResults(@term).then((data) =>
+    # data is always instanceof SearchResult
+    # all games need to have an id
+    if data instanceof Array
+      @results(data)
+    else if not data.id?
+      console.log "nulling"
+      @results(null)
+    else
+      @results([data])
+    )
+    .then(m.redraw)
+  return
     
 searchPage.view = (ctrl) ->
     resultsTable = [new SearchTable.view(ctrl.resultsTable)]
@@ -367,9 +341,11 @@ List.controller = (row,data) ->
     return
 
 List.view = (ctrl) ->
-    loaded = ctrl.data()? and ctrl.data().length>0
-    console.log loaded
-    if loaded
+  # consider it loaded if null or array.length > 0
+    loaded = not ctrl.data()? or ctrl?.data()?.length>0
+    if not ctrl.data()?
+      list = m("ul.trending-list.above.animation-bounce-up",m("li.text-center","No results found"))
+    else if loaded
         list = m("ul.trending-list.above.animation-bounce-up",ctrl.data().map((item,index) ->
             return m("li", ctrl.row().map((cell) ->
                 if typeof(cell) is "function"
