@@ -1,5 +1,5 @@
 (function() {
-  var Image, List, SearchResult, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, searchInput, searchPage, slidesIn, slidesUp, styler, trendingPage, util;
+  var Image, List, Mobile3ColList, SearchResult, SearchTable, Table, TempList, TrendingGame, TrendingTable, fadesOut, model, orLoading, searchInput, searchPage, slidesIn, slidesUp, styler, trendingPage, util;
 
   styler = {};
 
@@ -121,7 +121,6 @@
         v = query[k];
         url += "&" + k + "=" + v;
       }
-      console.log(id);
       return m.request({
         method: 'Get',
         url: url,
@@ -133,16 +132,29 @@
   searchPage = {};
 
   searchPage.controller = function() {
+    var log;
+    log = function(string) {
+      return console.log(string);
+    };
     m.redraw.strategy("diff");
     this.term = m.route.param("keyword");
     this.results = m.prop([]);
-    this.resultsTable = new TrendingTable.controller(this.results);
+    this.resultsTable = new SearchTable.controller(this.results);
     model.getSearchResults(this.term).then(this.results).then(m.redraw);
+    model.getSearchResults(this.term).then((function(_this) {
+      return function(data) {
+        if (data instanceof Array) {
+          return _this.results(data);
+        } else {
+          return _this.results([data]);
+        }
+      };
+    })(this)).then(m.redraw);
   };
 
   searchPage.view = function(ctrl) {
     var resultsTable;
-    resultsTable = [new TrendingTable.view(ctrl.resultsTable)];
+    resultsTable = [new SearchTable.view(ctrl.resultsTable)];
     return util.layout("Search", m('div.animation-bounce-in-right', [m('div.full-search', searchInput()), resultsTable]));
   };
 
@@ -195,10 +207,6 @@
   })(this);
 
   fadesOut = function(element, isInitialized, context) {
-    console.log("fade");
-    console.log(element);
-    console.log(element.style.opacity);
-    console.log(element.style.opacity != null);
     if (element.style.opacity === "" || element.style.opacity === !0) {
       console.log("out");
       return $.Velocity(element, "transition.fadeOut");
@@ -215,12 +223,18 @@
           _this.name = (data != null ? data.name : void 0) instanceof Array ? data != null ? data.name[0].value : void 0 : data != null ? (_ref = data.name) != null ? _ref.value : void 0 : void 0;
           _this.thumbnail = (data != null ? (_ref1 = data.thumbnail) != null ? _ref1.value : void 0 : void 0) || (data != null ? data.thumbnail : void 0);
           _this.year = data != null ? (_ref2 = data.yearpublished) != null ? _ref2.value : void 0 : void 0;
-          _this.rank = "";
+          _this.statistics = data != null ? data.statistics : void 0;
         }
       };
     })(this);
+    this.getStat = function(name) {
+      var _ref, _ref1, _ref2;
+      return (_ref = this.statistics) != null ? (_ref1 = _ref.ratings) != null ? (_ref2 = _ref1[name]) != null ? _ref2.value : void 0 : void 0 : void 0;
+    };
     populate(data);
-    model.getGameData(this.id).then(populate).then(m.redraw);
+    model.getGameData(this.id, {
+      "stats": 1
+    }).then(populate).then(m.redraw);
   };
 
   TrendingGame = function(data) {
@@ -231,23 +245,68 @@
     this.year = data != null ? (_ref = data.yearpublished) != null ? _ref.value : void 0 : void 0;
   };
 
+  SearchTable = {};
+
+  SearchTable.controller = function(data) {
+    var elements;
+    elements = [
+      function(game) {
+        return new Image({
+          src: game.thumbnail,
+          "class": 'img-center'
+        });
+      }, function(game) {
+        return [
+          m("span.game-title--small", game.name + " "), m("small", {
+            style: {
+              display: "block"
+            }
+          }, game.year)
+        ];
+      }, function(game) {
+        return parseFloat(game.getStat("bayesaverage")).toFixed(1);
+      }
+    ];
+    this.table = new Mobile3ColList.controller(elements, data);
+  };
+
+  SearchTable.view = function(ctrl) {
+    return new Mobile3ColList.view(ctrl.table);
+  };
+
   TrendingTable = {};
 
   TrendingTable.controller = function(data) {
-    var header, row;
-    header = [
-      {
-        label: ""
-      }, {
-        label: "Name",
-        key: "name",
-        type: "string"
-      }, {
-        label: "Rank",
-        key: "rank",
-        type: "int"
+    var elements;
+    elements = [
+      function(data) {
+        return new Image({
+          src: data.thumbnail,
+          "class": 'img-center'
+        });
+      }, function(data) {
+        return [
+          m("span.game-title--small", data.name + " "), m("small", {
+            style: {
+              display: "block"
+            }
+          }, data.year)
+        ];
+      }, function(data) {
+        return data.rank;
       }
     ];
+    this.table = new Mobile3ColList.controller(elements, data);
+  };
+
+  TrendingTable.view = function(ctrl) {
+    return new Mobile3ColList.view(ctrl.table);
+  };
+
+  Mobile3ColList = {};
+
+  Mobile3ColList.controller = function(elements, data) {
+    var row;
     row = [
       {
         attrs: {
@@ -260,48 +319,31 @@
             maxWidth: '100px'
           }
         },
-        el: function(data) {
-          return [
-            new Image({
-              src: data.thumbnail,
-              "class": 'img-center'
-            })
-          ];
-        }
+        el: elements[0]
       }, {
         attrs: {
           style: {
-            width: "60%",
+            width: "58%",
             overflow: 'hidden',
             padding: '0 5px'
           }
         },
-        el: function(data) {
-          return [
-            m("span.game-title--small", data.name + " "), m("small", {
-              style: {
-                display: "block"
-              }
-            }, data.year)
-          ];
-        }
+        el: elements[1]
       }, {
         attrs: {
           style: {
             textAlign: 'right',
-            width: "10%",
+            width: "12%",
             padding: "0 10px"
           }
         },
-        el: function(data) {
-          return data.rank;
-        }
+        el: elements[2]
       }
     ];
     this.table = new List.controller(row, data);
   };
 
-  TrendingTable.view = function(ctrl) {
+  Mobile3ColList.view = function(ctrl) {
     return new List.view(ctrl.table);
   };
 
@@ -316,10 +358,12 @@
   List.view = function(ctrl) {
     var body, list, loaded;
     loaded = (ctrl.data() != null) && ctrl.data().length > 0;
+    console.log(loaded);
     if (loaded) {
       list = m("ul.trending-list.above.animation-bounce-up", ctrl.data().map(function(item, index) {
         return m("li", ctrl.row().map(function(cell) {
           if (typeof cell === "function") {
+            console.log("fn");
             return m("div", cell(item));
           }
           return m("div", cell.attrs, cell.el(item));

@@ -101,7 +101,7 @@ model = {
         url = "/thing?id=#{id}"
         for k,v of query
           url += "&#{k}=#{v}"
-        console.log id
+        #console.log id
         return m.request({method:'Get',url:url,background:true})
     }
     
@@ -109,15 +109,25 @@ model = {
 searchPage = {}
 
 searchPage.controller = ->
+    log = (string) ->
+        console.log string
+        #console.log string()
     m.redraw.strategy("diff")
     @term = m.route.param("keyword")
     @results = m.prop([])
-    @resultsTable = new TrendingTable.controller(@results)
+    @resultsTable = new SearchTable.controller(@results)
     model.getSearchResults(@term).then(@results).then(m.redraw)
+    model.getSearchResults(@term).then((data) =>
+        if data instanceof Array
+            @results(data)
+        else
+            @results([data])
+        )
+        .then(m.redraw)
     return
     
 searchPage.view = (ctrl) ->
-    resultsTable = [new TrendingTable.view(ctrl.resultsTable)]
+    resultsTable = [new SearchTable.view(ctrl.resultsTable)]
     return util.layout("Search",m('div.animation-bounce-in-right',[m('div.full-search',searchInput()),resultsTable]))
 
 trendingPage = {}
@@ -190,10 +200,6 @@ slidesUp = (element, isInitialized, context) =>
 
 
 fadesOut = (element, isInitialized, context) ->
-    console.log "fade"
-    console.log element
-    console.log element.style.opacity
-    console.log element.style.opacity?
     if element.style.opacity is "" or element.style.opacity is not 0
         # m.redraw.strategy("none")
     # console.log isInitialized
@@ -206,6 +212,19 @@ fadesOut = (element, isInitialized, context) ->
         #     m.redraw()
         #     return});
 
+#BoardGame = (data) ->
+    #populate = (data) =>
+        #console.log data
+        #if data?
+            #@id = data?.id
+            #@name = if data?.name instanceof Array then data?.name[0].value else data?.name?.value
+            #@thumbnail = data?.thumbnail?.value or data?.thumbnail
+            #@year = data?.yearpublished?.value
+            #@rank = ""
+            #return
+    #populate(data)
+    #model.getGameData(@id).then(populate).then(m.redraw)
+    
 SearchResult = (data) ->
     populate = (data) =>
         #console.log data
@@ -214,10 +233,13 @@ SearchResult = (data) ->
             @name = if data?.name instanceof Array then data?.name[0].value else data?.name?.value
             @thumbnail = data?.thumbnail?.value or data?.thumbnail
             @year = data?.yearpublished?.value
-            @rank = ""
+            @statistics = data?.statistics
+            #@rank = rank.
             return
+    @getStat = (name) ->
+        @statistics?.ratings?[name]?.value
     populate(data)
-    model.getGameData(@id).then(populate).then(m.redraw)
+    model.getGameData(@id,{"stats":1}).then(populate).then(m.redraw)
         
     return
 
@@ -228,23 +250,54 @@ TrendingGame = (data) ->
     @year = data?.yearpublished?.value
     return
 
+SearchTable = {}
+
+SearchTable.controller = (data) ->
+    elements = [
+        (game) -> 
+            new Image({
+                src:game.thumbnail
+                class: 'img-center'
+            })
+        (game) ->
+            [
+                m("span.game-title--small",game.name + " "),
+                m("small",{style:{display:"block"}},game.year)
+            ]
+        (game) -> parseFloat(game.getStat("bayesaverage")).toFixed(1)
+        ]
+
+    @table = new Mobile3ColList.controller(elements, data)
+    return
+
+SearchTable.view = (ctrl) ->
+    return new Mobile3ColList.view(ctrl.table)
+
 TrendingTable = {}
 TrendingTable.controller = (data) ->
-    header = [
-        {
-            label: ""
-        },
-        {
-            label: "Name",
-            key: "name",
-            type: "string"
-        },
-        {
-            label: "Rank",
-            key: "rank",
-            type: "int"
-        }
-    ]
+    elements = [
+        (data) -> 
+            new Image({
+                src:data.thumbnail
+                class: 'img-center'
+            })
+        (data) ->
+            [
+                m("span.game-title--small",data.name + " "),
+                m("small",{style:{display:"block"}},data.year)
+            ]
+        (data) -> data.rank
+        ]
+
+    @table = new Mobile3ColList.controller(elements, data)
+    return
+
+TrendingTable.view = (ctrl) ->
+    return new Mobile3ColList.view(ctrl.table)
+
+Mobile3ColList = {}
+
+Mobile3ColList.controller = (elements, data) ->
     row = [
         {
             attrs: {
@@ -257,50 +310,49 @@ TrendingTable.controller = (data) ->
                     maxWidth:'100px'
                 }
             },
-            el: (data) -> [
-                new Image({
-                    src:data.thumbnail
-                    class: 'img-center'
-                    # class:'thumbnail round'
-                })
-            ]
+            el: elements[0]
+            
         },
         {
             attrs:{
                 style: {
-                    width:"60%"
+                    width:"58%"
                     overflow:'hidden'
                     padding:'0 5px'
                     # height:"50px"
                 }
             },
-            el: (data) -> [m("span.game-title--small",data.name + " "),m("small",{style:{display:"block"}},data.year)]
+            el: elements[1]
         },
         {
             attrs: {
                 style: {
                     textAlign:'right'
-                    width:"10%"
+                    width:"12%"
                     padding:"0 10px"
                 }
             },
-            el: (data) -> data.rank
+            el: elements[2]
         }
     ]
-    # @table = new Table.controller(header,row,data)
-    @table = new List.controller(row,data)
+    @table = new List.controller(row, data)
     return
 
-TrendingTable.view = (ctrl) ->
+Mobile3ColList.view = (ctrl) ->
     return new List.view(ctrl.table)
-    # return styler.styleTableHeader(styler.styleTable(new Table.view(ctrl.table)))
-
-
+    
 List = {}
 
 List.controller = (row,data) ->
     @state = {}
     @data = data
+    #console.log data()
+    #if data?
+        #if data() instanceof Array
+            #@data = data
+        #else
+            #@data = m.prop([data])
+    #@data = if data?
         # if @state.sortType
         #     sortMult = {asc:1,des:-1}[@state.sortDir]
         #     data.sort (a,b) =>
@@ -316,10 +368,12 @@ List.controller = (row,data) ->
 
 List.view = (ctrl) ->
     loaded = ctrl.data()? and ctrl.data().length>0
+    console.log loaded
     if loaded
         list = m("ul.trending-list.above.animation-bounce-up",ctrl.data().map((item,index) ->
             return m("li", ctrl.row().map((cell) ->
                 if typeof(cell) is "function"
+                    console.log "fn"
                     return m("div", cell(item))
                 return m("div",cell.attrs, cell.el(item))
                 )
