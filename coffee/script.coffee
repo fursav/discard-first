@@ -66,6 +66,8 @@ model = {
     return m.request({method:'Get',url:'/hot',type:TrendingGame,background: true})
   getSearchResults: (keyword) ->
     return m.request({method:'Get',url:"/search?type=boardgame&query=#{keyword}",type:SearchResult,background: true})
+  getInitialBoardGameData: (id) ->
+    return m.request({method:'Get',url:"/thing?id=#{id}",type:BoardGame,background: true})
   getGameData: (id,query) ->
     query ?= {}
     url = "/thing?id=#{id}"
@@ -76,6 +78,40 @@ model = {
     
 #---------------------------------------------------------------------  
 # PAGES
+#---------------------------------------------------------------------
+
+gameOverviewPage = {}
+
+gameOverviewPage.controller = ->
+  m.redraw.strategy("diff")
+  @gameId = m.route.param("id")
+  @gameData = m.prop()
+  #@gameData = model.getInitialBoardGameData(@gameId)
+  model.getInitialBoardGameData(@gameId).then(@gameData).then(m.redraw)
+  return
+  
+gameOverviewPage.view = (ctrl) ->
+  console.log ctrl.gameData()
+  nameView = NameView(ctrl.gameData())
+  return util.layout(ctrl.gameData()?.name, nameView)
+#
+# @param data [BoardGame]
+#
+NameView = (data) ->
+  console.log data
+  if data?.thumbnail?
+   img = new Image({
+      src:data.thumbnail
+      class: 'img-center2'
+    })
+  else
+    img = ""
+  title = m("h2",data?.name)
+  return m("div",[
+    img,title]
+  )
+  
+
 #---------------------------------------------------------------------
 
 searchPage = {}
@@ -93,7 +129,6 @@ searchPage.controller = ->
       if data instanceof Array
         @results(data)
       else if not data.id?
-        console.log "nulling"
         @results(null)
       else
         @results([data])
@@ -128,6 +163,22 @@ trendingPage.view = (ctrl) ->
 #TODO:
 # unify the models
 # tiered cache in localStorage and memory rather than relying on http
+
+BoardGame = (data) ->
+  console.log data
+  populate = (data) =>
+    if data?
+      @id = data?.id
+      @name = if data?.name instanceof Array then data?.name[0].value else data?.name?.value
+      @thumbnail = data?.thumbnail?.value or data?.thumbnail
+      @year = data?.yearpublished?.value
+      @statistics = data?.statistics
+      return
+  @getStat = (name) ->
+    @statistics?.ratings?[name]?.value
+  populate(data)
+  #model.getGameData(@id,{"stats":1}).then(populate).then(m.redraw)
+  return
 
 SearchResult = (data) ->
   populate = (data) =>
@@ -179,8 +230,11 @@ SearchTable.controller = (data) ->
       num = parseFloat(game.getStat("bayesaverage")).toFixed(1)
       return if not isNaN(num) then num else ""
   ]
-
-  @table = new Mobile3ColList.controller(elements, data)
+  rowOnClick = (e,item) ->
+    m.route("/bg/#{item.id}")
+    return
+    
+  @table = new Mobile3ColList.controller(elements, data, rowOnClick)
   return
 
 SearchTable.view = (ctrl) ->
@@ -220,7 +274,7 @@ TrendingTable.view = (ctrl) ->
 
 Mobile3ColList = {}
 
-Mobile3ColList.controller = (elements, data) ->
+Mobile3ColList.controller = (elements, data, rowOnClick) ->
   row = [
     {
       classes: ".img-col"
@@ -235,7 +289,7 @@ Mobile3ColList.controller = (elements, data) ->
       el: elements[2]
     }
   ]
-  @table = new List.controller(row, data)
+  @table = new List.controller(row, data, rowOnClick)
   return
 
 Mobile3ColList.view = (ctrl) ->
@@ -245,7 +299,7 @@ Mobile3ColList.view = (ctrl) ->
 
 List = {}
 
-List.controller = (row,data) ->
+List.controller = (row, data, @rowOnClick) ->
   @state = {}
   @row = m.prop(row)
   @data = data
@@ -257,8 +311,8 @@ List.view = (ctrl) ->
   if not ctrl.data()?
     list = m("ul.trending-list.animation-bounce-up",m("li.text-center","No results found"))
   else if loaded
-    list = m("ul.trending-list.animation-bounce-up",ctrl.data().map((item,index) ->
-      return m("li", ctrl.row().map(
+    list = m("ul.trending-list.animation-bounce-up", ctrl.data().map((item,index) ->
+      return m("li",{onclick:(e) -> ctrl.rowOnClick(e,item)} if ctrl.rowOnClick?, ctrl.row().map(
         (cell) ->
           element = "div" + if cell.classes? then cell.classes else ""
           return m(element, cell.attrs, cell.el(item))
@@ -297,4 +351,5 @@ m.route.mode = "search"
 m.route document.body, "/", {
     "/": trendingPage
     "/search/:keyword": searchPage
+    "/bg/:id": gameOverviewPage
 }

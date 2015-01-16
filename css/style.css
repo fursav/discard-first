@@ -393,7 +393,6 @@ div.center {
   width: 17.6%;
   margin-left: 0%;
   margin-right: 3%;
-  text-align: center;
 }
 .banner-left:before,
 .banner-left:after {
@@ -609,6 +608,11 @@ main {
   margin: auto;
   left: 0;
   right: 0;
+}
+.img-center2 {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 .game-table {
   width: 100%;
