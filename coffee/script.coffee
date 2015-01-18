@@ -83,7 +83,7 @@ model = {
 gameOverviewPage = {}
 
 gameOverviewPage.controller = ->
-  m.redraw.strategy("diff")
+  #m.redraw.strategy("diff")
   @gameId = m.route.param("id")
   @gameData = m.prop()
   #@gameData = model.getInitialBoardGameData(@gameId)
@@ -129,7 +129,7 @@ GameSummary = (data) ->
   quickStats = PlainList(stats.map((item,index) ->
     return QuickStat(item[0],item[1])),
     ".no-bullet")
-  return m("div.game-summary",[m("div.game-img",img),quickStats])
+  return m("div.game-summary.animation-bounce-up",[m("div.game-img",img),quickStats])
   
 QuickStat = (iconClass, value) ->
   return m("div.quick-stat",[new Icon(iconClass),value])

@@ -96,7 +96,6 @@
   gameOverviewPage = {};
 
   gameOverviewPage.controller = function() {
-    m.redraw.strategy("diff");
     this.gameId = m.route.param("id");
     this.gameData = m.prop();
     model.getInitialBoardGameData(this.gameId).then(this.gameData).then(m.redraw);
@@ -143,7 +142,7 @@
     quickStats = PlainList(stats.map(function(item, index) {
       return QuickStat(item[0], item[1]);
     }), ".no-bullet");
-    return m("div.game-summary", [m("div.game-img", img), quickStats]);
+    return m("div.game-summary.animation-bounce-up", [m("div.game-img", img), quickStats]);
   };
 
   QuickStat = function(iconClass, value) {
