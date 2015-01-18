@@ -2,6 +2,35 @@
 
 // edit()
 
+.game-summary
+  position relative
+  padding 1rem 0 1rem 1rem
+  font-size 1.2rem
+  height 13rem
+
+.game-summary .game-img
+  span(3/5)
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  
+.game-img img
+  display block
+  margin 0 auto
+  
+.game-summary ul
+  span(2/5)
+  padding-left .5rem
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  
+.quick-stat
+  padding .3rem
+  
+.quick-stat .icon
+  padding-right 10px
+
 .img-col
   text-align center
   position relative
@@ -76,7 +105,7 @@ div.center
   top 0
   
 .banner-left
-  col(1/5)
+  span(1/5)
   // text-align center
   
 .input-icon i
@@ -115,6 +144,9 @@ div.center
 .nav-btn
   padding 1rem
   cursor pointer 
+  
+.nav-btn i
+  vertical-align middle
   
 .invisible
   position fixed
@@ -186,13 +218,15 @@ div.center
   // clip rect(0, 0, 0, 0)
   
 .banner-title
-  col(3/5)
+  span(3/5)
   margin 0
   // font-size 1.875rem
-  font-size 1.5rem
+  font-size 1.4rem
   // line-height 1.2rem
   text-align center
   white-space nowrap
+  overflow hidden
+  text-overflow ellipsis
 
 // .nav-btn
 //   display: block;
@@ -607,6 +641,9 @@ main
   box-shadow inset 0 0 1rem darken(buttonblue,70%)
 
 //icons
+.icon-medium
+  font-size -font-size(1.5)
+
 .icon-large
     font-size -font-size(2)
 

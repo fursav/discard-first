@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, Image, List, Mobile3ColList, NameView, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
+  var BoardGame, GameSummary, Icon, Image, List, Mobile3ColList, NameView, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
 
   util = {};
 
@@ -70,7 +70,7 @@
     getInitialBoardGameData: function(id) {
       return m.request({
         method: 'Get',
-        url: "/thing?id=" + id,
+        url: "/thing?id=" + id + "&stats=1",
         type: BoardGame,
         background: true
       });
@@ -105,12 +105,12 @@
   gameOverviewPage.view = function(ctrl) {
     var nameView, _ref;
     console.log(ctrl.gameData());
-    nameView = NameView(ctrl.gameData());
+    nameView = GameSummary(ctrl.gameData());
     return util.layout((_ref = ctrl.gameData()) != null ? _ref.name : void 0, nameView);
   };
 
   NameView = function(data) {
-    var img, title;
+    var img, quickStats;
     console.log(data);
     if ((data != null ? data.thumbnail : void 0) != null) {
       img = new Image({
@@ -120,8 +120,34 @@
     } else {
       img = "";
     }
-    title = m("h2", data != null ? data.name : void 0);
-    return m("div", [img, title]);
+    quickStats = "";
+    return m("div", [img, qui]);
+  };
+
+  GameSummary = function(data) {
+    var img, quickStats, stats;
+    console.log(data);
+    if ((data != null ? data.thumbnail : void 0) != null) {
+      img = new Image({
+        src: data.thumbnail
+      });
+    } else {
+      img = "";
+    }
+    stats = [];
+    stats.push([".ion-speedometer", parseFloat(data != null ? data.getStat("bayesaverage").toFixed(1) : void 0)]);
+    stats.push([".ion-calendar", data != null ? data.year : void 0]);
+    stats.push([".ion-person-stalker", data != null ? data.numplayers : void 0]);
+    stats.push([".ion-person", (data != null ? data.minage : void 0) + "+"]);
+    stats.push([".ion-clock", (data != null ? data.playingtime : void 0) + " mins"]);
+    quickStats = PlainList(stats.map(function(item, index) {
+      return QuickStat(item[0], item[1]);
+    }), ".no-bullet");
+    return m("div.game-summary", [m("div.game-img", img), quickStats]);
+  };
+
+  QuickStat = function(iconClass, value) {
+    return m("div.quick-stat", [new Icon(iconClass), value]);
   };
 
   searchPage = {};
@@ -171,13 +197,16 @@
     console.log(data);
     populate = (function(_this) {
       return function(data) {
-        var _ref, _ref1, _ref2;
+        var _ref, _ref1, _ref2, _ref3;
         if (data != null) {
           _this.id = data != null ? data.id : void 0;
           _this.name = (data != null ? data.name : void 0) instanceof Array ? data != null ? data.name[0].value : void 0 : data != null ? (_ref = data.name) != null ? _ref.value : void 0 : void 0;
           _this.thumbnail = (data != null ? (_ref1 = data.thumbnail) != null ? _ref1.value : void 0 : void 0) || (data != null ? data.thumbnail : void 0);
           _this.year = data != null ? (_ref2 = data.yearpublished) != null ? _ref2.value : void 0 : void 0;
           _this.statistics = data != null ? data.statistics : void 0;
+          _this.numplayers = (data != null ? data.minplayers.value : void 0) === (data != null ? data.maxplayers.value : void 0) ? data != null ? data.minplayers.value : void 0 : "" + (data != null ? data.minplayers.value : void 0) + " - " + (data != null ? data.maxplayers.value : void 0);
+          _this.minage = data != null ? (_ref3 = data.minage) != null ? _ref3.value : void 0 : void 0;
+          _this.playingtime = data != null ? data.playingtime.value : void 0;
         }
       };
     })(this);
@@ -214,6 +243,7 @@
 
   TrendingGame = function(data) {
     var _ref;
+    this.id = data != null ? data.id : void 0;
     this.name = data.name.value;
     this.thumbnail = data.thumbnail.value;
     this.rank = data.rank;
@@ -265,7 +295,7 @@
   TrendingTable = {};
 
   TrendingTable.controller = function(data) {
-    var elements;
+    var elements, rowOnClick;
     elements = [
       function(data) {
         if (data.thumbnail != null) {
@@ -288,7 +318,10 @@
         return data.rank;
       }
     ];
-    this.table = new Mobile3ColList.controller(elements, data);
+    rowOnClick = function(e, item) {
+      m.route("/bg/" + item.id);
+    };
+    this.table = new Mobile3ColList.controller(elements, data, rowOnClick);
   };
 
   TrendingTable.view = function(ctrl) {
@@ -351,6 +384,15 @@
     return body;
   };
 
+  PlainList = function(items, classes) {
+    if (classes == null) {
+      classes = "";
+    }
+    return m("ul" + classes, items.map(function(item, index) {
+      return m("li", item);
+    }));
+  };
+
   TempList = function() {
     return m("ul.temp-list.under", [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(function() {
       return m("li", [m("div.img-col", m("span.placeholder-yellow")), m("div.main-col", m("span.placeholder-blue"))]);
@@ -362,6 +404,13 @@
       options = {};
     }
     return m("img", options);
+  };
+
+  Icon = function(classes) {
+    if (classes == null) {
+      classes = "";
+    }
+    return m("i.icon." + classes);
   };
 
   m.route.mode = "search";

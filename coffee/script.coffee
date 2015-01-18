@@ -67,7 +67,7 @@ model = {
   getSearchResults: (keyword) ->
     return m.request({method:'Get',url:"/search?type=boardgame&query=#{keyword}",type:SearchResult,background: true})
   getInitialBoardGameData: (id) ->
-    return m.request({method:'Get',url:"/thing?id=#{id}",type:BoardGame,background: true})
+    return m.request({method:'Get',url:"/thing?id=#{id}&stats=1",type:BoardGame,background: true})
   getGameData: (id,query) ->
     query ?= {}
     url = "/thing?id=#{id}"
@@ -92,7 +92,7 @@ gameOverviewPage.controller = ->
   
 gameOverviewPage.view = (ctrl) ->
   console.log ctrl.gameData()
-  nameView = NameView(ctrl.gameData())
+  nameView = GameSummary(ctrl.gameData())
   return util.layout(ctrl.gameData()?.name, nameView)
 #
 # @param data [BoardGame]
@@ -106,10 +106,33 @@ NameView = (data) ->
     })
   else
     img = ""
-  title = m("h2",data?.name)
+  #title = m("h2",data?.name)
+  quickStats = ""
   return m("div",[
-    img,title]
+    img,qui]
   )
+  
+GameSummary = (data) ->
+  console.log data
+  if data?.thumbnail?
+   img = new Image({
+      src:data.thumbnail
+    })
+  else
+    img = ""
+  stats = []
+  stats.push([".ion-speedometer",parseFloat(data?.getStat("bayesaverage").toFixed(1))])
+  stats.push([".ion-calendar",data?.year])
+  stats.push([".ion-person-stalker",data?.numplayers])
+  stats.push([".ion-person",data?.minage + "+"])
+  stats.push([".ion-clock",data?.playingtime + " mins"])
+  quickStats = PlainList(stats.map((item,index) ->
+    return QuickStat(item[0],item[1])),
+    ".no-bullet")
+  return m("div.game-summary",[m("div.game-img",img),quickStats])
+  
+QuickStat = (iconClass, value) ->
+  return m("div.quick-stat",[new Icon(iconClass),value])
   
 
 #---------------------------------------------------------------------
@@ -173,6 +196,9 @@ BoardGame = (data) ->
       @thumbnail = data?.thumbnail?.value or data?.thumbnail
       @year = data?.yearpublished?.value
       @statistics = data?.statistics
+      @numplayers = if data?.minplayers.value is data?.maxplayers.value then data?.minplayers.value else "#{data?.minplayers.value} - #{data?.maxplayers.value}"
+      @minage = data?.minage?.value
+      @playingtime = data?.playingtime.value
       return
   @getStat = (name) ->
     @statistics?.ratings?[name]?.value
@@ -196,6 +222,7 @@ SearchResult = (data) ->
   return
 
 TrendingGame = (data) ->
+  @id = data?.id
   @name = data.name.value
   @thumbnail = data.thumbnail.value
   @rank = data.rank
@@ -264,7 +291,11 @@ TrendingTable.controller = (data) ->
       ]
     (data) -> data.rank
   ]
-  @table = new Mobile3ColList.controller(elements, data)
+  rowOnClick = (e,item) ->
+    m.route("/bg/#{item.id}")
+    return
+    
+  @table = new Mobile3ColList.controller(elements, data, rowOnClick)
   return
 
 TrendingTable.view = (ctrl) ->
@@ -326,6 +357,14 @@ List.view = (ctrl) ->
   
 #---------------------------------------------------------------------
 
+PlainList = (items,classes) ->
+  classes ?= ""
+  return m("ul" + classes,items.map (item,index) ->
+    return m("li",item)
+  )
+  
+#---------------------------------------------------------------------
+
 TempList = ->
   return m("ul.temp-list.under",[0..10].map ->
     return m("li",[
@@ -340,6 +379,12 @@ TempList = ->
 Image = (options) ->
   options ?= {}
   return m("img",options)
+  
+#---------------------------------------------------------------------
+
+Icon = (classes) ->
+  classes ?= ""
+  return m("i.icon." + classes)
 
 #---------------------------------------------------------------------  
 # Components

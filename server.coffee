@@ -84,7 +84,7 @@ class App
         #request url, (err,response,body) ->
         opts =
           maxAttempts     : 3
-          retryDelay      : 1000
+          retryDelay      : 500
           retryStrategy   : requestRetry.RetryStrategies.HTTPOrNetworkError 
           url             : url
         #requestRetry opts, (err,response,body) ->
