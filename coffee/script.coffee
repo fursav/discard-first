@@ -94,46 +94,34 @@ gameOverviewPage.view = (ctrl) ->
   console.log ctrl.gameData()
   nameView = GameSummary(ctrl.gameData())
   return util.layout(ctrl.gameData()?.name, nameView)
-#
-# @param data [BoardGame]
-#
-NameView = (data) ->
-  console.log data
-  if data?.thumbnail?
-   img = new Image({
-      src:data.thumbnail
-      class: 'img-center2'
-    })
-  else
-    img = ""
-  #title = m("h2",data?.name)
-  quickStats = ""
-  return m("div",[
-    img,qui]
-  )
   
 GameSummary = (data) ->
   console.log data
-  if data?.thumbnail?
-   img = new Image({
-      src:data.thumbnail
-    })
+  loaded = data?.id?
+  if loaded
+    if data?.thumbnail?
+     img = new Image({
+        src:data.thumbnail
+      })
+    else
+      img = ""
+    stats = []
+    stats.push([".ion-speedometer",parseFloat(data?.getStat("bayesaverage").toFixed(1))])
+    stats.push([".ion-calendar",data?.year])
+    stats.push([".ion-person-stalker",data?.numplayers])
+    stats.push([".ion-person",data?.minage + "+"])
+    stats.push([".ion-clock",data?.playingtime + " mins"])
+    quickStats = PlainList(stats.map((item,index) ->
+      return QuickStat(item[0],item[1])),
+      ".no-bullet")
+    content = m("div.game-summary.animation-bounce-up",[m("div.game-img",img),quickStats])
   else
-    img = ""
-  stats = []
-  stats.push([".ion-speedometer",parseFloat(data?.getStat("bayesaverage").toFixed(1))])
-  stats.push([".ion-calendar",data?.year])
-  stats.push([".ion-person-stalker",data?.numplayers])
-  stats.push([".ion-person",data?.minage + "+"])
-  stats.push([".ion-clock",data?.playingtime + " mins"])
-  quickStats = PlainList(stats.map((item,index) ->
-    return QuickStat(item[0],item[1])),
-    ".no-bullet")
-  return m("div.game-summary.animation-bounce-up",[m("div.game-img",img),quickStats])
+    content = m("div")
+    
+  body = m("div",[GameSummarySkeleton(),content])
   
 QuickStat = (iconClass, value) ->
   return m("div.quick-stat",[new Icon(iconClass),value])
-  
 
 #---------------------------------------------------------------------
 
@@ -362,6 +350,16 @@ PlainList = (items,classes) ->
   return m("ul" + classes,items.map (item,index) ->
     return m("li",item)
   )
+  
+#---------------------------------------------------------------------
+
+GameSummarySkeleton = ->
+  stats = [".ion-speedometer",".ion-calendar",".ion-person-stalker",
+  ".ion-person",".ion-clock"]
+  stats = PlainList(stats.map((item,index) ->
+    return QuickStat(item,"")),
+    ".no-bullet")
+  return m("div.game-summary.under",[m("div.game-img",m("span.placeholder-img.placeholder-yellow")),stats])
   
 #---------------------------------------------------------------------
 

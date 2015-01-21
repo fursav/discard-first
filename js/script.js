@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, GameSummary, Icon, Image, List, Mobile3ColList, NameView, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
+  var BoardGame, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
 
   util = {};
 
@@ -108,41 +108,32 @@
     return util.layout((_ref = ctrl.gameData()) != null ? _ref.name : void 0, nameView);
   };
 
-  NameView = function(data) {
-    var img, quickStats;
-    console.log(data);
-    if ((data != null ? data.thumbnail : void 0) != null) {
-      img = new Image({
-        src: data.thumbnail,
-        "class": 'img-center2'
-      });
-    } else {
-      img = "";
-    }
-    quickStats = "";
-    return m("div", [img, qui]);
-  };
-
   GameSummary = function(data) {
-    var img, quickStats, stats;
+    var body, content, img, loaded, quickStats, stats;
     console.log(data);
-    if ((data != null ? data.thumbnail : void 0) != null) {
-      img = new Image({
-        src: data.thumbnail
-      });
+    loaded = (data != null ? data.id : void 0) != null;
+    if (loaded) {
+      if ((data != null ? data.thumbnail : void 0) != null) {
+        img = new Image({
+          src: data.thumbnail
+        });
+      } else {
+        img = "";
+      }
+      stats = [];
+      stats.push([".ion-speedometer", parseFloat(data != null ? data.getStat("bayesaverage").toFixed(1) : void 0)]);
+      stats.push([".ion-calendar", data != null ? data.year : void 0]);
+      stats.push([".ion-person-stalker", data != null ? data.numplayers : void 0]);
+      stats.push([".ion-person", (data != null ? data.minage : void 0) + "+"]);
+      stats.push([".ion-clock", (data != null ? data.playingtime : void 0) + " mins"]);
+      quickStats = PlainList(stats.map(function(item, index) {
+        return QuickStat(item[0], item[1]);
+      }), ".no-bullet");
+      content = m("div.game-summary.animation-bounce-up", [m("div.game-img", img), quickStats]);
     } else {
-      img = "";
+      content = m("div");
     }
-    stats = [];
-    stats.push([".ion-speedometer", parseFloat(data != null ? data.getStat("bayesaverage").toFixed(1) : void 0)]);
-    stats.push([".ion-calendar", data != null ? data.year : void 0]);
-    stats.push([".ion-person-stalker", data != null ? data.numplayers : void 0]);
-    stats.push([".ion-person", (data != null ? data.minage : void 0) + "+"]);
-    stats.push([".ion-clock", (data != null ? data.playingtime : void 0) + " mins"]);
-    quickStats = PlainList(stats.map(function(item, index) {
-      return QuickStat(item[0], item[1]);
-    }), ".no-bullet");
-    return m("div.game-summary.animation-bounce-up", [m("div.game-img", img), quickStats]);
+    return body = m("div", [GameSummarySkeleton(), content]);
   };
 
   QuickStat = function(iconClass, value) {
@@ -390,6 +381,15 @@
     return m("ul" + classes, items.map(function(item, index) {
       return m("li", item);
     }));
+  };
+
+  GameSummarySkeleton = function() {
+    var stats;
+    stats = [".ion-speedometer", ".ion-calendar", ".ion-person-stalker", ".ion-person", ".ion-clock"];
+    stats = PlainList(stats.map(function(item, index) {
+      return QuickStat(item, "");
+    }), ".no-bullet");
+    return m("div.game-summary.under", [m("div.game-img", m("span.placeholder-img.placeholder-yellow")), stats]);
   };
 
   TempList = function() {
