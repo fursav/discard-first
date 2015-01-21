@@ -672,6 +672,7 @@ main {
 .placeholder-img {
   width: 10rem;
   height: 10rem;
+  margin: 0 auto;
 }
 .img-center {
   position: absolute;
