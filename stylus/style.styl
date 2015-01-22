@@ -2,12 +2,20 @@
 
 // edit()
 
+.container
+  position relative
+  min-height 12rem
+
+.section 
+  background white
+  padding 0.9rem 0.9rem 0 0.9rem
+
 .game-summary
   position relative
   background white
-  padding 1rem 0 1rem 1rem
+  // padding 1rem 0 1rem 1rem
   font-size 1.2rem
-  height 13rem
+  height 12rem
 
 .game-summary .game-img
   span(3/5)
@@ -27,7 +35,7 @@
   transform: translateY(-50%);
   
 .quick-stat
-  padding .3rem
+  padding .3rem 0
   
 .quick-stat .icon
   padding-right 10px
@@ -259,6 +267,7 @@ main
   list-style-type: none
   background white
   min-height 80vh
+  margin 0
   // overflow hidden
   // position: relative;
   // -webkit-animation: fadein 1s; /* Safari, Chrome and Opera > 12.1 */
@@ -315,6 +324,7 @@ main
   list-style-type none
   max-height: 80vh
   overflow hidden
+  margin 0
   // transition: all 2s ease-in;
   // transition-delay 1s
 .temp-list div
@@ -339,7 +349,10 @@ main
   width 10rem
   height 10rem
   margin 0 auto
-
+  
+.placeholder-description
+  font-family "Redacted"
+  color #999
 
 .img-center
   position: absolute
@@ -627,20 +640,20 @@ main
 
 /* sections */
 
-.section
-    margin-bottom .2em
-    padding 1rem 0
-    box-shadow 0 .3em .3em -.3em black
+// .section
+//     margin-bottom .2em
+//     padding 1rem 0
+//     box-shadow 0 .3em .3em -.3em black
 
-@media (min-width: medium-screen)
-  .section
-    padding 4rem 0
+// @media (min-width: medium-screen)
+//   .section
+//     padding 4rem 0
 
-.section-white
-  background-image linear-gradient(to bottom, #F5F3EB 0%, #FFFFFF 0%)
+// .section-white
+//   background-image linear-gradient(to bottom, #F5F3EB 0%, #FFFFFF 0%)
 
-.section-gray
-  background-image linear-gradient(to bottom, #F5F3EB 0%, #E8E8E8 100%)
+// .section-gray
+//   background-image linear-gradient(to bottom, #F5F3EB 0%, #E8E8E8 100%)
 
 .selected
   background-color darken(buttonblue-hover,29%) !important

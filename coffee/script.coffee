@@ -32,7 +32,7 @@ util.nav = ->
           m("i.icon.icon-large.ion-close")
         )
       ),
-      m("ul.off-canvas-nav",
+      m("ul.no-bullet.off-canvas-nav",
         [
           m("li",m("a.clickable",{onclick: closeNav },"Trending")),
           m("li",m("div","Item 2")),
@@ -86,17 +86,17 @@ gameOverviewPage.controller = ->
   #m.redraw.strategy("diff")
   @gameId = m.route.param("id")
   @gameData = m.prop()
-  #@gameData = model.getInitialBoardGameData(@gameId)
   model.getInitialBoardGameData(@gameId).then(@gameData).then(m.redraw)
   return
   
 gameOverviewPage.view = (ctrl) ->
   console.log ctrl.gameData()
   nameView = GameSummary(ctrl.gameData())
-  return util.layout(ctrl.gameData()?.name, nameView)
+  descriptionView = GameDescription(ctrl.gameData())
+  page = m("div",[nameView, descriptionView])
+  return util.layout(ctrl.gameData()?.name, page)
   
 GameSummary = (data) ->
-  console.log data
   loaded = data?.id?
   if loaded
     if data?.thumbnail?
@@ -114,11 +114,21 @@ GameSummary = (data) ->
     quickStats = PlainList(stats.map((item,index) ->
       return QuickStat(item[0],item[1])),
       ".no-bullet")
-    content = m("div.game-summary.animation-bounce-up",[m("div.game-img",img),quickStats])
+    content = m("div.game-summary.section.animation-bounce-up",[m("div.game-img",img),quickStats])
   else
     content = m("div")
     
-  body = m("div",[GameSummarySkeleton(),content])
+  body = m("div.container",[GameSummarySkeleton(),content])
+  return body
+  
+GameDescription = (game) ->
+  loaded = game?.id
+  if loaded
+    content = m("div.section.animation-bounce-up",m.trust(game?.description))
+  else
+    content = m("div")
+  body = m("div.container",[GameDescriptionSkeleton(),content])
+  return body
   
 QuickStat = (iconClass, value) ->
   return m("div.quick-stat",[new Icon(iconClass),value])
@@ -177,12 +187,58 @@ trendingPage.view = (ctrl) ->
 
 BoardGame = (data) ->
   console.log data
+  
+  # Returns the html of description string
+  getHTMLString = (string) =>
+    return string if not string?
+    paragraphs = 1
+    # [String]
+    htmlString = string
+
+    regex = new RegExp("&#10;&#10;    ", "g")
+    htmlString = htmlString.replace(regex, "</br></br><ul><li>")
+
+
+    regex = new RegExp("&#10;&#10;&#10;", "g")
+    htmlString = htmlString.replace(regex, "</li></ul></br>")
+
+    regex = new RegExp("&#10;    ", "g")
+    htmlString = htmlString.replace(regex, "</li><li>")
+
+    #htmlString = "<p>" + htmlString
+
+    regex = new RegExp("&#10;&#10;", "g")
+    htmlString = htmlString.replace(regex, "</br></br>")
+
+    #htmlString += "</p>"
+    # console.log htmlString
+    i = 0
+
+    #while i < htmlString.length
+      # Count the number of paragraphs
+      # Unordered lists count as paragraphs
+      #if htmlString.slice(i, i + 3) is "<p>" or htmlString.slice(i - 5, i) is "</ul>"
+        #paragraphs += 1
+        # If past the defined limit of characters or paragraphs
+        # hide the rest of the description
+        #if (paragraphs > 3 and i > 600 and htmlString.length - i > 7) and contenthid is false
+          #htmlString = htmlString.slice(0, i) + "<div class='full-description' style='display:none'>" + htmlString.slice(i, htmlString.length)
+          #contenthid = true
+          #break
+      #i++
+    # Add a button to show the hidden part of the description
+    #htmlString += "</div><button class='link link-wide' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down icon-large'></i></button>"  if contenthid
+    regex = new RegExp(@name, "g")
+    htmlString = htmlString.replace(regex, "<b>" + @name + "</b>")
+    return htmlString
+    
   populate = (data) =>
     if data?
       @id = data?.id
       @name = if data?.name instanceof Array then data?.name[0].value else data?.name?.value
       @thumbnail = data?.thumbnail?.value or data?.thumbnail
       @year = data?.yearpublished?.value
+      @description = getHTMLString(data?.description)
       @statistics = data?.statistics
       @numplayers = if data?.minplayers.value is data?.maxplayers.value then data?.minplayers.value else "#{data?.minplayers.value} - #{data?.maxplayers.value}"
       @minage = data?.minage?.value
@@ -360,6 +416,12 @@ GameSummarySkeleton = ->
     return QuickStat(item,"")),
     ".no-bullet")
   return m("div.game-summary.under",[m("div.game-img",m("span.placeholder-img.placeholder-yellow")),stats])
+ 
+GameDescriptionSkeleton = ->
+  sample = [m("p","Game description from the publisher:"),
+  m("p","Crossroads is a new series from Plaid Hat Games that tests a group of survivors' ability to work together and stay alive while facing crises and challenges from both outside and inside."),
+  m("p","Dead of Winter: A Crossroads Game, the first game in this series, puts 2-5 players")]
+  return m("div.placeholder-description.under.section",sample)
   
 #---------------------------------------------------------------------
 

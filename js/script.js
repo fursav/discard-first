@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
+  var BoardGame, GameDescription, GameDescriptionSkeleton, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
 
   util = {};
 
@@ -24,7 +24,7 @@
       m.route("/");
     };
     return [
-      m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas", m("div.off-canvas-title", m("label[for=nav-expand].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.off-canvas-nav", [
+      m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas", m("div.off-canvas-title", m("label[for=nav-expand].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.no-bullet.off-canvas-nav", [
         m("li", m("a.clickable", {
           onclick: closeNav
         }, "Trending")), m("li", m("div", "Item 2")), m("li", searchInput())
@@ -102,15 +102,16 @@
   };
 
   gameOverviewPage.view = function(ctrl) {
-    var nameView, _ref;
+    var descriptionView, nameView, page, _ref;
     console.log(ctrl.gameData());
     nameView = GameSummary(ctrl.gameData());
-    return util.layout((_ref = ctrl.gameData()) != null ? _ref.name : void 0, nameView);
+    descriptionView = GameDescription(ctrl.gameData());
+    page = m("div", [nameView, descriptionView]);
+    return util.layout((_ref = ctrl.gameData()) != null ? _ref.name : void 0, page);
   };
 
   GameSummary = function(data) {
     var body, content, img, loaded, quickStats, stats;
-    console.log(data);
     loaded = (data != null ? data.id : void 0) != null;
     if (loaded) {
       if ((data != null ? data.thumbnail : void 0) != null) {
@@ -129,11 +130,24 @@
       quickStats = PlainList(stats.map(function(item, index) {
         return QuickStat(item[0], item[1]);
       }), ".no-bullet");
-      content = m("div.game-summary.animation-bounce-up", [m("div.game-img", img), quickStats]);
+      content = m("div.game-summary.section.animation-bounce-up", [m("div.game-img", img), quickStats]);
     } else {
       content = m("div");
     }
-    return body = m("div", [GameSummarySkeleton(), content]);
+    body = m("div.container", [GameSummarySkeleton(), content]);
+    return body;
+  };
+
+  GameDescription = function(game) {
+    var body, content, loaded;
+    loaded = game != null ? game.id : void 0;
+    if (loaded) {
+      content = m("div.section.animation-bounce-up", m.trust(game != null ? game.description : void 0));
+    } else {
+      content = m("div");
+    }
+    body = m("div.container", [GameDescriptionSkeleton(), content]);
+    return body;
   };
 
   QuickStat = function(iconClass, value) {
@@ -183,8 +197,30 @@
   };
 
   BoardGame = function(data) {
-    var populate;
+    var getHTMLString, populate;
     console.log(data);
+    getHTMLString = (function(_this) {
+      return function(string) {
+        var htmlString, i, paragraphs, regex;
+        if (string == null) {
+          return string;
+        }
+        paragraphs = 1;
+        htmlString = string;
+        regex = new RegExp("&#10;&#10;    ", "g");
+        htmlString = htmlString.replace(regex, "</br></br><ul><li>");
+        regex = new RegExp("&#10;&#10;&#10;", "g");
+        htmlString = htmlString.replace(regex, "</li></ul></br>");
+        regex = new RegExp("&#10;    ", "g");
+        htmlString = htmlString.replace(regex, "</li><li>");
+        regex = new RegExp("&#10;&#10;", "g");
+        htmlString = htmlString.replace(regex, "</br></br>");
+        i = 0;
+        regex = new RegExp(_this.name, "g");
+        htmlString = htmlString.replace(regex, "<b>" + _this.name + "</b>");
+        return htmlString;
+      };
+    })(this);
     populate = (function(_this) {
       return function(data) {
         var _ref, _ref1, _ref2, _ref3;
@@ -193,6 +229,7 @@
           _this.name = (data != null ? data.name : void 0) instanceof Array ? data != null ? data.name[0].value : void 0 : data != null ? (_ref = data.name) != null ? _ref.value : void 0 : void 0;
           _this.thumbnail = (data != null ? (_ref1 = data.thumbnail) != null ? _ref1.value : void 0 : void 0) || (data != null ? data.thumbnail : void 0);
           _this.year = data != null ? (_ref2 = data.yearpublished) != null ? _ref2.value : void 0 : void 0;
+          _this.description = getHTMLString(data != null ? data.description : void 0);
           _this.statistics = data != null ? data.statistics : void 0;
           _this.numplayers = (data != null ? data.minplayers.value : void 0) === (data != null ? data.maxplayers.value : void 0) ? data != null ? data.minplayers.value : void 0 : "" + (data != null ? data.minplayers.value : void 0) + " - " + (data != null ? data.maxplayers.value : void 0);
           _this.minage = data != null ? (_ref3 = data.minage) != null ? _ref3.value : void 0 : void 0;
@@ -390,6 +427,12 @@
       return QuickStat(item, "");
     }), ".no-bullet");
     return m("div.game-summary.under", [m("div.game-img", m("span.placeholder-img.placeholder-yellow")), stats]);
+  };
+
+  GameDescriptionSkeleton = function() {
+    var sample;
+    sample = [m("p", "Game description from the publisher:"), m("p", "Crossroads is a new series from Plaid Hat Games that tests a group of survivors' ability to work together and stay alive while facing crises and challenges from both outside and inside."), m("p", "Dead of Winter: A Crossroads Game, the first game in this series, puts 2-5 players")];
+    return m("div.placeholder-description.under.section", sample);
   };
 
   TempList = function() {
