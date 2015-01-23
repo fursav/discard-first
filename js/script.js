@@ -3,18 +3,43 @@
 
   util = {};
 
-  util.layout = (function(_this) {
-    return function(title, body) {
-      return m("#wrap", [util.header(title), util.nav(), m("main", body)]);
-    };
-  })(this);
+  util.layout = function(title, body) {
+    return m("#wrap", [util.header(title), util.nav(), m("main", body)]);
+  };
 
-  util.header = function(title) {
+  util.gameLayout = function(game, body) {
+    return m("#wrap", [util.header(game().name, new Icon(".icon-large.ion-chevron-right")), util.nav(), util.gameNav(game), m("main", body)]);
+  };
+
+  util.header = function(title, rightIcon) {
+    var right;
+    if (rightIcon) {
+      right = m("label.nav-btn", {
+        "for": "nav-secondary"
+      }, rightIcon);
+    } else {
+      right = "";
+    }
     return m("header.banner", [
       m("div.banner-left", m("label.nav-btn", {
         "for": "nav-expand"
-      }, m("i.icon.icon-large.ion-navicon"))), m("div.banner-title", title)
+      }, m("i.icon.icon-large.ion-navicon"))), m("div.banner-center", title), m("div.banner-right", right)
     ]);
+  };
+
+  util.gameNav = function() {
+    var closeNav;
+    closeNav = function() {
+      document.getElementById("nav-secondary").checked = false;
+      m.route("/");
+    };
+    return [
+      m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas-secondary", m("div.off-canvas-title.text-right", m("label[for=nav-secondary].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.no-bullet.off-canvas-nav", [
+        m("li", m("a.clickable", {
+          onclick: closeNav
+        }, "Overview")), m("li", m("div", "Details")), m("li", m("div", "Statistics"))
+      ])), m("label[for=nav-secondary].overlay")
+    ];
   };
 
   util.nav = function() {
@@ -102,12 +127,12 @@
   };
 
   gameOverviewPage.view = function(ctrl) {
-    var descriptionView, nameView, page, _ref;
+    var descriptionView, nameView, page;
     console.log(ctrl.gameData());
     nameView = GameSummary(ctrl.gameData());
     descriptionView = GameDescription(ctrl.gameData());
     page = m("div", [nameView, descriptionView]);
-    return util.layout((_ref = ctrl.gameData()) != null ? _ref.name : void 0, page);
+    return util.gameLayout(ctrl.gameData, page);
   };
 
   GameSummary = function(data) {

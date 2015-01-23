@@ -1,14 +1,35 @@
 # defines the layout of the page
-util = {}    
+util = {}  
     
-util.layout = (title, body) =>
+util.layout = (title, body) ->
   return m("#wrap", [
       util.header(title),
       util.nav(),
       m("main", body)
   ]);
 
-util.header = (title) ->
+util.gameLayout = (game, body) ->
+  #loaded = game()?.id
+  #if loaded?
+    #return m("#wrap", [
+        #util.header(game().name),
+        #util.nav(),
+        #m("main", body)
+      #]);
+  #else
+  return m("#wrap", [
+      util.header(game().name,new Icon(".icon-large.ion-chevron-right")),
+      util.nav(),
+      util.gameNav(game),
+      m("main", body)
+    ]);
+
+util.header = (title,rightIcon) ->
+  if rightIcon
+    right = m("label.nav-btn",{for:"nav-secondary"},
+          rightIcon)
+  else
+    right = ""
   return m("header.banner",
     [
       m("div.banner-left",
@@ -16,8 +37,34 @@ util.header = (title) ->
           m("i.icon.icon-large.ion-navicon")
         )
       ),
-      m("div.banner-title",title)
+      m("div.banner-center",title),
+      m("div.banner-right",right)
+
     ])
+    
+util.gameNav = ->
+  closeNav = ->
+    document.getElementById("nav-secondary").checked = false
+    m.route("/")
+    return
+  return [
+    m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"),
+    m("nav.off-canvas-secondary",
+      m("div.off-canvas-title.text-right",
+        m("label[for=nav-secondary].nav-btn",
+          m("i.icon.icon-large.ion-close")
+        )
+      ),
+      m("ul.no-bullet.off-canvas-nav",
+        [
+          m("li",m("a.clickable",{onclick: closeNav },"Overview")),
+          m("li",m("div","Details")),
+          m("li",m("div","Statistics"))
+        ]
+      )
+    ),
+    m("label[for=nav-secondary].overlay")
+  ]
 
 util.nav = ->
   closeNav = ->
@@ -94,7 +141,8 @@ gameOverviewPage.view = (ctrl) ->
   nameView = GameSummary(ctrl.gameData())
   descriptionView = GameDescription(ctrl.gameData())
   page = m("div",[nameView, descriptionView])
-  return util.layout(ctrl.gameData()?.name, page)
+  return util.gameLayout(ctrl.gameData,page)
+  #return util.layout(ctrl.gameData()?.name, page)
   
 GameSummary = (data) ->
   loaded = data?.id?
