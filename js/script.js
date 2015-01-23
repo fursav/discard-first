@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, GameDescription, GameDescriptionSkeleton, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
+  var BoardGame, GameDescription, GameDescriptionSkeleton, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
 
   util = {};
 
@@ -8,7 +8,8 @@
   };
 
   util.gameLayout = function(game, body) {
-    return m("#wrap", [util.header(game().name, new Icon(".icon-large.ion-chevron-right")), util.nav(), util.gameNav(game), m("main", body)]);
+    var _ref;
+    return m("#wrap", [util.header((_ref = game()) != null ? _ref.name : void 0, new Icon(".icon-large.ion-chevron-right")), util.nav(), util.gameNav(game), m("main", body)]);
   };
 
   util.header = function(title, rightIcon) {
@@ -27,17 +28,22 @@
     ]);
   };
 
-  util.gameNav = function() {
+  util.gameNav = function(game) {
     var closeNav;
-    closeNav = function() {
+    closeNav = function(e) {
       document.getElementById("nav-secondary").checked = false;
-      m.route("/");
     };
     return [
-      m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas-secondary", m("div.off-canvas-title.text-right", m("label[for=nav-secondary].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.no-bullet.off-canvas-nav", [
+      m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas-secondary", m("div.off-canvas-title.text-right", m("label[for=nav-secondary].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.no-bullet.off-canvas-nav", {
+        onclick: closeNav
+      }, [
         m("li", m("a.clickable", {
-          onclick: closeNav
-        }, "Overview")), m("li", m("div", "Details")), m("li", m("div", "Statistics"))
+          href: "/bg/" + (game().id),
+          config: m.route
+        }, "Overview")), m("li", m("a.clickable", {
+          href: "/bg/" + (game().id) + "/details",
+          config: m.route
+        }, "Details")), m("li", m("div", "Statistics"))
       ])), m("label[for=nav-secondary].overlay")
     ];
   };
@@ -116,6 +122,21 @@
         background: true
       });
     }
+  };
+
+  gameDetailsPage = {};
+
+  gameDetailsPage.controller = function() {
+    this.gameId = m.route.param("id");
+    this.gameData = m.prop();
+    model.getInitialBoardGameData(this.gameId).then(this.gameData).then(m.redraw);
+  };
+
+  gameDetailsPage.view = function(ctrl) {
+    var page;
+    console.log(ctrl.gameData());
+    page = m("div", "Details");
+    return util.gameLayout(ctrl.gameData, page);
   };
 
   gameOverviewPage = {};
@@ -485,6 +506,7 @@
   m.route(document.body, "/", {
     "/": trendingPage,
     "/search/:keyword": searchPage,
+    "/bg/:id/details": gameDetailsPage,
     "/bg/:id": gameOverviewPage
   });
 

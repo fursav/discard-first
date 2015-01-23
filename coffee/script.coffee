@@ -18,7 +18,7 @@ util.gameLayout = (game, body) ->
       #]);
   #else
   return m("#wrap", [
-      util.header(game().name,new Icon(".icon-large.ion-chevron-right")),
+      util.header(game()?.name,new Icon(".icon-large.ion-chevron-right")),
       util.nav(),
       util.gameNav(game),
       m("main", body)
@@ -42,10 +42,12 @@ util.header = (title,rightIcon) ->
 
     ])
     
-util.gameNav = ->
-  closeNav = ->
+util.gameNav = (game) ->
+  closeNav = (e) ->
+    #console.log e
+    #e.preventDefault()
     document.getElementById("nav-secondary").checked = false
-    m.route("/")
+    #m.route("/")
     return
   return [
     m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"),
@@ -55,10 +57,10 @@ util.gameNav = ->
           m("i.icon.icon-large.ion-close")
         )
       ),
-      m("ul.no-bullet.off-canvas-nav",
+      m("ul.no-bullet.off-canvas-nav",{onclick: closeNav },
         [
-          m("li",m("a.clickable",{onclick: closeNav },"Overview")),
-          m("li",m("div","Details")),
+          m("li",m("a.clickable",{href:"/bg/#{game().id}",config:m.route},"Overview")),
+          m("li",m("a.clickable",{href:"/bg/#{game().id}/details",config:m.route},"Details")),
           m("li",m("div","Statistics"))
         ]
       )
@@ -127,6 +129,23 @@ model = {
 # PAGES
 #---------------------------------------------------------------------
 
+gameDetailsPage = {}
+
+gameDetailsPage.controller = ->
+  #m.redraw.strategy("diff")
+  @gameId = m.route.param("id")
+  @gameData = m.prop()
+  model.getInitialBoardGameData(@gameId).then(@gameData).then(m.redraw)
+  return
+  
+gameDetailsPage.view = (ctrl) ->
+  console.log ctrl.gameData()
+  #nameView = GameSummary(ctrl.gameData())
+  #descriptionView = GameDescription(ctrl.gameData())
+  page = m("div","Details")
+  return util.gameLayout(ctrl.gameData,page)
+  #return util.layout(ctrl.gameData()?.name, page)
+  
 gameOverviewPage = {}
 
 gameOverviewPage.controller = ->
@@ -504,5 +523,6 @@ m.route.mode = "search"
 m.route document.body, "/", {
     "/": trendingPage
     "/search/:keyword": searchPage
+    "/bg/:id/details": gameDetailsPage
     "/bg/:id": gameOverviewPage
 }
