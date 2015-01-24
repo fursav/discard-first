@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, GameDescription, GameDescriptionSkeleton, GameDetails, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
+  var BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameStats, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameStatsPage, model, searchInput, searchPage, trendingPage, util;
 
   util = {};
 
@@ -29,7 +29,7 @@
   };
 
   util.gameNav = function(game) {
-    var closeNav;
+    var closeNav, _ref, _ref1, _ref2;
     closeNav = function(e) {
       document.getElementById("nav-secondary").checked = false;
     };
@@ -38,12 +38,15 @@
         onclick: closeNav
       }, [
         m("li", m("a.clickable", {
-          href: "/bg/" + (game().id),
+          href: "/bg/" + ((_ref = game()) != null ? _ref.id : void 0),
           config: m.route
         }, "Overview")), m("li", m("a.clickable", {
-          href: "/bg/" + (game().id) + "/details",
+          href: "/bg/" + ((_ref1 = game()) != null ? _ref1.id : void 0) + "/details",
           config: m.route
-        }, "Details")), m("li", m("div", "Statistics"))
+        }, "Details")), m("li", m("a.clickable", {
+          href: "/bg/" + ((_ref2 = game()) != null ? _ref2.id : void 0) + "/stats",
+          config: m.route
+        }, "Statistics"))
       ])), m("label[for=nav-secondary].overlay")
     ];
   };
@@ -124,6 +127,31 @@
     }
   };
 
+  gameStatsPage = {};
+
+  gameStatsPage.controller = function() {
+    this.gameId = m.route.param("id");
+    this.gameData = m.prop();
+    model.getInitialBoardGameData(this.gameId).then(this.gameData).then(m.redraw).then((function(_this) {
+      return function() {
+        model.getGameData(_this.gameId, {
+          comments: 1
+        }).then(function(x) {
+          return _this.gameData().putComments(x.comments);
+        }).then(m.redraw);
+      };
+    })(this));
+  };
+
+  gameStatsPage.view = function(ctrl) {
+    var commentView, page, statsViev;
+    console.log(ctrl.gameData());
+    statsViev = GameStats(ctrl.gameData());
+    commentView = GameComment(ctrl.gameData());
+    page = m("div", [statsViev, commentView]);
+    return util.gameLayout(ctrl.gameData, page);
+  };
+
   gameDetailsPage = {};
 
   gameDetailsPage.controller = function() {
@@ -157,6 +185,34 @@
     return util.gameLayout(ctrl.gameData, page);
   };
 
+  GameComment = function(game) {
+    var body, comment, content, loaded;
+    loaded = (game != null ? game.comments : void 0) != null;
+    if (loaded) {
+      comment = game.getFeaturedComment();
+      content = m("div.animation-bounce-up", [m("div", comment.rating), m("div", comment.value), m("div", comment.username)]);
+    } else {
+      content = m("div");
+    }
+    return body = m("div.container.section", [m("div.subheader", "Featured Rating"), content]);
+  };
+
+  GameStats = function(game) {
+    var body, content, loaded, ranks, stats;
+    loaded = (game != null ? game.id : void 0) != null;
+    if (loaded) {
+      ranks = game.getRanks();
+      stats = [["Average Rating", game.getStat("bayesaverage").toFixed(1)], ["Number Of Ratings", game.getStat("usersrated")]];
+      stats = ranks.concat(stats);
+      content = PlainList(stats.map(function(item) {
+        return [m("div.label", item[0]), m("div.value", item[1])];
+      }), ".no-bullet.stats.animation-bounce-up");
+    } else {
+      content = m("div");
+    }
+    return body = m("div.container.section", [m("div.subheader", "Statistics"), content]);
+  };
+
   GameDetails = function(game) {
     var body, content, details, loaded;
     loaded = (game != null ? game.id : void 0) != null;
@@ -164,7 +220,7 @@
       details = [["Designer", game.designer], ["Artist", game.artist], ["Publisher", game.publisher], ["Category", game.category], ["Mechanic", game.mechanic]];
       content = PlainList(details.map(function(item) {
         return [m("div.label", item[0]), PlainList(item[1], ".no-bullet.value")];
-      }), ".no-bullet.details");
+      }), ".no-bullet.details.animation-bounce-up");
     } else {
       content = m("div");
     }
@@ -344,9 +400,41 @@
         }
       };
     })(this);
+    this.getRanks = function() {
+      var rank;
+      return (function() {
+        var _i, _len, _ref, _ref1, _ref2, _ref3, _results;
+        _ref3 = (_ref = this.statistics) != null ? (_ref1 = _ref.ratings) != null ? (_ref2 = _ref1.ranks) != null ? _ref2.rank : void 0 : void 0 : void 0;
+        _results = [];
+        for (_i = 0, _len = _ref3.length; _i < _len; _i++) {
+          rank = _ref3[_i];
+          _results.push([rank.friendlyname, rank.value]);
+        }
+        return _results;
+      }).call(this);
+    };
     this.getStat = function(name) {
       var _ref, _ref1, _ref2;
       return (_ref = this.statistics) != null ? (_ref1 = _ref.ratings) != null ? (_ref2 = _ref1[name]) != null ? _ref2.value : void 0 : void 0 : void 0;
+    };
+    this.putComments = function(comments) {
+      var comment;
+      this.comments = comments.comment;
+      this.goodComments = (function() {
+        var _i, _len, _ref, _results;
+        _ref = this.comments;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          comment = _ref[_i];
+          if (comment.value.length > 119 && parseInt(comment.rating) > 0) {
+            _results.push(comment);
+          }
+        }
+        return _results;
+      }).call(this);
+    };
+    this.getFeaturedComment = function() {
+      return this.goodComments[Math.floor(Math.random() * this.goodComments.length)];
     };
     populate(data);
   };
@@ -568,6 +656,7 @@
     "/": trendingPage,
     "/search/:keyword": searchPage,
     "/bg/:id/details": gameDetailsPage,
+    "/bg/:id/stats": gameStatsPage,
     "/bg/:id": gameOverviewPage
   });
 

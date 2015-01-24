@@ -59,9 +59,9 @@ util.gameNav = (game) ->
       ),
       m("ul.no-bullet.off-canvas-nav",{onclick: closeNav },
         [
-          m("li",m("a.clickable",{href:"/bg/#{game().id}",config:m.route},"Overview")),
-          m("li",m("a.clickable",{href:"/bg/#{game().id}/details",config:m.route},"Details")),
-          m("li",m("div","Statistics"))
+          m("li",m("a.clickable",{href:"/bg/#{game()?.id}",config:m.route},"Overview")),
+          m("li",m("a.clickable",{href:"/bg/#{game()?.id}/details",config:m.route},"Details")),
+          m("li",m("a.clickable",{href:"/bg/#{game()?.id}/stats",config:m.route},"Statistics"))
         ]
       )
     ),
@@ -129,6 +129,28 @@ model = {
 # PAGES
 #---------------------------------------------------------------------
 
+gameStatsPage = {}
+
+gameStatsPage.controller = ->
+  @gameId = m.route.param("id")
+  @gameData = m.prop()
+  model.getInitialBoardGameData(@gameId).then(@gameData).then(m.redraw)
+  .then( => 
+    model.getGameData(@gameId,{comments:1})
+    .then((x) => 
+      @gameData().putComments(x.comments))
+    .then(m.redraw)
+    return
+  )
+  return
+
+gameStatsPage.view = (ctrl) ->
+  console.log ctrl.gameData()
+  statsViev = GameStats(ctrl.gameData())
+  commentView = GameComment(ctrl.gameData())
+  page = m("div",[statsViev,commentView])
+  return util.gameLayout(ctrl.gameData,page)
+
 gameDetailsPage = {}
 
 gameDetailsPage.controller = ->
@@ -161,6 +183,30 @@ gameOverviewPage.view = (ctrl) ->
   return util.gameLayout(ctrl.gameData,page)
   #return util.layout(ctrl.gameData()?.name, page)
   
+GameComment = (game) ->
+  loaded = game?.comments?
+  if loaded
+    comment = game.getFeaturedComment()
+    content = m("div.animation-bounce-up",[m("div",comment.rating),m("div",comment.value),m("div",comment.username)])
+  else
+    content = m("div")
+  body = m("div.container.section",[m("div.subheader","Featured Rating"),content])
+GameStats = (game) ->
+  loaded = game?.id?
+  if loaded
+    ranks = game.getRanks()
+    stats = [
+      ["Average Rating", game.getStat("bayesaverage").toFixed(1)],
+      ["Number Of Ratings", game.getStat("usersrated")]
+      ]
+    stats = ranks.concat(stats)
+    content = PlainList(stats.map((item) ->
+      return [m("div.label",item[0]),m("div.value",item[1])]
+      ),".no-bullet.stats.animation-bounce-up")
+  else
+    content = m("div")
+  body = m("div.container.section",[m("div.subheader","Statistics"),content])
+  
 GameDetails = (game) ->
   loaded = game?.id?
   if loaded
@@ -175,7 +221,7 @@ GameDetails = (game) ->
       #return [m("div.label",item[0])]
       return [m("div.label",item[0]),
       PlainList(item[1],".no-bullet.value")]
-      ),".no-bullet.details")
+      ),".no-bullet.details.animation-bounce-up")
   else
     content = m("div")
   body = m("div.container.section",[m("div.subheader","Details"),content])
@@ -324,10 +370,17 @@ BoardGame = (data) ->
       @mechanic = []
       populateLinks()
       return
+  @getRanks = ->
+    return ([rank.friendlyname,rank.value] for rank in @statistics?.ratings?.ranks?.rank)
   @getStat = (name) ->
     @statistics?.ratings?[name]?.value
+  @putComments = (comments)->
+    @comments = comments.comment
+    @goodComments = (comment for comment in @comments when comment.value.length > 119 and parseInt(comment.rating) > 0)
+    return
+  @getFeaturedComment= ->
+    return @goodComments[Math.floor(Math.random() * @goodComments.length)]
   populate(data)
-  #model.getGameData(@id,{"stats":1}).then(populate).then(m.redraw)
   return
 
 SearchResult = (data) ->
@@ -537,5 +590,6 @@ m.route document.body, "/", {
     "/": trendingPage
     "/search/:keyword": searchPage
     "/bg/:id/details": gameDetailsPage
+    "/bg/:id/stats": gameStatsPage
     "/bg/:id": gameOverviewPage
 }

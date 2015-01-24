@@ -308,6 +308,19 @@ ul li ol {
   margin-left: 1.25rem;
   margin-bottom: 0;
 }
+.stats > li {
+  padding-bottom: 0.5rem;
+}
+.stats .label {
+  display: inline-block;
+  vertical-align: top;
+  width: 60%;
+}
+.stats .value {
+  display: inline-block;
+  vertical-align: top;
+  width: 40%;
+}
 .details > li {
   padding-bottom: 0.5rem;
 }
@@ -330,7 +343,6 @@ ul li ol {
 .label {
   color: #0b5da1;
   font-weight: bold;
-  font-size: 1.1rem;
 }
 .container {
   position: relative;
