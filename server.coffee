@@ -1,10 +1,4 @@
 express = require('express')
-#request = require('request')
-#OiBackoff = require('oibackoff')
-#backoff = OiBackoff.backoff({
-    #algorithm  : 'exponential',
-    #delayRatio : 0.4,
-#})
 requestRetry = require "requestretry"
 RateLimiter = require('limiter').RateLimiter
 limiter = new RateLimiter(1, 500); # at most 1 request every 100 ms
@@ -20,7 +14,7 @@ throttledRequest = ->
 async   = require('async')
 parser  = require('xml2json')
 cache_manager = require('cache-manager')
-memory_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 300})
+memory_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 3000})
 app     = express()
 
 class App
@@ -69,10 +63,48 @@ class App
       sanitize      : false
       trim          : false
       arrayNotation : false
-    
+      
+    a_request = (url,res,cb) ->
+      console.log url
+      memory_cache.get url,(err, result) ->
+        if result
+          console.log 'cached_A'
+          cb result
+          return
+        opts =
+          maxAttempts     : 3
+          retryDelay      : 500
+          retryStrategy   : requestRetry.RetryStrategies.HTTPOrNetworkError 
+          url             : url
+        throttledRequest opts, (err,response,body) ->
+          if err
+            console.log "Error"
+            console.log err
+            res.end()
+            return
+            #throw err
+          try
+            result = parser.toJson(body,jsonOptions)
+            if result.forums?
+              result = result.forums.forum
+            else if result.threads?
+              result = result.threads.thread
+            else
+              result = result.items.item
+            memory_cache.set(url, result)
+            cb result
+            return
+          catch error
+            console.log error
+            #res.end()
+          return
+        return
+      return
+      
     _request = (url,res) ->
+      console.log url
       cb = (result) ->
-        #res.set('Cache-Control', 'public, max-age=300')
+        #res.set('Cache-Control', 'public, max-age=3000')
         res.send result
         return
       memory_cache.get url,(err, result) ->
@@ -81,20 +113,25 @@ class App
           cb result
           return
         #console.log 'hitting'
-        #request url, (err,response,body) ->
         opts =
           maxAttempts     : 3
           retryDelay      : 500
           retryStrategy   : requestRetry.RetryStrategies.HTTPOrNetworkError 
           url             : url
-        #requestRetry opts, (err,response,body) ->
         throttledRequest opts, (err,response,body) ->
           if err
-            throw err
-          #if err
+            console.log error
+            res.end()
+            return
+            #throw err
           try
             result = parser.toJson(body,jsonOptions)
-            result = result.items.item
+            if result.forums?
+              result = result.forums.forum
+            else if result.forum?
+              result = result.forum.threads.thread
+            else
+              result = result.items.item
             memory_cache.set(url, result)
             cb result
           catch error
@@ -102,21 +139,19 @@ class App
             #res.end()
           return
         return
-          
-      #result
-      #if result isnt {}
-        #console.log 'caching'
-        #res.send result
-      #else
-        #console.log 'hitting'
-        #request url, (err,response,body) ->
-          #result = parser.toJson(body,jsonOptions)
-          #result = result.items.item
-          #_cache.set(url, result)
-          #res.send(result)
-          #return
       return
+      
     @routes = {}
+    
+    @routes['/reviews/:id'] = (req,res) ->
+      id = req.params.id
+      a_request("http://boardgamegeek.com/xmlapi2/forumlist?id=#{id}&type=thing",res,(list) ->
+        forumid = forum.id for forum in list when forum.title.toLowerCase() is "reviews"
+        console.log "about to _request"
+        _request("http://boardgamegeek.com/xmlapi2/forum?id=#{forumid}&type=thing",res)
+        return
+      )
+      return
     
     @routes['/thing'] = (req,res) ->
       #console.log 'bg'

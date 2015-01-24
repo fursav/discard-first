@@ -330,6 +330,17 @@ blockquote p {
   line-height: 1.6;
   color: #646464;
 }
+.secondary {
+  color: #4e4e4e;
+}
+.forum {
+  border-top: 1px solid #ccc;
+  background: #fff;
+}
+.forum li {
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+}
 .comment,
 .comment p {
   line-height: 1.6;

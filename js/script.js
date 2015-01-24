@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameStats, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameStatsPage, model, searchInput, searchPage, trendingPage, util;
+  var BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameForum, GameStats, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameReviewsPage, gameStatsPage, model, searchInput, searchPage, trendingPage, util;
 
   util = {};
 
@@ -29,7 +29,7 @@
   };
 
   util.gameNav = function(game) {
-    var closeNav, _ref, _ref1, _ref2;
+    var closeNav, _ref, _ref1, _ref2, _ref3;
     closeNav = function(e) {
       document.getElementById("nav-secondary").checked = false;
     };
@@ -46,7 +46,10 @@
         }, "Details")), m("li", m("a.clickable", {
           href: "/bg/" + ((_ref2 = game()) != null ? _ref2.id : void 0) + "/stats",
           config: m.route
-        }, "Statistics"))
+        }, "Statistics")), m("li", m("a.clickable", {
+          href: "/bg/" + ((_ref3 = game()) != null ? _ref3.id : void 0) + "/reviews",
+          config: m.route
+        }, "Reviews"))
       ])), m("label[for=nav-secondary].overlay")
     ];
   };
@@ -124,7 +127,32 @@
         url: url,
         background: true
       });
+    },
+    getReviews: function(id) {
+      return m.request({
+        method: 'Get',
+        url: "/reviews/" + id,
+        background: true
+      });
     }
+  };
+
+  gameReviewsPage = {};
+
+  gameReviewsPage.controller = function() {
+    this.gameId = m.route.param("id");
+    this.gameData = m.prop();
+    this.threads = m.prop();
+    model.getInitialBoardGameData(this.gameId).then(this.gameData).then(m.redraw);
+    model.getReviews(this.gameId).then(this.threads).then(m.redraw);
+  };
+
+  gameReviewsPage.view = function(ctrl) {
+    var forumViev, page;
+    console.log(ctrl.threads());
+    forumViev = GameForum(ctrl.threads());
+    page = m("div", forumViev);
+    return util.gameLayout(ctrl.gameData, page);
   };
 
   gameStatsPage = {};
@@ -135,7 +163,8 @@
     model.getInitialBoardGameData(this.gameId).then(this.gameData).then(m.redraw).then((function(_this) {
       return function() {
         model.getGameData(_this.gameId, {
-          comments: 1
+          comments: 1,
+          pagesize: 100
         }).then(function(x) {
           return _this.gameData().putComments(x.comments);
         }).then(m.redraw);
@@ -185,6 +214,20 @@
     return util.gameLayout(ctrl.gameData, page);
   };
 
+  GameForum = function(forum) {
+    var body, content, loaded;
+    loaded = (forum != null ? forum.length : void 0) > 0;
+    if (loaded) {
+      content = PlainList(forum.map(function(item) {
+        return [m("div", item.subject), m("div.secondary", "date: " + (item.lastpostdate.slice(4, 16))), m("div.secondary", "posts: " + item.numarticles)];
+      }), ".forum.no-bullet.animation-bounce-up");
+    } else {
+      content = m("div");
+    }
+    body = m("div.container", [m("div.subheader", "Reviews"), content]);
+    return body;
+  };
+
   GameComment = function(game) {
     var body, comment, content, loaded;
     loaded = (game != null ? game.comments : void 0) != null;
@@ -219,7 +262,8 @@
     } else {
       content = m("div");
     }
-    return body = m("div.container.section", [m("div.subheader", "Statistics"), content]);
+    body = m("div.container.section", [m("div.subheader", "Statistics"), content]);
+    return body;
   };
 
   GameDetails = function(game) {
@@ -233,7 +277,8 @@
     } else {
       content = m("div");
     }
-    return body = m("div.container.section", [m("div.subheader", "Details"), content]);
+    body = m("div.container.section", [m("div.subheader", "Details"), content]);
+    return body;
   };
 
   GameSummary = function(data) {
@@ -670,6 +715,7 @@
     "/search/:keyword": searchPage,
     "/bg/:id/details": gameDetailsPage,
     "/bg/:id/stats": gameStatsPage,
+    "/bg/:id/reviews": gameReviewsPage,
     "/bg/:id": gameOverviewPage
   });
 

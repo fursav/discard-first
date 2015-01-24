@@ -61,7 +61,8 @@ util.gameNav = (game) ->
         [
           m("li",m("a.clickable",{href:"/bg/#{game()?.id}",config:m.route},"Overview")),
           m("li",m("a.clickable",{href:"/bg/#{game()?.id}/details",config:m.route},"Details")),
-          m("li",m("a.clickable",{href:"/bg/#{game()?.id}/stats",config:m.route},"Statistics"))
+          m("li",m("a.clickable",{href:"/bg/#{game()?.id}/stats",config:m.route},"Statistics")),
+          m("li",m("a.clickable",{href:"/bg/#{game()?.id}/reviews",config:m.route},"Reviews"))
         ]
       )
     ),
@@ -123,12 +124,31 @@ model = {
     for k,v of query
       url += "&#{k}=#{v}"
     return m.request({method:'Get',url:url,background:true})
+  getReviews: (id) ->
+    return m.request({method:'Get',url:"/reviews/#{id}",background: true})
   }
     
 #---------------------------------------------------------------------  
 # PAGES
 #---------------------------------------------------------------------
 
+gameReviewsPage = {}
+
+gameReviewsPage.controller = ->
+  @gameId = m.route.param("id")
+  #we don't access anything else from game data here
+  @gameData = m.prop()
+  @threads = m.prop()
+  model.getInitialBoardGameData(@gameId).then(@gameData).then(m.redraw)
+  model.getReviews(@gameId).then(@threads).then(m.redraw)
+  return
+
+gameReviewsPage.view = (ctrl) ->
+  console.log ctrl.threads()
+  forumViev = GameForum(ctrl.threads())
+  page = m("div",forumViev)
+  return util.gameLayout(ctrl.gameData,page)
+  
 gameStatsPage = {}
 
 gameStatsPage.controller = ->
@@ -136,7 +156,7 @@ gameStatsPage.controller = ->
   @gameData = m.prop()
   model.getInitialBoardGameData(@gameId).then(@gameData).then(m.redraw)
   .then( => 
-    model.getGameData(@gameId,{comments:1})
+    model.getGameData(@gameId,{comments:1,pagesize:100})
     .then((x) => 
       @gameData().putComments(x.comments))
     .then(m.redraw)
@@ -183,6 +203,17 @@ gameOverviewPage.view = (ctrl) ->
   return util.gameLayout(ctrl.gameData,page)
   #return util.layout(ctrl.gameData()?.name, page)
   
+GameForum = (forum) ->
+  loaded = forum?.length > 0
+  if loaded
+    content = PlainList(forum.map((item) ->
+      return [m("div",item.subject),m("div.secondary","date: #{item.lastpostdate.slice(4,16)}"),m("div.secondary","posts: #{item.numarticles}")]
+      ),".forum.no-bullet.animation-bounce-up")
+  else
+    content = m("div")
+  body = m("div.container",[m("div.subheader","Reviews"),content])
+  return body
+  
 GameComment = (game) ->
   loaded = game?.comments?
   if loaded
@@ -218,6 +249,7 @@ GameStats = (game) ->
   else
     content = m("div")
   body = m("div.container.section",[m("div.subheader","Statistics"),content])
+  return body
   
 GameDetails = (game) ->
   loaded = game?.id?
@@ -237,6 +269,7 @@ GameDetails = (game) ->
   else
     content = m("div")
   body = m("div.container.section",[m("div.subheader","Details"),content])
+  return body
   
 GameSummary = (data) ->
   loaded = data?.id?
@@ -605,5 +638,6 @@ m.route document.body, "/", {
     "/search/:keyword": searchPage
     "/bg/:id/details": gameDetailsPage
     "/bg/:id/stats": gameStatsPage
+    "/bg/:id/reviews": gameReviewsPage
     "/bg/:id": gameOverviewPage
 }
