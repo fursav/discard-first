@@ -190,11 +190,17 @@
     loaded = (game != null ? game.comments : void 0) != null;
     if (loaded) {
       comment = game.getFeaturedComment();
-      content = m("div.animation-bounce-up", [m("div", comment.rating), m("div", comment.value), m("div", comment.username)]);
+      content = m("div.animation-bounce-up", m("div.comment", [comment.value, m("cite", "Rating: " + comment.rating), m("cite", comment.username)]));
     } else {
       content = m("div");
     }
-    return body = m("div.container.section", [m("div.subheader", "Featured Rating"), content]);
+    return body = m("div.container.section", [
+      m("div.subheader", [
+        m("span", "Featured Rating"), new Icon(".ion-refresh.clickable", {
+          onclick: m.redraw
+        })
+      ]), content
+    ]);
   };
 
   GameStats = function(game) {
@@ -643,11 +649,14 @@
     return m("img", options);
   };
 
-  Icon = function(classes) {
+  Icon = function(classes, options) {
     if (classes == null) {
       classes = "";
     }
-    return m("i.icon." + classes);
+    if (options == null) {
+      options = {};
+    }
+    return m("i.icon." + classes, options);
   };
 
   m.route.mode = "search";

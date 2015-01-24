@@ -187,10 +187,16 @@ GameComment = (game) ->
   loaded = game?.comments?
   if loaded
     comment = game.getFeaturedComment()
-    content = m("div.animation-bounce-up",[m("div",comment.rating),m("div",comment.value),m("div",comment.username)])
+    content = m("div.animation-bounce-up",
+      m("div.comment",[comment.value,
+        m("cite","Rating: #{comment.rating}"),
+        m("cite",comment.username)]
+      )
+    )
   else
     content = m("div")
-  body = m("div.container.section",[m("div.subheader","Featured Rating"),content])
+  body = m("div.container.section",[m("div.subheader",[m("span","Featured Rating"),new Icon(".ion-refresh.clickable",{onclick:m.redraw})]),content])
+  
 GameStats = (game) ->
   loaded = game?.id?
   if loaded
@@ -575,9 +581,10 @@ Image = (options) ->
   
 #---------------------------------------------------------------------
 
-Icon = (classes) ->
+Icon = (classes,options) ->
   classes ?= ""
-  return m("i.icon." + classes)
+  options ?= {}
+  return m("i.icon." + classes,options)
 
 #---------------------------------------------------------------------  
 # Components

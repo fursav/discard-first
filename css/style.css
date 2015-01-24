@@ -308,6 +308,40 @@ ul li ol {
   margin-left: 1.25rem;
   margin-bottom: 0;
 }
+blockquote {
+  margin: 0 0 1.25rem;
+  padding: 0.5625rem 1.25rem 0 1.1875rem;
+  border-left: 1px solid #ddd;
+}
+blockquote cite {
+  display: block;
+  font-size: 0.8125rem;
+  color: #919191;
+}
+blockquote cite:before {
+  content: "\2014 \0020";
+}
+blockquote cite a,
+blockquote cite a:visited {
+  color: #919191;
+}
+blockquote,
+blockquote p {
+  line-height: 1.6;
+  color: #646464;
+}
+.comment,
+.comment p {
+  line-height: 1.6;
+}
+.comment cite {
+  display: block;
+  font-size: 0.8125rem;
+  color: #4e4e4e;
+}
+.comment cite:before {
+  content: "\2014 \0020";
+}
 .stats > li {
   padding-bottom: 0.5rem;
 }
@@ -339,6 +373,9 @@ ul li ol {
   font-size: 1.3rem;
   color: #666;
   padding-bottom: 1rem;
+}
+.subheader i {
+  padding: 0 0.5rem;
 }
 .label {
   color: #0b5da1;
