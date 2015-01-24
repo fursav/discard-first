@@ -186,7 +186,7 @@ gameOverviewPage.view = (ctrl) ->
 GameComment = (game) ->
   loaded = game?.comments?
   if loaded
-    comment = game.getFeaturedComment()
+    comment = game.featuredComment
     content = m("div.animation-bounce-up",
       m("div.comment",[comment.value,
         m("cite","Rating: #{comment.rating}"),
@@ -195,7 +195,13 @@ GameComment = (game) ->
     )
   else
     content = m("div")
-  body = m("div.container.section",[m("div.subheader",[m("span","Featured Rating"),new Icon(".ion-refresh.clickable",{onclick:m.redraw})]),content])
+  body = m("div.container.section",[m("div.subheader",
+    [m("span","Featured Rating"),
+    new Icon(".ion-refresh.clickable",{onclick:->
+      game.randomizeComment()
+      m.redraw()
+      return})
+    ]),content])
   
 GameStats = (game) ->
   loaded = game?.id?
@@ -383,9 +389,10 @@ BoardGame = (data) ->
   @putComments = (comments)->
     @comments = comments.comment
     @goodComments = (comment for comment in @comments when comment.value.length > 119 and parseInt(comment.rating) > 0)
+    @randomizeComment()
     return
-  @getFeaturedComment= ->
-    return @goodComments[Math.floor(Math.random() * @goodComments.length)]
+  @randomizeComment= ->
+    @featuredComment = @goodComments[Math.floor(Math.random() * @goodComments.length)]
   populate(data)
   return
 

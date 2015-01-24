@@ -189,7 +189,7 @@
     var body, comment, content, loaded;
     loaded = (game != null ? game.comments : void 0) != null;
     if (loaded) {
-      comment = game.getFeaturedComment();
+      comment = game.featuredComment;
       content = m("div.animation-bounce-up", m("div.comment", [comment.value, m("cite", "Rating: " + comment.rating), m("cite", comment.username)]));
     } else {
       content = m("div");
@@ -197,7 +197,10 @@
     return body = m("div.container.section", [
       m("div.subheader", [
         m("span", "Featured Rating"), new Icon(".ion-refresh.clickable", {
-          onclick: m.redraw
+          onclick: function() {
+            game.randomizeComment();
+            m.redraw();
+          }
         })
       ]), content
     ]);
@@ -438,9 +441,10 @@
         }
         return _results;
       }).call(this);
+      this.randomizeComment();
     };
-    this.getFeaturedComment = function() {
-      return this.goodComments[Math.floor(Math.random() * this.goodComments.length)];
+    this.randomizeComment = function() {
+      return this.featuredComment = this.goodComments[Math.floor(Math.random() * this.goodComments.length)];
     };
     populate(data);
   };
