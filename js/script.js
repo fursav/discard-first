@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, GameDescription, GameDescriptionSkeleton, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
+  var BoardGame, GameDescription, GameDescriptionSkeleton, GameDetails, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, model, searchInput, searchPage, trendingPage, util;
 
   util = {};
 
@@ -133,9 +133,10 @@
   };
 
   gameDetailsPage.view = function(ctrl) {
-    var page;
+    var detailsView, page;
     console.log(ctrl.gameData());
-    page = m("div", "Details");
+    detailsView = GameDetails(ctrl.gameData());
+    page = m("div", detailsView);
     return util.gameLayout(ctrl.gameData, page);
   };
 
@@ -154,6 +155,20 @@
     descriptionView = GameDescription(ctrl.gameData());
     page = m("div", [nameView, descriptionView]);
     return util.gameLayout(ctrl.gameData, page);
+  };
+
+  GameDetails = function(game) {
+    var body, content, details, loaded;
+    loaded = (game != null ? game.id : void 0) != null;
+    if (loaded) {
+      details = [["Designer", game.designer], ["Artist", game.artist], ["Publisher", game.publisher], ["Category", game.category], ["Mechanic", game.mechanic]];
+      content = PlainList(details.map(function(item) {
+        return [m("div.label", item[0]), PlainList(item[1], ".no-bullet.value")];
+      }), ".no-bullet.details");
+    } else {
+      content = m("div");
+    }
+    return body = m("div.container.section", [m("div.subheader", "Details"), content]);
   };
 
   GameSummary = function(data) {
@@ -243,15 +258,14 @@
   };
 
   BoardGame = function(data) {
-    var getHTMLString, populate;
+    var getHTMLString, getLinks, populate;
     console.log(data);
     getHTMLString = (function(_this) {
       return function(string) {
-        var htmlString, i, paragraphs, regex;
+        var htmlString, regex;
         if (string == null) {
           return string;
         }
-        paragraphs = 1;
         htmlString = string;
         regex = new RegExp("&#10;&#10;    ", "g");
         htmlString = htmlString.replace(regex, "</br></br><ul><li>");
@@ -261,15 +275,56 @@
         htmlString = htmlString.replace(regex, "</li><li>");
         regex = new RegExp("&#10;&#10;", "g");
         htmlString = htmlString.replace(regex, "</br></br>");
-        i = 0;
         regex = new RegExp(_this.name, "g");
         htmlString = htmlString.replace(regex, "<b>" + _this.name + "</b>");
         return htmlString;
       };
     })(this);
+    getLinks = function(links, type) {
+      var link, results;
+      return results = (function() {
+        var _i, _len, _results;
+        _results = [];
+        for (_i = 0, _len = links.length; _i < _len; _i++) {
+          link = links[_i];
+          if (link.type === type) {
+            _results.push(link.value);
+          }
+        }
+        return _results;
+      })();
+    };
     populate = (function(_this) {
       return function(data) {
-        var _ref, _ref1, _ref2, _ref3;
+        var populateLinks, _ref, _ref1, _ref2, _ref3;
+        populateLinks = function() {
+          var link, _i, _len, _ref, _results;
+          _ref = data != null ? data.link : void 0;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            link = _ref[_i];
+            switch (link.type) {
+              case "boardgamedesigner":
+                _results.push(_this.designer.push(link.value));
+                break;
+              case "boardgameartist":
+                _results.push(_this.artist.push(link.value));
+                break;
+              case "boardgamepublisher":
+                _results.push(_this.publisher.push(link.value));
+                break;
+              case "boardgamecategory":
+                _results.push(_this.category.push(link.value));
+                break;
+              case "boardgamemechanic":
+                _results.push(_this.mechanic.push(link.value));
+                break;
+              default:
+                _results.push(void 0);
+            }
+          }
+          return _results;
+        };
         if (data != null) {
           _this.id = data != null ? data.id : void 0;
           _this.name = (data != null ? data.name : void 0) instanceof Array ? data != null ? data.name[0].value : void 0 : data != null ? (_ref = data.name) != null ? _ref.value : void 0 : void 0;
@@ -280,6 +335,12 @@
           _this.numplayers = (data != null ? data.minplayers.value : void 0) === (data != null ? data.maxplayers.value : void 0) ? data != null ? data.minplayers.value : void 0 : "" + (data != null ? data.minplayers.value : void 0) + " - " + (data != null ? data.maxplayers.value : void 0);
           _this.minage = data != null ? (_ref3 = data.minage) != null ? _ref3.value : void 0 : void 0;
           _this.playingtime = data != null ? data.playingtime.value : void 0;
+          _this.designer = [];
+          _this.artist = [];
+          _this.publisher = [];
+          _this.category = [];
+          _this.mechanic = [];
+          populateLinks();
         }
       };
     })(this);

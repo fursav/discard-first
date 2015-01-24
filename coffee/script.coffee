@@ -140,11 +140,9 @@ gameDetailsPage.controller = ->
   
 gameDetailsPage.view = (ctrl) ->
   console.log ctrl.gameData()
-  #nameView = GameSummary(ctrl.gameData())
-  #descriptionView = GameDescription(ctrl.gameData())
-  page = m("div","Details")
+  detailsView = GameDetails(ctrl.gameData())
+  page = m("div",detailsView)
   return util.gameLayout(ctrl.gameData,page)
-  #return util.layout(ctrl.gameData()?.name, page)
   
 gameOverviewPage = {}
 
@@ -162,6 +160,25 @@ gameOverviewPage.view = (ctrl) ->
   page = m("div",[nameView, descriptionView])
   return util.gameLayout(ctrl.gameData,page)
   #return util.layout(ctrl.gameData()?.name, page)
+  
+GameDetails = (game) ->
+  loaded = game?.id?
+  if loaded
+    details = [
+      ["Designer",game.designer]
+      ["Artist",game.artist]
+      ["Publisher",game.publisher]
+      ["Category",game.category]
+      ["Mechanic",game.mechanic]
+    ]
+    content = PlainList(details.map((item) ->
+      #return [m("div.label",item[0])]
+      return [m("div.label",item[0]),
+      PlainList(item[1],".no-bullet.value")]
+      ),".no-bullet.details")
+  else
+    content = m("div")
+  body = m("div.container.section",[m("div.subheader","Details"),content])
   
 GameSummary = (data) ->
   loaded = data?.id?
@@ -258,7 +275,6 @@ BoardGame = (data) ->
   # Returns the html of description string
   getHTMLString = (string) =>
     return string if not string?
-    paragraphs = 1
     # [String]
     htmlString = string
 
@@ -272,34 +288,25 @@ BoardGame = (data) ->
     regex = new RegExp("&#10;    ", "g")
     htmlString = htmlString.replace(regex, "</li><li>")
 
-    #htmlString = "<p>" + htmlString
-
     regex = new RegExp("&#10;&#10;", "g")
     htmlString = htmlString.replace(regex, "</br></br>")
 
-    #htmlString += "</p>"
-    # console.log htmlString
-    i = 0
-
-    #while i < htmlString.length
-      # Count the number of paragraphs
-      # Unordered lists count as paragraphs
-      #if htmlString.slice(i, i + 3) is "<p>" or htmlString.slice(i - 5, i) is "</ul>"
-        #paragraphs += 1
-        # If past the defined limit of characters or paragraphs
-        # hide the rest of the description
-        #if (paragraphs > 3 and i > 600 and htmlString.length - i > 7) and contenthid is false
-          #htmlString = htmlString.slice(0, i) + "<div class='full-description' style='display:none'>" + htmlString.slice(i, htmlString.length)
-          #contenthid = true
-          #break
-      #i++
-    # Add a button to show the hidden part of the description
-    #htmlString += "</div><button class='link link-wide' onclick=$('.full-description').toggle(function(){$('.show-more').toggleClass('ion-chevron-up')});><i class='show-more icon ion-chevron-down icon-large'></i></button>"  if contenthid
     regex = new RegExp(@name, "g")
     htmlString = htmlString.replace(regex, "<b>" + @name + "</b>")
     return htmlString
     
+  getLinks = (links, type) ->
+    results = (link.value for link in links when link.type is type)
+    
   populate = (data) =>
+    populateLinks = =>
+      for link in data?.link
+        switch link.type
+          when "boardgamedesigner" then @designer.push(link.value)
+          when "boardgameartist" then @artist.push(link.value)
+          when "boardgamepublisher" then @publisher.push(link.value)
+          when "boardgamecategory" then @category.push(link.value)
+          when "boardgamemechanic" then @mechanic.push(link.value)
     if data?
       @id = data?.id
       @name = if data?.name instanceof Array then data?.name[0].value else data?.name?.value
@@ -310,6 +317,12 @@ BoardGame = (data) ->
       @numplayers = if data?.minplayers.value is data?.maxplayers.value then data?.minplayers.value else "#{data?.minplayers.value} - #{data?.maxplayers.value}"
       @minage = data?.minage?.value
       @playingtime = data?.playingtime.value
+      @designer = []
+      @artist = []
+      @publisher = []
+      @category = []
+      @mechanic = []
+      populateLinks()
       return
   @getStat = (name) ->
     @statistics?.ratings?[name]?.value

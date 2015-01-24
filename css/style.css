@@ -308,6 +308,30 @@ ul li ol {
   margin-left: 1.25rem;
   margin-bottom: 0;
 }
+.details > li {
+  padding-bottom: 0.5rem;
+}
+.details .label {
+  display: inline-block;
+  vertical-align: top;
+  width: 33%;
+}
+.details .value {
+  display: inline-block;
+  vertical-align: top;
+  width: 67%;
+}
+.subheader {
+  text-align: center;
+  font-size: 1.3rem;
+  color: #666;
+  padding-bottom: 1rem;
+}
+.label {
+  color: #0b5da1;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
 .container {
   position: relative;
   min-height: 12rem;
@@ -499,6 +523,9 @@ div.center {
 }
 .banner-left:after {
   clear: both;
+}
+.banner-right {
+  text-align: right;
 }
 .banner-center {
   *zoom: 1;
