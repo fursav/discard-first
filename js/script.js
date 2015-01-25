@@ -1,5 +1,5 @@
 (function() {
-  var BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameForum, GameStats, GameSummary, GameSummarySkeleton, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameReviewsPage, gameStatsPage, model, searchInput, searchPage, trendingPage, util;
+  var BetterList, BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameForum, GameStats, GameSummary, GameSummarySkeleton, GameThread, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameReviewsPage, gameStatsPage, model, searchInput, searchPage, threadPage, trendingPage, util;
 
   util = {};
 
@@ -134,7 +134,33 @@
         url: "/reviews/" + id,
         background: true
       });
+    },
+    getThread: function(id) {
+      return m.request({
+        method: 'Get',
+        url: "/thread/" + id,
+        background: true
+      });
     }
+  };
+
+  threadPage = {};
+
+  threadPage.controller = function() {
+    this.gameId = m.route.param("id");
+    this.threadId = m.route.param("threadid");
+    this.gameData = m.prop();
+    this.thread = m.prop();
+    model.getInitialBoardGameData(this.gameId).then(this.gameData).then(m.redraw);
+    model.getThread(this.threadId).then(this.thread).then(m.redraw);
+  };
+
+  threadPage.view = function(ctrl) {
+    var page, threadView;
+    console.log(ctrl.thread());
+    threadView = GameThread(ctrl.thread());
+    page = m("div", threadView);
+    return util.gameLayout(ctrl.gameData, page);
   };
 
   gameReviewsPage = {};
@@ -148,10 +174,10 @@
   };
 
   gameReviewsPage.view = function(ctrl) {
-    var forumViev, page;
+    var forumView, page, _ref;
     console.log(ctrl.threads());
-    forumViev = GameForum(ctrl.threads());
-    page = m("div", forumViev);
+    forumView = GameForum(ctrl.threads(), (_ref = ctrl.gameData()) != null ? _ref.id : void 0);
+    page = m("div", forumView);
     return util.gameLayout(ctrl.gameData, page);
   };
 
@@ -214,13 +240,32 @@
     return util.gameLayout(ctrl.gameData, page);
   };
 
-  GameForum = function(forum) {
+  GameThread = function(thread) {
     var body, content, loaded;
+    loaded = (thread != null ? thread.id : void 0) != null;
+    if (loaded) {
+      content = m("div.animation-bounce-up", m.trust(thread.articles.article[0].body));
+    } else {
+      content = m("div");
+    }
+    body = m("div.container.section", [m("div.subheader", thread != null ? thread.subject : void 0), content]);
+    return body;
+  };
+
+  GameForum = function(forum, gameId) {
+    var body, content, loaded, onClick;
+    onClick = function(data) {
+      m.route("/bg/" + gameId + "/reviews/" + data.id);
+    };
     loaded = (forum != null ? forum.length : void 0) > 0;
     if (loaded) {
-      content = PlainList(forum.map(function(item) {
-        return [m("div", item.subject), m("div.secondary", "date: " + (item.lastpostdate.slice(4, 16))), m("div.secondary", "posts: " + item.numarticles)];
-      }), ".forum.no-bullet.animation-bounce-up");
+      content = BetterList(forum, [
+        {
+          el: function(data) {
+            return [m("div", data.subject), m("div.secondary", "date: " + (data.lastpostdate.slice(4, 16))), m("div.secondary", "posts: " + data.numarticles)];
+          }
+        }
+      ], ".forum.no-bullet.animation-bounce-up", onClick);
     } else {
       content = m("div");
     }
@@ -661,6 +706,23 @@
     return body;
   };
 
+  BetterList = function(data, row, classes, onClick) {
+    if (classes == null) {
+      classes = "";
+    }
+    return m("ul" + classes, data.map(function(item, index) {
+      return m("li", onClick != null ? {
+        onclick: function() {
+          return onClick(item);
+        }
+      } : void 0, row.map(function(cell) {
+        var element;
+        element = "div" + (cell.classes != null ? cell.classes : "");
+        return m(element, cell.attrs, cell.el(item));
+      }));
+    }));
+  };
+
   PlainList = function(items, classes) {
     if (classes == null) {
       classes = "";
@@ -715,6 +777,7 @@
     "/search/:keyword": searchPage,
     "/bg/:id/details": gameDetailsPage,
     "/bg/:id/stats": gameStatsPage,
+    "/bg/:id/reviews/:threadid": threadPage,
     "/bg/:id/reviews": gameReviewsPage,
     "/bg/:id": gameOverviewPage
   });

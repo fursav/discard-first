@@ -130,6 +130,8 @@ class App
               result = result.forums.forum
             else if result.forum?
               result = result.forum.threads.thread
+            else if result.thread?
+              result = result.thread
             else
               result = result.items.item
             memory_cache.set(url, result)
@@ -142,6 +144,11 @@ class App
       return
       
     @routes = {}
+    
+    @routes['/thread/:id'] = (req,res) ->
+      id = req.params.id
+      _request("http://boardgamegeek.com/xmlapi2/thread?id=#{id}",res)
+      return
     
     @routes['/reviews/:id'] = (req,res) ->
       id = req.params.id

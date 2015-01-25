@@ -126,12 +126,31 @@ model = {
     return m.request({method:'Get',url:url,background:true})
   getReviews: (id) ->
     return m.request({method:'Get',url:"/reviews/#{id}",background: true})
+  getThread: (id) ->
+    return m.request({method:'Get',url:"/thread/#{id}",background: true})
   }
     
 #---------------------------------------------------------------------  
 # PAGES
 #---------------------------------------------------------------------
 
+threadPage = {}
+
+threadPage.controller = ->
+  @gameId = m.route.param("id")
+  @threadId = m.route.param("threadid")
+  @gameData = m.prop()
+  @thread = m.prop()
+  model.getInitialBoardGameData(@gameId).then(@gameData).then(m.redraw)
+  model.getThread(@threadId).then(@thread).then(m.redraw)
+  return
+
+threadPage.view = (ctrl) ->
+  console.log ctrl.thread()
+  threadView = GameThread(ctrl.thread())
+  page = m("div",threadView)
+  return util.gameLayout(ctrl.gameData,page)
+  
 gameReviewsPage = {}
 
 gameReviewsPage.controller = ->
@@ -145,8 +164,8 @@ gameReviewsPage.controller = ->
 
 gameReviewsPage.view = (ctrl) ->
   console.log ctrl.threads()
-  forumViev = GameForum(ctrl.threads())
-  page = m("div",forumViev)
+  forumView = GameForum(ctrl.threads(),ctrl.gameData()?.id)
+  page = m("div",forumView)
   return util.gameLayout(ctrl.gameData,page)
   
 gameStatsPage = {}
@@ -203,12 +222,26 @@ gameOverviewPage.view = (ctrl) ->
   return util.gameLayout(ctrl.gameData,page)
   #return util.layout(ctrl.gameData()?.name, page)
   
-GameForum = (forum) ->
+GameThread = (thread) ->
+  loaded = thread?.id?
+  if loaded
+    content = m("div.animation-bounce-up",m.trust(thread.articles.article[0].body))
+  else
+    content = m("div")
+  body = m("div.container.section",[m("div.subheader",thread?.subject),content])
+  return body
+  
+GameForum = (forum,gameId) ->
+  onClick = (data) ->
+    m.route("/bg/#{gameId}/reviews/#{data.id}")
+    return
   loaded = forum?.length > 0
   if loaded
-    content = PlainList(forum.map((item) ->
-      return [m("div",item.subject),m("div.secondary","date: #{item.lastpostdate.slice(4,16)}"),m("div.secondary","posts: #{item.numarticles}")]
-      ),".forum.no-bullet.animation-bounce-up")
+    content = BetterList(forum,[{el:(data) ->
+      return [m("div",data.subject),
+      m("div.secondary","date: #{data.lastpostdate.slice(4,16)}"),
+      m("div.secondary","posts: #{data.numarticles}")]
+      }],".forum.no-bullet.animation-bounce-up",onClick)
   else
     content = m("div")
   body = m("div.container",[m("div.subheader","Reviews"),content])
@@ -580,9 +613,18 @@ List.view = (ctrl) ->
   
 #---------------------------------------------------------------------
 
+BetterList = (data,row,classes,onClick) ->
+  classes ?= ""
+  return m("ul" + classes, data.map (item,index) ->
+    return m("li",{onclick: -> onClick(item)} if onClick?,row.map (cell) ->
+      element = "div" + if cell.classes? then cell.classes else ""
+      return m(element, cell.attrs, cell.el(item))
+      )
+    )
+  
 PlainList = (items,classes) ->
   classes ?= ""
-  return m("ul" + classes,items.map (item,index) ->
+  return m("ul" + classes, items.map (item,index) ->
     return m("li",item)
   )
   
@@ -638,6 +680,7 @@ m.route document.body, "/", {
     "/search/:keyword": searchPage
     "/bg/:id/details": gameDetailsPage
     "/bg/:id/stats": gameStatsPage
+    "/bg/:id/reviews/:threadid": threadPage
     "/bg/:id/reviews": gameReviewsPage
     "/bg/:id": gameOverviewPage
 }
