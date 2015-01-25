@@ -225,13 +225,18 @@ gameOverviewPage.view = (ctrl) ->
 GameThread = (thread) ->
   loaded = thread?.id?
   if loaded
-    content = m("div.animation-bounce-up",m.trust(thread.articles.article[0].body))
+    text = thread.articles.article[0]?.body or thread.articles.article?.body
+    content = m("div.section.animation-bounce-up",m.trust(text))
   else
     content = m("div")
-  body = m("div.container.section",[m("div.subheader",thread?.subject),content])
+  body = m("div.container",[m("div.subheader",thread?.subject),ThreadSkeleton(),content])
   return body
   
 GameForum = (forum,gameId) ->
+  randomThread = ->
+    thread = forum[Math.floor(Math.random() * forum.length)]
+    onClick(thread)
+    return
   onClick = (data) ->
     m.route("/bg/#{gameId}/reviews/#{data.id}")
     return
@@ -244,7 +249,10 @@ GameForum = (forum,gameId) ->
       }],".forum.no-bullet.animation-bounce-up",onClick)
   else
     content = m("div")
-  body = m("div.container",[m("div.subheader","Reviews"),content])
+  body = m("div.container",[m("div.subheader",
+    [m("span","Reviews"),
+    new Icon(".ion-shuffle.clickable",{onclick:randomThread})
+    ]),content])
   return body
   
 GameComment = (game) ->
@@ -638,6 +646,17 @@ GameSummarySkeleton = ->
     ".no-bullet")
   return m("div.game-summary.under",[m("div.game-img",m("span.placeholder-img.placeholder-yellow")),stats])
  
+ThreadSkeleton = ->
+  sample = [m("p.text-center","Review of a game"),
+  m("p","Crossroads is a new series from Plaid Hat Games that tests a group of survivors' ability to work together and stay alive while facing crises and challenges from both outside and inside."),
+  m("p","Dead of Winter: A Crossroads Game, the first game in this series, puts 2-5 players"),
+  m("p","""Dead of Winter: A Crossroads Game, the first game in this series, puts 2-5 players
+  ########### ##### ############ ##### ########### ############## ##### ######## #############
+  ###### ########## ############## ######## ###### ### ## ######## ###### ##### ##### #### #####
+  ##### ######## ############ ######
+  """)]
+  return m("div.placeholder-description.under.section",sample)
+   
 GameDescriptionSkeleton = ->
   sample = [m("p","Game description from the publisher:"),
   m("p","Crossroads is a new series from Plaid Hat Games that tests a group of survivors' ability to work together and stay alive while facing crises and challenges from both outside and inside."),

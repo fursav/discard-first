@@ -1,5 +1,5 @@
 (function() {
-  var BetterList, BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameForum, GameStats, GameSummary, GameSummarySkeleton, GameThread, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameReviewsPage, gameStatsPage, model, searchInput, searchPage, threadPage, trendingPage, util;
+  var BetterList, BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameForum, GameStats, GameSummary, GameSummarySkeleton, GameThread, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, ThreadSkeleton, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameReviewsPage, gameStatsPage, model, searchInput, searchPage, threadPage, trendingPage, util;
 
   util = {};
 
@@ -241,19 +241,25 @@
   };
 
   GameThread = function(thread) {
-    var body, content, loaded;
+    var body, content, loaded, text, _ref, _ref1;
     loaded = (thread != null ? thread.id : void 0) != null;
     if (loaded) {
-      content = m("div.animation-bounce-up", m.trust(thread.articles.article[0].body));
+      text = ((_ref = thread.articles.article[0]) != null ? _ref.body : void 0) || ((_ref1 = thread.articles.article) != null ? _ref1.body : void 0);
+      content = m("div.section.animation-bounce-up", m.trust(text));
     } else {
       content = m("div");
     }
-    body = m("div.container.section", [m("div.subheader", thread != null ? thread.subject : void 0), content]);
+    body = m("div.container", [m("div.subheader", thread != null ? thread.subject : void 0), ThreadSkeleton(), content]);
     return body;
   };
 
   GameForum = function(forum, gameId) {
-    var body, content, loaded, onClick;
+    var body, content, loaded, onClick, randomThread;
+    randomThread = function() {
+      var thread;
+      thread = forum[Math.floor(Math.random() * forum.length)];
+      onClick(thread);
+    };
     onClick = function(data) {
       m.route("/bg/" + gameId + "/reviews/" + data.id);
     };
@@ -269,7 +275,13 @@
     } else {
       content = m("div");
     }
-    body = m("div.container", [m("div.subheader", "Reviews"), content]);
+    body = m("div.container", [
+      m("div.subheader", [
+        m("span", "Reviews"), new Icon(".ion-shuffle.clickable", {
+          onclick: randomThread
+        })
+      ]), content
+    ]);
     return body;
   };
 
@@ -739,6 +751,12 @@
       return QuickStat(item, "");
     }), ".no-bullet");
     return m("div.game-summary.under", [m("div.game-img", m("span.placeholder-img.placeholder-yellow")), stats]);
+  };
+
+  ThreadSkeleton = function() {
+    var sample;
+    sample = [m("p.text-center", "Review of a game"), m("p", "Crossroads is a new series from Plaid Hat Games that tests a group of survivors' ability to work together and stay alive while facing crises and challenges from both outside and inside."), m("p", "Dead of Winter: A Crossroads Game, the first game in this series, puts 2-5 players"), m("p", "Dead of Winter: A Crossroads Game, the first game in this series, puts 2-5 players\n########### ##### ############ ##### ########### ############## ##### ######## #############\n###### ########## ############## ######## ###### ### ## ######## ###### ##### ##### #### #####\n##### ######## ############ ######")];
+    return m("div.placeholder-description.under.section", sample);
   };
 
   GameDescriptionSkeleton = function() {
