@@ -25,6 +25,7 @@
   "dependencies": {
     "async": "0.8.x",
     "cache-manager": "^0.11.0",
+    "cron": "^1.0.6",
     "express": "^4.x",
     "limiter": "^1.0.5",
     "request": "^2.x",
@@ -49,9 +50,9 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-nodemon": "^0.3.0",
     "grunt-usemin": "^2.3.0",
-    "jeet": "^6.1.1",
+    "jeet": "^6.1.2",
     "load-grunt-tasks": "0.3.x",
-    "rupture": "^0.4.0",
+    "rupture": "^0.6.1",
     "stylus": "~0.43.1",
     "time-grunt": "^1.0.0"
   },

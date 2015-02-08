@@ -1,5 +1,5 @@
 (function() {
-  var BetterList, BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameForum, GameStats, GameSummary, GameSummarySkeleton, GameThread, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, ThreadSkeleton, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameReviewsPage, gameStatsPage, model, searchInput, searchPage, threadPage, trendingPage, util;
+  var BetterList, BoardGame, GameComment, GameDescription, GameDescriptionSkeleton, GameDetails, GameForum, GameStats, GameSummary, GameSummarySkeleton, GameThread, Icon, Image, List, Mobile3ColList, PlainList, QuickStat, SearchResult, SearchTable, TempList, ThreadSkeleton, TopGame, TrendingGame, TrendingTable, gameDetailsPage, gameOverviewPage, gameReviewsPage, gameStatsPage, model, searchInput, searchPage, threadPage, topPage, trendingPage, util;
 
   util = {};
 
@@ -64,7 +64,9 @@
       m("input#nav-expand[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas", m("div.off-canvas-title", m("label[for=nav-expand].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.no-bullet.off-canvas-nav", [
         m("li", m("a.clickable", {
           onclick: closeNav
-        }, "Trending")), m("li", m("div", "Item 2")), m("li", searchInput())
+        }, "Trending")), m("li", m("a.clickable[href='/top']", {
+          config: m.route
+        }, "Top")), m("li", searchInput())
       ])), m("label[for=nav-expand].overlay")
     ];
   };
@@ -93,6 +95,13 @@
         method: 'Get',
         url: '/hot',
         type: TrendingGame,
+        background: true
+      });
+    },
+    getTopGames: function() {
+      return m.request({
+        method: 'Get',
+        url: '/json/top100.json',
         background: true
       });
     },
@@ -142,6 +151,40 @@
         background: true
       });
     }
+  };
+
+  topPage = {};
+
+  topPage.controller = function() {
+    this.type = m.route.param("type");
+    if (this.type == null) {
+      this.type = "boardgame";
+    }
+    this.games = m.prop([]);
+    model.getTopGames().then((function(_this) {
+      return function(data) {
+        var x;
+        return _this.games((function() {
+          var _i, _len, _ref, _results;
+          _ref = data[this.type];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            x = _ref[_i];
+            _results.push(new TopGame({
+              id: x
+            }));
+          }
+          return _results;
+        }).call(_this));
+      };
+    })(this)).then(m.redraw);
+    this.resultsTable = new SearchTable.controller(this.games);
+  };
+
+  topPage.view = function(ctrl) {
+    var resultsTable;
+    resultsTable = [new SearchTable.view(ctrl.resultsTable)];
+    return util.layout("Top", m('div.animation-bounce-in-right', resultsTable));
   };
 
   threadPage = {};
@@ -385,7 +428,6 @@
   searchPage = {};
 
   searchPage.controller = function() {
-    m.redraw.strategy("diff");
     this.term = m.route.param("keyword");
     this.results = m.prop([]);
     this.resultsTable = new SearchTable.controller(this.results);
@@ -559,6 +601,32 @@
         if (data != null) {
           _this.id = data != null ? data.id : void 0;
           _this.name = (data != null ? data.name : void 0) instanceof Array ? data != null ? data.name[0].value : void 0 : data != null ? (_ref = data.name) != null ? _ref.value : void 0 : void 0;
+          _this.thumbnail = (data != null ? (_ref1 = data.thumbnail) != null ? _ref1.value : void 0 : void 0) || (data != null ? data.thumbnail : void 0);
+          _this.year = data != null ? (_ref2 = data.yearpublished) != null ? _ref2.value : void 0 : void 0;
+          _this.statistics = data != null ? data.statistics : void 0;
+        }
+      };
+    })(this);
+    this.getStat = function(name) {
+      var _ref, _ref1, _ref2;
+      return (_ref = this.statistics) != null ? (_ref1 = _ref.ratings) != null ? (_ref2 = _ref1[name]) != null ? _ref2.value : void 0 : void 0 : void 0;
+    };
+    populate(data);
+    model.getGameData(this.id, {
+      "stats": 1
+    }).then(populate).then(m.redraw);
+  };
+
+  TopGame = function(data) {
+    var populate;
+    populate = (function(_this) {
+      return function(data) {
+        var _ref, _ref1, _ref2;
+        if (data != null) {
+          _this.id = data != null ? data.id : void 0;
+          _this.name = (data != null ? data.name : void 0) instanceof Array ? data != null ? data.name[0].value : void 0 : data != null ? (_ref = data.name) != null ? _ref.value : void 0 : void 0;
+          console.log(data != null ? data.name : void 0);
+          console.log(_this.name);
           _this.thumbnail = (data != null ? (_ref1 = data.thumbnail) != null ? _ref1.value : void 0 : void 0) || (data != null ? data.thumbnail : void 0);
           _this.year = data != null ? (_ref2 = data.yearpublished) != null ? _ref2.value : void 0 : void 0;
           _this.statistics = data != null ? data.statistics : void 0;
@@ -792,6 +860,7 @@
 
   m.route(document.body, "/", {
     "/": trendingPage,
+    "/top": topPage,
     "/search/:keyword": searchPage,
     "/bg/:id/details": gameDetailsPage,
     "/bg/:id/stats": gameStatsPage,

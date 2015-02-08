@@ -85,7 +85,7 @@ util.nav = ->
       m("ul.no-bullet.off-canvas-nav",
         [
           m("li",m("a.clickable",{onclick: closeNav },"Trending")),
-          m("li",m("div","Item 2")),
+          m("li",m("a.clickable[href='/top']",{config:m.route},"Top")),
           m("li",searchInput())
         ]
       )
@@ -114,6 +114,8 @@ model = {
   searchTerm: m.prop("")
   getData: ()->
     return m.request({method:'Get',url:'/hot',type:TrendingGame,background: true})
+  getTopGames: ->
+    return m.request({method:'Get',url:'/json/top100.json',background: true})
   getSearchResults: (keyword) ->
     return m.request({method:'Get',url:"/search?type=boardgame&query=#{keyword}",type:SearchResult,background: true})
   getInitialBoardGameData: (id) ->
@@ -133,6 +135,22 @@ model = {
 #---------------------------------------------------------------------  
 # PAGES
 #---------------------------------------------------------------------
+
+
+topPage = {}
+
+topPage.controller = ->
+  @type = m.route.param("type")
+  @type ?= "boardgame"
+  @games = m.prop([])
+  model.getTopGames().then((data) => @games((new TopGame({id:x}) for x in data[@type]))).then(m.redraw)
+  @resultsTable = new SearchTable.controller(@games)
+  return
+
+topPage.view = (ctrl) ->
+  resultsTable = [new SearchTable.view(ctrl.resultsTable)]
+  return util.layout("Top",m('div.animation-bounce-in-right',resultsTable))
+
 
 threadPage = {}
 
@@ -354,7 +372,7 @@ QuickStat = (iconClass, value) ->
 searchPage = {}
 
 searchPage.controller = ->
-  m.redraw.strategy("diff")
+  #m.redraw.strategy("diff")
   @term = m.route.param("keyword")
   @results = m.prop([])
   @resultsTable = new SearchTable.controller(@results)
@@ -485,6 +503,23 @@ SearchResult = (data) ->
   model.getGameData(@id,{"stats":1}).then(populate).then(m.redraw)
   return
 
+TopGame = (data) ->
+  populate = (data) =>
+    if data?
+      @id = data?.id
+      @name = if data?.name instanceof Array then data?.name[0].value else data?.name?.value
+      console.log data?.name
+      console.log @name
+      @thumbnail = data?.thumbnail?.value or data?.thumbnail
+      @year = data?.yearpublished?.value
+      @statistics = data?.statistics
+      return
+  @getStat = (name) ->
+    @statistics?.ratings?[name]?.value
+  populate(data)
+  model.getGameData(@id,{"stats":1}).then(populate).then(m.redraw)
+  return
+  
 TrendingGame = (data) ->
   @id = data?.id
   @name = data.name.value
@@ -696,6 +731,7 @@ m.route.mode = "search"
 
 m.route document.body, "/", {
     "/": trendingPage
+    "/top": topPage
     "/search/:keyword": searchPage
     "/bg/:id/details": gameDetailsPage
     "/bg/:id/stats": gameStatsPage

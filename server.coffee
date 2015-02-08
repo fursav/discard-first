@@ -1,5 +1,7 @@
 express = require('express')
 requestRetry = require "requestretry"
+exec = require('child_process').exec
+CronJob = require('cron').CronJob;
 RateLimiter = require('limiter').RateLimiter
 limiter = new RateLimiter(1, 500); # at most 1 request every 100 ms
 
@@ -14,8 +16,36 @@ throttledRequest = ->
 async   = require('async')
 parser  = require('xml2json')
 cache_manager = require('cache-manager')
-memory_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 3000})
+memory_cache = cache_manager.caching({store: 'memory', max: 10000, ttl: 30000})
 app     = express()
+
+scrape_top_games = ->
+  
+  console.log "there"
+  scrape_top = exec('casperjs scrape.coffee')
+  
+  scrape_top.stdout.on 'data', (data) ->
+      console.log('stdout: ' + data)
+      return
+      
+  scrape_top.stderr.on 'data', (data) ->
+      console.log('stdout: ' + data)
+      return
+    
+  scrape_top.on 'exit', (code) ->
+    console.log('Child process exited with exit code '+code);
+    return
+  return
+
+job = new CronJob({
+  cronTime: '00 15 02 * * *',
+  onTick: scrape_top_games,
+  start: false,
+  timeZone: "America/New_York"
+})
+
+job.start()
+
 
 class App
   constructor: ->
@@ -104,7 +134,7 @@ class App
     _request = (url,res) ->
       console.log url
       cb = (result) ->
-        #res.set('Cache-Control', 'public, max-age=3000')
+        #res.set('Cache-Control', 'public, max-age=30000')
         res.send result
         return
       memory_cache.get url,(err, result) ->
@@ -144,6 +174,12 @@ class App
       return
       
     @routes = {}
+    
+    @routes['/top'] = (req,res) ->
+      console.log "here"
+      res.setHeader('Content-Type', 'text/json')
+      res.send('json/top100.json')
+      return
     
     @routes['/thread/:id'] = (req,res) ->
       id = req.params.id
