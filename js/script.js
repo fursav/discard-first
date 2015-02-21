@@ -7,6 +7,10 @@
     return m("#wrap", [util.header(title), util.nav(), m("main", body)]);
   };
 
+  util.topLayout = function(category, body) {
+    return m("#wrap", [util.header(category, new Icon(".icon-large.ion-chevron-right")), util.nav(), util.topNav(category), m("main", body)]);
+  };
+
   util.gameLayout = function(game, body) {
     var _ref;
     return m("#wrap", [util.header((_ref = game()) != null ? _ref.name : void 0, new Icon(".icon-large.ion-chevron-right")), util.nav(), util.gameNav(game), m("main", body)]);
@@ -26,6 +30,24 @@
         "for": "nav-expand"
       }, m("i.icon.icon-large.ion-navicon"))), m("div.banner-center", title), m("div.banner-right", right)
     ]);
+  };
+
+  util.topNav = function() {
+    var categories, closeNav;
+    closeNav = function(e) {
+      document.getElementById("nav-secondary").checked = false;
+    };
+    categories = ['boardgame', 'partygames', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'strategygames', 'thematic', 'wargames'];
+    return [
+      m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas-secondary", m("div.off-canvas-title.text-right", m("label[for=nav-secondary].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.no-bullet.off-canvas-nav", {
+        onclick: closeNav
+      }, categories.map(function(x) {
+        return m("li", m("a.clickable", {
+          href: "/top/" + x,
+          config: m.route
+        }, x));
+      }))), m("label[for=nav-secondary].overlay")
+    ];
   };
 
   util.gameNav = function(game) {
@@ -184,7 +206,7 @@
   topPage.view = function(ctrl) {
     var resultsTable;
     resultsTable = [new SearchTable.view(ctrl.resultsTable)];
-    return util.layout("Top", m('div.animation-bounce-in-right', resultsTable));
+    return util.topLayout(this.type, m('div.animation-bounce-in-right', resultsTable));
   };
 
   threadPage = {};
@@ -860,6 +882,7 @@
 
   m.route(document.body, "/", {
     "/": trendingPage,
+    "/top/:type": topPage,
     "/top": topPage,
     "/search/:keyword": searchPage,
     "/bg/:id/details": gameDetailsPage,

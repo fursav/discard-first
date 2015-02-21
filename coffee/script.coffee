@@ -8,15 +8,15 @@ util.layout = (title, body) ->
       m("main", body)
   ]);
 
+util.topLayout = (category, body) ->
+  return m("#wrap", [
+      util.header(category,new Icon(".icon-large.ion-chevron-right")),
+      util.nav(),
+      util.topNav(category),
+      m("main", body)
+    ]);
+    
 util.gameLayout = (game, body) ->
-  #loaded = game()?.id
-  #if loaded?
-    #return m("#wrap", [
-        #util.header(game().name),
-        #util.nav(),
-        #m("main", body)
-      #]);
-  #else
   return m("#wrap", [
       util.header(game()?.name,new Icon(".icon-large.ion-chevron-right")),
       util.nav(),
@@ -42,12 +42,31 @@ util.header = (title,rightIcon) ->
 
     ])
     
+util.topNav = ->
+  closeNav = (e) ->
+    document.getElementById("nav-secondary").checked = false
+    return
+  categories = ['boardgame','partygames','abstracts','cgs','childrensgames','familygames','strategygames','thematic','wargames']
+  return [
+    m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"),
+    m("nav.off-canvas-secondary",
+      m("div.off-canvas-title.text-right",
+        m("label[for=nav-secondary].nav-btn",
+          m("i.icon.icon-large.ion-close")
+        )
+      ),
+      m("ul.no-bullet.off-canvas-nav",{onclick: closeNav },
+        categories.map((x) ->
+          return m("li",m("a.clickable",{href:"/top/#{x}",config:m.route},x))
+        )
+      )
+    ),
+    m("label[for=nav-secondary].overlay")
+  ]
+
 util.gameNav = (game) ->
   closeNav = (e) ->
-    #console.log e
-    #e.preventDefault()
     document.getElementById("nav-secondary").checked = false
-    #m.route("/")
     return
   return [
     m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"),
@@ -149,7 +168,7 @@ topPage.controller = ->
 
 topPage.view = (ctrl) ->
   resultsTable = [new SearchTable.view(ctrl.resultsTable)]
-  return util.layout("Top",m('div.animation-bounce-in-right',resultsTable))
+  return util.topLayout(@type,m('div.animation-bounce-in-right',resultsTable))
 
 
 threadPage = {}
@@ -731,6 +750,7 @@ m.route.mode = "search"
 
 m.route document.body, "/", {
     "/": trendingPage
+    "/top/:type": topPage
     "/top": topPage
     "/search/:keyword": searchPage
     "/bg/:id/details": gameDetailsPage
