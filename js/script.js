@@ -3,12 +3,27 @@
 
   util = {};
 
+  util.getCategoryDisplay = function(type) {
+    console.log(type);
+    return {
+      boardgame: 'All',
+      partygames: 'Party',
+      abstracts: 'Abstracts',
+      cgs: 'Customizable',
+      childrensgames: 'Children',
+      familygames: 'Family',
+      strategygames: 'Strategy',
+      thematic: 'Thematic',
+      wargames: 'War'
+    }[type];
+  };
+
   util.layout = function(title, body) {
     return m("#wrap", [util.header(title), util.nav(), m("main", body)]);
   };
 
   util.topLayout = function(category, body) {
-    return m("#wrap", [util.header(category, new Icon(".icon-large.ion-chevron-right")), util.nav(), util.topNav(category), m("main", body)]);
+    return m("#wrap", [util.header(util.getCategoryDisplay(category), new Icon(".icon-large.ion-chevron-right")), util.nav(), util.topNav(category), m("main", body)]);
   };
 
   util.gameLayout = function(game, body) {
@@ -37,7 +52,7 @@
     closeNav = function(e) {
       document.getElementById("nav-secondary").checked = false;
     };
-    categories = ['boardgame', 'partygames', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'strategygames', 'thematic', 'wargames'];
+    categories = ['boardgame', 'abstracts', 'cgs', 'childrensgames', 'familygames', 'partygames', 'strategygames', 'thematic', 'wargames'];
     return [
       m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"), m("nav.off-canvas-secondary", m("div.off-canvas-title.text-right", m("label[for=nav-secondary].nav-btn", m("i.icon.icon-large.ion-close"))), m("ul.no-bullet.off-canvas-nav", {
         onclick: closeNav
@@ -45,7 +60,7 @@
         return m("li", m("a.clickable", {
           href: "/top/" + x,
           config: m.route
-        }, x));
+        }, util.getCategoryDisplay(x)));
       }))), m("label[for=nav-secondary].overlay")
     ];
   };
@@ -206,7 +221,7 @@
   topPage.view = function(ctrl) {
     var resultsTable;
     resultsTable = [new SearchTable.view(ctrl.resultsTable)];
-    return util.topLayout(this.type, m('div.animation-bounce-in-right', resultsTable));
+    return util.topLayout(ctrl.type, m('div.animation-bounce-in-right', resultsTable));
   };
 
   threadPage = {};

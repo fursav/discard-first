@@ -1,6 +1,20 @@
 # defines the layout of the page
 util = {}  
     
+util.getCategoryDisplay = (type) -> 
+  console.log type
+  {
+    boardgame: 'All'
+    partygames: 'Party'
+    abstracts: 'Abstracts'
+    cgs: 'Customizable'
+    childrensgames: 'Children'
+    familygames: 'Family'
+    strategygames: 'Strategy'
+    thematic: 'Thematic'
+    wargames: 'War'
+  }[type]
+  
 util.layout = (title, body) ->
   return m("#wrap", [
       util.header(title),
@@ -10,7 +24,7 @@ util.layout = (title, body) ->
 
 util.topLayout = (category, body) ->
   return m("#wrap", [
-      util.header(category,new Icon(".icon-large.ion-chevron-right")),
+      util.header(util.getCategoryDisplay(category),new Icon(".icon-large.ion-chevron-right")),
       util.nav(),
       util.topNav(category),
       m("main", body)
@@ -46,7 +60,7 @@ util.topNav = ->
   closeNav = (e) ->
     document.getElementById("nav-secondary").checked = false
     return
-  categories = ['boardgame','partygames','abstracts','cgs','childrensgames','familygames','strategygames','thematic','wargames']
+  categories = ['boardgame','abstracts','cgs','childrensgames','familygames','partygames','strategygames','thematic','wargames']
   return [
     m("input#nav-secondary[name=nav][type=checkbox][checked=''].invisible"),
     m("nav.off-canvas-secondary",
@@ -57,7 +71,7 @@ util.topNav = ->
       ),
       m("ul.no-bullet.off-canvas-nav",{onclick: closeNav },
         categories.map((x) ->
-          return m("li",m("a.clickable",{href:"/top/#{x}",config:m.route},x))
+          return m("li",m("a.clickable",{href:"/top/#{x}",config:m.route},util.getCategoryDisplay(x)))
         )
       )
     ),
@@ -168,7 +182,7 @@ topPage.controller = ->
 
 topPage.view = (ctrl) ->
   resultsTable = [new SearchTable.view(ctrl.resultsTable)]
-  return util.topLayout(@type,m('div.animation-bounce-in-right',resultsTable))
+  return util.topLayout(ctrl.type,m('div.animation-bounce-in-right',resultsTable))
 
 
 threadPage = {}
